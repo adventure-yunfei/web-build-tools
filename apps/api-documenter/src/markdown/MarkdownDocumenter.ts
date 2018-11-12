@@ -26,7 +26,8 @@ import {
   Markup,
   MarkupBasicElement,
   MarkupStructuredElement,
-  IMarkupTableRow
+  IMarkupTableRow,
+  IApiModuleVariable
 } from '@microsoft/api-extractor';
 
 import {
@@ -103,6 +104,12 @@ export class MarkdownDocumenter {
       Markup.createTextElements('Description')
     ]);
 
+    const variablesTable: IMarkupTable = Markup.createTable([
+      Markup.createTextElements('Variable'),
+      Markup.createTextElements('Type'),
+      Markup.createTextElements('Description')
+    ]);
+
     for (const docChild of docPackage.children) {
       const apiChild: ApiItem = docChild.apiItem;
 
@@ -167,6 +174,17 @@ export class MarkdownDocumenter {
           );
           this._writePackagePage(docChild);
           break;
+        case 'module variable': {
+          const apiModuleVariable: IApiModuleVariable = docChild.apiItem as IApiModuleVariable;
+          variablesTable.rows.push(
+            Markup.createTableRow([
+              [ Markup.createCode(docChild.name, 'javascript') ],
+              [ Markup.createCode(apiModuleVariable.type, 'javascript')],
+              docChildDescription
+            ])
+          );
+          break;
+        }
       }
     }
 
@@ -198,6 +216,11 @@ export class MarkdownDocumenter {
     if (enumerationsTable.rows.length > 0) {
       markupPage.elements.push(Markup.createHeading1('Enumerations'));
       markupPage.elements.push(enumerationsTable);
+    }
+
+    if (variablesTable.rows.length > 0) {
+      markupPage.elements.push(Markup.createHeading1('Variables'));
+      markupPage.elements.push(variablesTable);
     }
 
     this._writePage(markupPage, docPackage);

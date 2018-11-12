@@ -19,7 +19,8 @@ export enum DocItemKind {
   Function,
   Property,
   Enum,
-  EnumMember
+  EnumMember,
+  ModuleVariable
 }
 
 /**
@@ -101,6 +102,9 @@ export class DocItem {
         break;
       case 'enum value':
         this.kind = DocItemKind.EnumMember;
+        break;
+      case 'module variable':
+        this.kind = DocItemKind.ModuleVariable;
         break;
       default:
         throw new Error('Unsupported item kind: ' + (this.apiItem as ApiItem).kind);
