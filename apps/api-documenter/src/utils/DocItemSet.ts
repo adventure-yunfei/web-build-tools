@@ -20,7 +20,8 @@ export enum DocItemKind {
   Property,
   Enum,
   EnumMember,
-  ModuleVariable
+  ModuleVariable,
+  TypeAlias
 }
 
 /**
@@ -105,6 +106,9 @@ export class DocItem {
         break;
       case 'module variable':
         this.kind = DocItemKind.ModuleVariable;
+        break;
+      case 'type alias':
+        this.kind = DocItemKind.TypeAlias;
         break;
       default:
         throw new Error('Unsupported item kind: ' + (this.apiItem as ApiItem).kind);

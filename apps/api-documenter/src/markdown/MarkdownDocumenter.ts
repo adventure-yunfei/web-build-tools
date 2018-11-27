@@ -27,7 +27,8 @@ import {
   MarkupBasicElement,
   MarkupStructuredElement,
   IMarkupTableRow,
-  IApiModuleVariable
+  IApiModuleVariable,
+  IApiTypeAlias
 } from '@microsoft/api-extractor';
 
 import {
@@ -110,6 +111,12 @@ export class MarkdownDocumenter {
       Markup.createTextElements('Description')
     ]);
 
+    const typesTable: IMarkupTable = Markup.createTable([
+      Markup.createTextElements('Name'),
+      Markup.createTextElements('Type'),
+      Markup.createTextElements('Description')
+    ]);
+
     for (const docChild of docPackage.children) {
       const apiChild: ApiItem = docChild.apiItem;
 
@@ -185,6 +192,17 @@ export class MarkdownDocumenter {
           );
           break;
         }
+        case 'type alias': {
+          const apiTypeAlias: IApiTypeAlias = docChild.apiItem as IApiTypeAlias;
+          typesTable.rows.push(
+            Markup.createTableRow([
+              [ Markup.createCode(docChild.name, 'javascript') ],
+              [ Markup.createCode(apiTypeAlias.type, 'javascript')],
+              docChildDescription
+            ])
+          );
+          break;
+        }
       }
     }
 
@@ -221,6 +239,11 @@ export class MarkdownDocumenter {
     if (variablesTable.rows.length > 0) {
       markupPage.elements.push(Markup.createHeading1('Variables'));
       markupPage.elements.push(variablesTable);
+    }
+
+    if (typesTable.rows.length > 0) {
+      markupPage.elements.push(Markup.createHeading1('Type Declarations'));
+      markupPage.elements.push(typesTable);
     }
 
     this._writePage(markupPage, docPackage);
