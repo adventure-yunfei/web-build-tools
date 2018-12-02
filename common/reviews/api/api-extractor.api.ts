@@ -142,7 +142,11 @@ enum ApiItemKind {
   // (undocumented)
   Property = "Property",
   // (undocumented)
-  PropertySignature = "PropertySignature"
+  PropertySignature = "PropertySignature",
+  // (undocumented)
+  TypeAlias = "TypeAlias",
+  // (undocumented)
+  Variable = "Variable"
 }
 
 // @public (undocumented)
