@@ -10,6 +10,7 @@ export const enum ApiItemKind {
   Enum = 'Enum',
   EnumMember = 'EnumMember',
   Interface = 'Interface',
+  TypeAlias = 'TypeAlias',
   Method = 'Method',
   MethodSignature = 'MethodSignature',
   Model = 'Model',
@@ -18,6 +19,7 @@ export const enum ApiItemKind {
   Parameter = 'Parameter',
   Property = 'Property',
   PropertySignature = 'PropertySignature',
+  Variable = 'Variable',
   None = 'None'
 }
 

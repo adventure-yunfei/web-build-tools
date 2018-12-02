@@ -26,6 +26,8 @@ import { ApiEnum } from '../api/model/ApiEnum';
 import { ApiEnumMember } from '../api/model/ApiEnumMember';
 import { IDeclarationExcerpt } from '../api/mixins/Excerpt';
 import { ExcerptBuilder } from './ExcerptBuilder';
+import { ApiTypeAlias } from '../api/model/ApiTypeAlias';
+import { ApiVariable } from '../api/model/ApiVariable';
 
 export class ApiModelGenerator {
   private readonly _collector: Collector;
@@ -115,12 +117,18 @@ export class ApiModelGenerator {
         this._processApiPropertySignature(astDeclaration, exportedName, parentApiItem);
         break;
 
+      case ts.SyntaxKind.VariableDeclaration:
+        this._processApiVariable(astDeclaration, exportedName, parentApiItem);
+        break;
+
+      case ts.SyntaxKind.TypeAliasDeclaration:
+        this._processApiTypeAlias(astDeclaration, exportedName, parentApiItem);
+        break;
+
       case ts.SyntaxKind.Constructor:
       case ts.SyntaxKind.ConstructSignature:
       case ts.SyntaxKind.FunctionDeclaration:
       case ts.SyntaxKind.IndexSignature:
-      case ts.SyntaxKind.TypeAliasDeclaration:
-      case ts.SyntaxKind.VariableDeclaration:
         default:
     }
   }
@@ -227,6 +235,48 @@ export class ApiModelGenerator {
     }
 
     this._processChildDeclarations(astDeclaration, exportedName, apiInterface);
+  }
+
+  private _processApiTypeAlias(astDeclaration: AstDeclaration, exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin): void {
+
+    const name: string = !!exportedName ? exportedName : astDeclaration.astSymbol.localName;
+    const canonicalReference: string = ApiTypeAlias.getCanonicalReference(name);
+
+    let apiTypeAlias: ApiTypeAlias | undefined = parentApiItem.tryGetMember(canonicalReference) as ApiTypeAlias;
+
+    if (apiTypeAlias === undefined) {
+      const declarationExcerpt: IDeclarationExcerpt = ExcerptBuilder.build({
+        startingNode: astDeclaration.declaration
+      });
+
+      const docComment: tsdoc.DocComment | undefined = this._collector.fetchMetadata(astDeclaration).tsdocComment;
+      const releaseTag: ReleaseTag = this._collector.fetchMetadata(astDeclaration.astSymbol).releaseTag;
+
+      apiTypeAlias = new ApiTypeAlias({ name, declarationExcerpt, docComment, releaseTag });
+      parentApiItem.addMember(apiTypeAlias);
+    }
+  }
+
+  private _processApiVariable(astDeclaration: AstDeclaration, exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin): void {
+
+    const name: string = !!exportedName ? exportedName : astDeclaration.astSymbol.localName;
+    const canonicalReference: string = ApiTypeAlias.getCanonicalReference(name);
+
+    let apiVariable: ApiVariable | undefined = parentApiItem.tryGetMember(canonicalReference) as ApiVariable;
+
+    if (apiVariable === undefined) {
+      const declarationExcerpt: IDeclarationExcerpt = ExcerptBuilder.build({
+        startingNode: astDeclaration.declaration
+      });
+
+      const docComment: tsdoc.DocComment | undefined = this._collector.fetchMetadata(astDeclaration).tsdocComment;
+      const releaseTag: ReleaseTag = this._collector.fetchMetadata(astDeclaration.astSymbol).releaseTag;
+
+      apiVariable = new ApiVariable({ name, declarationExcerpt, docComment, releaseTag });
+      parentApiItem.addMember(apiVariable);
+    }
   }
 
   private _processApiMethod(astDeclaration: AstDeclaration, exportedName: string | undefined,

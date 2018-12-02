@@ -15,6 +15,8 @@ import { ApiMethodSignature } from './ApiMethodSignature';
 import { ApiProperty } from './ApiProperty';
 import { ApiEnumMember } from './ApiEnumMember';
 import { ApiEnum } from './ApiEnum';
+import { ApiVariable } from './ApiVariable';
+import { ApiTypeAlias } from './ApiTypeAlias';
 
 export class Deserializer {
   public static deserialize(jsonObject: IApiItemJson): ApiItem {
@@ -59,6 +61,12 @@ export class Deserializer {
       case ApiItemKind.PropertySignature:
         ApiPropertySignature.onDeserializeInto(options, jsonObject);
         return new ApiPropertySignature(options as any); // tslint:disable-line:no-any
+      case ApiItemKind.Variable:
+        ApiVariable.onDeserializeInto(options, jsonObject);
+        return new ApiVariable(options as any); // tslint:disable-line:no-any
+      case ApiItemKind.TypeAlias:
+        ApiTypeAlias.onDeserializeInto(options, jsonObject);
+        return new ApiTypeAlias(options as any); // tslint:disable-line:no-any
       default:
         throw new Error(`Failed to deserialize unsupported API item type ${JSON.stringify(jsonObject.kind)}`);
     }
