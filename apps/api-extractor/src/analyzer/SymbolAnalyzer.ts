@@ -63,6 +63,8 @@ export class SymbolAnalyzer {
       case ts.SyntaxKind.PropertySignature:
       case ts.SyntaxKind.TypeAliasDeclaration:  // Example: "type Shape = Circle | Square"
       case ts.SyntaxKind.VariableDeclaration:
+
+      case ts.SyntaxKind.SourceFile:
         return true;
 
       // NOTE: In contexts where a source file is treated as a module, we do create "nominal"
@@ -137,8 +139,10 @@ export class SymbolAnalyzer {
       // ts.SyntaxKind.SourceFile node to see whether it has a symbol or not (i.e. whether it
       // is acting as a module or not).
       if (!insideDeclareGlobal) {
-        const sourceFileNode: ts.Node | undefined = TypeScriptHelpers.findFirstParent(
-          current.declarations[0], ts.SyntaxKind.SourceFile);
+        const declaration: ts.Declaration = current.declarations[0];
+        const sourceFileNode: ts.Node | undefined = declaration.kind === ts.SyntaxKind.SourceFile ?
+          declaration :
+          TypeScriptHelpers.findFirstParent(current.declarations[0], ts.SyntaxKind.SourceFile);
         if (sourceFileNode && !!typeChecker.getSymbolAtLocation(sourceFileNode)) {
           isAmbient = false;
         }

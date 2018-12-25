@@ -32,6 +32,9 @@ import { ApiIndexSignature } from '../api/model/ApiIndexSignature';
 import { ApiVariable } from '../api/model/ApiVariable';
 import { ApiTypeAlias } from '../api/model/ApiTypeAlias';
 import { ApiCallSignature } from '../api/model/ApiCallSignature';
+import { TypeScriptHelpers } from '../analyzer/TypeScriptHelpers';
+import { AstSymbol } from '../analyzer/AstSymbol';
+import { IExportedMember } from '../analyzer/AstEntryPoint';
 
 export class ApiModelGenerator {
   private readonly _collector: Collector;
@@ -130,6 +133,7 @@ export class ApiModelGenerator {
         break;
 
       case ts.SyntaxKind.ModuleDeclaration:
+      case ts.SyntaxKind.SourceFile:
         this._processApiNamespace(astDeclaration, exportedName, parentApiItem);
         break;
 
@@ -154,10 +158,34 @@ export class ApiModelGenerator {
     }
   }
 
+  private _getExportsOfFileSymbol(sourceFile: ts.SourceFile): ReadonlyArray<IExportedMember> {
+    const fileSymbol: ts.Symbol = TypeScriptHelpers.getSymbolForDeclaration(sourceFile);
+    return this._collector.typeChecker.getExportsOfModule(fileSymbol)
+      .map(exportedSymbol => {
+        const exportedAstSymbol: AstSymbol | undefined = this._collector.astSymbolTable.tryGetAstSymbol(exportedSymbol);
+        if (!exportedAstSymbol) {
+          throw new Error(`Cannot find AstSymbol for exported symbol "${exportedSymbol.name}"`
+            + ` of file ${sourceFile.fileName}`);
+        }
+        return {
+          name: '',
+          astSymbol: exportedAstSymbol
+        };
+      });
+  }
+
   private _processChildDeclarations(astDeclaration: AstDeclaration, exportedName: string | undefined,
     parentApiItem: ApiItemContainerMixin): void {
-    for (const childDeclaration of astDeclaration.children) {
-      this._processDeclaration(childDeclaration, undefined, parentApiItem);
+    if (ts.isSourceFile(astDeclaration.declaration)) {
+      for (const exportedMember of this._getExportsOfFileSymbol(astDeclaration.declaration)) {
+        for (const exportDeclaration of exportedMember.astSymbol.astDeclarations) {
+          this._processDeclaration(exportDeclaration, exportedMember.name, parentApiItem);
+        }
+      }
+    } else {
+      for (const childDeclaration of astDeclaration.children) {
+        this._processDeclaration(childDeclaration, undefined, parentApiItem);
+      }
     }
   }
 
@@ -551,10 +579,11 @@ export class ApiModelGenerator {
     let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMember(canonicalReference) as ApiNamespace;
 
     if (apiNamespace === undefined) {
-      const excerptTokens: IExcerptToken[] = ExcerptBuilder.build({
-        startingNode: astDeclaration.declaration,
-        nodeToStopAt: ts.SyntaxKind.ModuleBlock  // ModuleBlock = the "{ ... }" block
-      });
+      const excerptTokens: IExcerptToken[] = astDeclaration.declaration.kind === ts.SyntaxKind.SourceFile ?
+        [] : ExcerptBuilder.build({
+          startingNode: astDeclaration.declaration,
+          nodeToStopAt: ts.SyntaxKind.ModuleBlock  // ModuleBlock = the "{ ... }" block
+        });
 
       const docComment: tsdoc.DocComment | undefined = this._collector.fetchMetadata(astDeclaration).tsdocComment;
       const releaseTag: ReleaseTag = this._collector.fetchMetadata(astDeclaration.astSymbol).releaseTag;

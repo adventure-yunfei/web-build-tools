@@ -12,7 +12,7 @@ import { TypeScriptHelpers } from './TypeScriptHelpers';
 import { AstSymbol } from './AstSymbol';
 import { AstImport } from './AstImport';
 import { AstEntryPoint, IExportedMember } from './AstEntryPoint';
-import { PackageMetadataManager } from './PackageMetadataManager';
+// import { PackageMetadataManager } from './PackageMetadataManager';
 import { ILogger } from '../api/ILogger';
 
 /**
@@ -23,9 +23,9 @@ import { ILogger } from '../api/ILogger';
  * is "exported" or not.)
  */
 export class AstSymbolTable {
-  private readonly _program: ts.Program;
+  // private readonly _program: ts.Program;
   private readonly _typeChecker: ts.TypeChecker;
-  private readonly _packageMetadataManager: PackageMetadataManager;
+  // private readonly _packageMetadataManager: PackageMetadataManager;
 
   /**
    * A mapping from ts.Symbol --> AstSymbol
@@ -58,9 +58,9 @@ export class AstSymbolTable {
   public constructor(program: ts.Program, typeChecker: ts.TypeChecker, packageJsonLookup: PackageJsonLookup,
     logger: ILogger) {
 
-    this._program = program;
+    // this._program = program;
     this._typeChecker = typeChecker;
-    this._packageMetadataManager = new PackageMetadataManager(packageJsonLookup, logger);
+    // this._packageMetadataManager = new PackageMetadataManager(packageJsonLookup, logger);
   }
 
   /**
@@ -285,7 +285,7 @@ export class AstSymbolTable {
 
       if (!astSymbol) {
         // None of the above lookups worked, so create a new entry...
-        let nominal: boolean = false;
+        const nominal: boolean = false;
 
         // NOTE: In certain circumstances we need an AstSymbol for a source file that is acting
         // as a TypeScript module.  For example, one of the unit tests has this line:
@@ -297,19 +297,19 @@ export class AstSymbolTable {
         // of a declaration tree, because in general the *.d.ts generator is trying to roll up
         // definitions and eliminate source files.  So, even though isAstDeclaration() would return
         // false, we do create an AstDeclaration for a ts.SyntaxKind.SourceFile in this special edge case.
-        if (followedSymbol.declarations.length === 1
-          && followedSymbol.declarations[0].kind === ts.SyntaxKind.SourceFile) {
-          nominal = true;
-        }
+        // if (followedSymbol.declarations.length === 1
+        //   && followedSymbol.declarations[0].kind === ts.SyntaxKind.SourceFile) {
+        //   nominal = true;
+        // }
 
         // If the file is from a package that does not support AEDoc, then we process the
         // symbol itself, but we don't attempt to process any parent/children of it.
-        const followedSymbolSourceFile: ts.SourceFile = followedSymbol.declarations[0].getSourceFile();
-        if (this._program.isSourceFileFromExternalLibrary(followedSymbolSourceFile)) {
-          if (!this._packageMetadataManager.isAedocSupportedFor(followedSymbolSourceFile.fileName)) {
-            nominal = true;
-          }
-        }
+        // const followedSymbolSourceFile: ts.SourceFile = followedSymbol.declarations[0].getSourceFile();
+        // if (this._program.isSourceFileFromExternalLibrary(followedSymbolSourceFile)) {
+        //   if (!this._packageMetadataManager.isAedocSupportedFor(followedSymbolSourceFile.fileName)) {
+        //     nominal = true;
+        //   }
+        // }
 
         let parentAstSymbol: AstSymbol | undefined = undefined;
 
@@ -390,17 +390,17 @@ export class AstSymbolTable {
       }
     }
 
-    if (followAliasesResult.astImport && !astSymbol.imported) {
-      // Our strategy for recognizing external declarations is to look for an import statement
-      // during SymbolAnalyzer.followAliases().  Although it is sometimes possible to reach a symbol
-      // without traversing an import statement, we assume that that the first reference will always
-      // involve an import statement.
-      //
-      // This assumption might be violated if the caller did something unusual like feeding random
-      // symbols to AstSymbolTable.analyze() in the middle of the analysis.
-      throw new InternalError('The symbol ' + astSymbol.localName + ' is being imported'
-        + ' after it was already registered as non-imported');
-    }
+    // if (followAliasesResult.astImport && !astSymbol.imported) {
+    //   // Our strategy for recognizing external declarations is to look for an import statement
+    //   // during SymbolAnalyzer.followAliases().  Although it is sometimes possible to reach a symbol
+    //   // without traversing an import statement, we assume that that the first reference will always
+    //   // involve an import statement.
+    //   //
+    //   // This assumption might be violated if the caller did something unusual like feeding random
+    //   // symbols to AstSymbolTable.analyze() in the middle of the analysis.
+    //   throw new InternalError('The symbol ' + astSymbol.localName + ' is being imported'
+    //     + ' after it was already registered as non-imported');
+    // }
 
     return astSymbol;
   }

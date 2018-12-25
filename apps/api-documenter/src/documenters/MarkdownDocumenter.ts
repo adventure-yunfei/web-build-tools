@@ -28,7 +28,6 @@ import {
   ApiEnum,
   ApiPackage,
   ApiItemKind,
-  ApiEntryPoint,
   ApiReleaseTagMixin,
   ApiDocumentedItem,
   ApiClass,
@@ -39,7 +38,8 @@ import {
   Excerpt,
   ApiParameterListMixin,
   ApiReturnTypeMixin,
-  ApiDeclaredItem
+  ApiDeclaredItem,
+  ApiNamespace
 } from '@microsoft/api-extractor';
 
 import { CustomDocNodes } from '../nodes/CustomDocNodeKind';
@@ -178,9 +178,8 @@ export class MarkdownDocumenter {
         this._writeParameterTables(output, apiItem as ApiParameterListMixin);
         break;
       case ApiItemKind.Namespace:
-        break;
       case ApiItemKind.Package:
-        this._writePackageTables(output, apiItem as ApiPackage);
+        this._writePackageTables(output, apiItem as (ApiPackage | ApiNamespace));
         break;
       case ApiItemKind.Property:
       case ApiItemKind.PropertySignature:
@@ -234,7 +233,7 @@ export class MarkdownDocumenter {
   /**
    * GENERATE PAGE: PACKAGE
    */
-  private _writePackageTables(output: DocSection, apiPackage: ApiPackage): void {
+  private _writePackageTables(output: DocSection, apiPackage: ApiPackage | ApiNamespace): void {
     const configuration: TSDocConfiguration = this._tsdocConfiguration;
 
     const classesTable: DocTable = new DocTable({ configuration,
@@ -257,9 +256,11 @@ export class MarkdownDocumenter {
       headerTitles: [ 'Namespace', 'Description' ]
     });
 
-    const apiEntryPoint: ApiEntryPoint = apiPackage.entryPoints[0];
+    const members: ReadonlyArray<ApiItem> = apiPackage.kind === ApiItemKind.Package ?
+      (apiPackage as ApiPackage).entryPoints[0].members
+      : apiPackage.members;
 
-    for (const apiMember of apiEntryPoint.members) {
+    for (const apiMember of members) {
 
       const row: DocTableRow = new DocTableRow({ configuration }, [
         this._createTitleCell(apiMember),
@@ -279,6 +280,11 @@ export class MarkdownDocumenter {
 
         case ApiItemKind.Interface:
           interfacesTable.addRow(row);
+          this._writeApiItemPage(apiMember);
+          break;
+
+        case ApiItemKind.Namespace:
+          namespacesTable.addRow(row);
           this._writeApiItemPage(apiMember);
           break;
 
