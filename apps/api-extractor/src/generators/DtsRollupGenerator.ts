@@ -270,7 +270,7 @@ export class DtsRollupGenerator {
 
         // Should we trim this node?
         let trimmed: boolean = false;
-        if (SymbolAnalyzer.isAstDeclaration(child.kind)) {
+        if (SymbolAnalyzer.isAstDeclaration(child.node)) {
           childAstDeclaration = collector.astSymbolTable.getChildAstDeclarationByNode(child.node, astDeclaration);
 
           const releaseTag: ReleaseTag = collector.fetchMetadata(childAstDeclaration.astSymbol).releaseTag;

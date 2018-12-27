@@ -44,9 +44,9 @@ export class SymbolAnalyzer {
    * This function determines which ts.Node kinds will generate an AstDeclaration.
    * These correspond to the definitions that we can add AEDoc to.
    */
-  public static isAstDeclaration(kind: ts.SyntaxKind): boolean {
+  public static isAstDeclaration(node: ts.Node): boolean {
     // (alphabetical order)
-    switch (kind) {
+    switch (node.kind) {
       case ts.SyntaxKind.CallSignature:
       case ts.SyntaxKind.ClassDeclaration:
       case ts.SyntaxKind.ConstructSignature:    // Example: "new(x: number): IMyClass"
@@ -64,8 +64,12 @@ export class SymbolAnalyzer {
       case ts.SyntaxKind.TypeAliasDeclaration:  // Example: "type Shape = Circle | Square"
       case ts.SyntaxKind.VariableDeclaration:
 
-      case ts.SyntaxKind.SourceFile:
         return true;
+
+      case ts.SyntaxKind.SourceFile:
+        if (TypeScriptHelpers.tryGetSymbolForDeclaration(node as ts.SourceFile)) {
+          return true;
+        }
 
       // NOTE: In contexts where a source file is treated as a module, we do create "nominal"
       // AstSymbol objects corresponding to a ts.SyntaxKind.SourceFile node.  However, a source file

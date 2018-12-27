@@ -237,7 +237,7 @@ export class AstSymbolTable {
   }
 
   private _fetchAstSymbolForNode(node: ts.Node): AstSymbol | undefined {
-    if (!SymbolAnalyzer.isAstDeclaration(node.kind)) {
+    if (!SymbolAnalyzer.isAstDeclaration(node)) {
       return undefined;
     }
 
@@ -315,7 +315,7 @@ export class AstSymbolTable {
 
         if (!nominal) {
           for (const declaration of followedSymbol.declarations || []) {
-            if (!SymbolAnalyzer.isAstDeclaration(declaration.kind)) {
+            if (!SymbolAnalyzer.isAstDeclaration(declaration)) {
               throw new InternalError(`The "${followedSymbol.name}" symbol uses the construct`
                 + ` "${ts.SyntaxKind[declaration.kind]}" which may be an unimplemented language feature`);
             }
@@ -411,7 +411,7 @@ export class AstSymbolTable {
   private _tryFindFirstAstDeclarationParent(node: ts.Node): ts.Node | undefined {
     let currentNode: ts.Node | undefined = node.parent;
     while (currentNode) {
-      if (SymbolAnalyzer.isAstDeclaration(currentNode.kind)) {
+      if (SymbolAnalyzer.isAstDeclaration(currentNode)) {
         return currentNode;
       }
       currentNode = currentNode.parent;
