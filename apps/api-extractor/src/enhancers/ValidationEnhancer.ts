@@ -13,7 +13,6 @@ import { CollectorEntity } from '../collector/CollectorEntity';
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 import { ReleaseTag } from '@microsoft/api-extractor-model';
 import { AstImportInternal } from '../analyzer/AstImportInternal';
-import { InternalError } from '@microsoft/node-core-library';
 
 export class ValidationEnhancer {
 
@@ -32,7 +31,7 @@ export class ValidationEnhancer {
           ValidationEnhancer._checkForInconsistentReleaseTags(collector, entity.astEntity, symbolMetadata);
         }
       } else if (entity.astEntity instanceof AstImportInternal) {
-        // doesn't need to analyze for local module import
+        // TODO: validation for local module import
       }
     }
   }
@@ -179,6 +178,7 @@ export class ValidationEnhancer {
         const rootSymbol: AstSymbol = referencedEntity.rootAstSymbol;
 
         if (!rootSymbol.isExternal) {
+          // TODO: consider exported by local module import
           const collectorEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(rootSymbol);
 
           if (collectorEntity && collectorEntity.exported) {
@@ -214,7 +214,7 @@ export class ValidationEnhancer {
           }
         }
       } else if (referencedEntity instanceof AstImportInternal) {
-        throw new InternalError('Unsupported AstImportInternal');
+        // TODO: validation for local module import
       }
     }
   }
