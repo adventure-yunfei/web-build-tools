@@ -3,16 +3,14 @@
 
 import { loader } from 'webpack';
 import * as loaderUtils from 'loader-utils';
+import { NewlineKind } from '@rushstack/node-core-library';
 
 export interface IBaseLoaderOptions {
-  /**
-   * If set to `true`, wrap the strings object in a "default" object
-   */
-  exportAsDefault: boolean;
+  resxNewlineNormalization: NewlineKind | undefined;
 }
 
 export interface ILoaderResult {
-  [stringName: string]: string
+  [stringName: string]: string;
 }
 
 export function loaderFactory<TOptions extends IBaseLoaderOptions>(
@@ -21,6 +19,6 @@ export function loaderFactory<TOptions extends IBaseLoaderOptions>(
   return function (this: loader.LoaderContext, content: string): string {
     const options: TOptions = loaderUtils.getOptions(this) as TOptions;
     const resultObject: ILoaderResult = innerLoader.call(this, this.resourcePath, content, options);
-    return JSON.stringify(options.exportAsDefault ? { default: resultObject } : resultObject);
-  }
+    return JSON.stringify(resultObject);
+  };
 }

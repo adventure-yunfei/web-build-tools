@@ -3,7 +3,7 @@
 
 import * as ts from 'typescript';
 
-import { InternalError } from '@microsoft/node-core-library';
+import { InternalError } from '@rushstack/node-core-library';
 import { CollectorEntity } from '../collector/CollectorEntity';
 import { AstImport, AstImportKind } from '../analyzer/AstImport';
 import { StringWriter } from './StringWriter';
@@ -13,10 +13,19 @@ import { Collector } from '../collector/Collector';
  * Some common code shared between DtsRollupGenerator and ApiReportGenerator.
  */
 export class DtsEmitHelpers {
-  public static emitImport(stringWriter: StringWriter, collectorEntity: CollectorEntity, astImport: AstImport): void {
+  public static emitImport(
+    stringWriter: StringWriter,
+    collectorEntity: CollectorEntity,
+    astImport: AstImport
+  ): void {
     switch (astImport.importKind) {
       case AstImportKind.DefaultImport:
-        stringWriter.writeLine(`import ${astImport.exportName} from '${astImport.modulePath}';`);
+        if (collectorEntity.nameForEmit !== astImport.exportName) {
+          stringWriter.write(`import { default as ${collectorEntity.nameForEmit} }`);
+        } else {
+          stringWriter.write(`import ${astImport.exportName}`);
+        }
+        stringWriter.writeLine(` from '${astImport.modulePath}';`);
         break;
       case AstImportKind.NamedImport:
         if (collectorEntity.nameForEmit !== astImport.exportName) {
@@ -37,9 +46,11 @@ export class DtsEmitHelpers {
     }
   }
 
-  public static emitNamedExport(stringWriter: StringWriter, exportName: string,
-    collectorEntity: CollectorEntity): void {
-
+  public static emitNamedExport(
+    stringWriter: StringWriter,
+    exportName: string,
+    collectorEntity: CollectorEntity
+  ): void {
     if (exportName === ts.InternalSymbolName.Default) {
       stringWriter.writeLine(`export default ${collectorEntity.nameForEmit};`);
     } else if (collectorEntity.nameForEmit !== exportName) {

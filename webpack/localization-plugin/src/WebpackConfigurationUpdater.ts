@@ -3,102 +3,75 @@
 
 import * as path from 'path';
 import * as Webpack from 'webpack';
-import * as SetPublicPathPluginPackageType from '@microsoft/set-webpack-public-path-plugin';
+import * as SetPublicPathPluginPackageType from '@rushstack/set-webpack-public-path-plugin';
+import { NewlineKind } from '@rushstack/node-core-library';
+import * as lodash from 'lodash';
 
 import { Constants } from './utilities/Constants';
 import { LocalizationPlugin } from './LocalizationPlugin';
-import { IBaseLoaderOptions } from './loaders/LoaderFactory';
-import { ISingleLocaleLoaderOptions } from './loaders/SingleLocaleLoader';
 import { ILocLoaderOptions } from './loaders/LocLoader';
+import { IBaseLoaderOptions } from './loaders/LoaderFactory';
 
 export interface IWebpackConfigurationUpdaterOptions {
   pluginInstance: LocalizationPlugin;
   configuration: Webpack.Configuration;
-  locFiles: Set<string>;
   filesToIgnore: Set<string>;
   localeNameOrPlaceholder: string;
-  exportAsDefault: boolean;
+  resxNewlineNormalization: NewlineKind | undefined;
 }
 
-export interface ISingleLocaleConfigOptions extends IWebpackConfigurationUpdaterOptions {
-  localeName: string;
-  resolvedStrings: Map<string, Map<string, string>>;
-  passthroughLocale: boolean;
-}
+const FILE_TOKEN_REGEX: RegExp = new RegExp(lodash.escapeRegExp('[file]'));
 
 export class WebpackConfigurationUpdater {
   public static amendWebpackConfigurationForMultiLocale(options: IWebpackConfigurationUpdaterOptions): void {
     const loader: string = path.resolve(__dirname, 'loaders', 'LocLoader.js');
     const loaderOptions: ILocLoaderOptions = {
       pluginInstance: options.pluginInstance,
-      exportAsDefault: options.exportAsDefault
+      resxNewlineNormalization: options.resxNewlineNormalization
     };
 
-    WebpackConfigurationUpdater._addLoadersForProvidedLocFiles(options, loader, loaderOptions);
+    WebpackConfigurationUpdater._addLoadersForLocFiles(options, loader, loaderOptions);
 
     WebpackConfigurationUpdater._tryUpdateLocaleTokenInPublicPathPlugin(options);
+
+    WebpackConfigurationUpdater._tryUpdateSourceMapFilename(options.configuration);
   }
 
-  public static amendWebpackConfigurationForSingleLocale(options: ISingleLocaleConfigOptions): void {
-    // We can cheat on the validation a bit here because _initializeAndValidateOptions already validated this
-    options.configuration.output!.filename = (options.configuration.output!.filename as string).replace(
-      Constants.LOCALE_FILENAME_PLACEHOLDER_REGEX,
-      options.localeName
-    );
-    if (options.configuration.output!.chunkFilename) {
-      options.configuration.output!.chunkFilename = (options.configuration.output!.chunkFilename as string).replace(
-        Constants.LOCALE_FILENAME_PLACEHOLDER_REGEX,
-        options.localeName
-      );
-    }
-
-    const loader: string = path.resolve(__dirname, 'loaders', 'SingleLocaleLoader.js');
-    const loaderOptions: ISingleLocaleLoaderOptions = {
-      resolvedStrings: options.resolvedStrings,
-      passthroughLocale: options.passthroughLocale,
-      exportAsDefault: options.exportAsDefault
-    };
-    WebpackConfigurationUpdater._addLoadersForProvidedLocFiles(options, loader, loaderOptions);
-
-    WebpackConfigurationUpdater._tryUpdateLocaleTokenInPublicPathPlugin({
-      ...options,
-      localeNameOrPlaceholder: options.localeName
-    });
-  }
-
-  public static amendWebpackConfigurationForInPlaceLocFiles(options: IWebpackConfigurationUpdaterOptions): void {
+  public static amendWebpackConfigurationForInPlaceLocFiles(
+    options: IWebpackConfigurationUpdaterOptions
+  ): void {
     const loader: string = path.resolve(__dirname, 'loaders', 'InPlaceLocFileLoader.js');
     const loaderOptions: IBaseLoaderOptions = {
-      exportAsDefault: options.exportAsDefault
-    }
+      resxNewlineNormalization: options.resxNewlineNormalization
+    };
 
-    WebpackConfigurationUpdater._addRulesToConfiguration(
-      options.configuration,
-      [
-        {
-          test: Constants.LOC_JSON_REGEX,
-          loader: loader,
-          options: loaderOptions
-        },
-        {
-          test: Constants.RESX_REGEX,
-          use: [
-            require.resolve('json-loader'),
-            {
-              loader,
-              options: loaderOptions
-            }
-          ]
-        }
-      ]
-    );
+    WebpackConfigurationUpdater._addRulesToConfiguration(options.configuration, [
+      {
+        test: Constants.LOC_JSON_REGEX,
+        use: [
+          {
+            loader: loader,
+            options: loaderOptions
+          }
+        ]
+      },
+      {
+        test: Constants.RESX_REGEX,
+        use: [
+          {
+            loader: loader,
+            options: loaderOptions
+          }
+        ],
+        type: 'json'
+      }
+    ]);
   }
 
   private static _tryUpdateLocaleTokenInPublicPathPlugin(options: IWebpackConfigurationUpdaterOptions): void {
     let setPublicPathPlugin: typeof SetPublicPathPluginPackageType.SetPublicPathPlugin | undefined;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const pluginPackage: typeof SetPublicPathPluginPackageType = require('@microsoft/set-webpack-public-path-plugin');
+      const pluginPackage: typeof SetPublicPathPluginPackageType = require('@rushstack/set-webpack-public-path-plugin');
       setPublicPathPlugin = pluginPackage.SetPublicPathPlugin;
     } catch (e) {
       // public path plugin isn't present - ignore
@@ -123,66 +96,42 @@ export class WebpackConfigurationUpdater {
     }
   }
 
-  private static _addLoadersForProvidedLocFiles(
+  private static _addLoadersForLocFiles(
     options: IWebpackConfigurationUpdaterOptions,
     loader: string,
     loaderOptions: IBaseLoaderOptions
   ): void {
-    WebpackConfigurationUpdater._addRulesAndWarningLoaderToConfiguration(
-      options,
-      [
-        {
-          test: {
-            and: [
-              (filePath: string) => options.locFiles.has(filePath),
-              Constants.LOC_JSON_REGEX
-            ]
-          },
-          loader: loader,
-          options: loaderOptions
+    WebpackConfigurationUpdater._addRulesToConfiguration(options.configuration, [
+      {
+        test: {
+          and: [(filePath: string) => !options.filesToIgnore.has(filePath), Constants.LOC_JSON_REGEX]
         },
-        {
-          test: {
-            and: [
-              (filePath: string) => options.locFiles.has(filePath),
-              Constants.RESX_REGEX
-            ]
-          },
-          use: [
-            require.resolve('json-loader'),
-            {
-              loader: loader,
-              options: loaderOptions
-            }
-          ]
-        }
-      ]
-    );
+        use: [
+          {
+            loader: loader,
+            options: loaderOptions
+          }
+        ]
+      },
+      {
+        test: {
+          and: [(filePath: string) => !options.filesToIgnore.has(filePath), Constants.RESX_REGEX]
+        },
+        use: [
+          {
+            loader: loader,
+            options: loaderOptions
+          }
+        ],
+        type: 'json'
+      }
+    ]);
   }
 
-  private static _addRulesAndWarningLoaderToConfiguration(
-    options: IWebpackConfigurationUpdaterOptions,
+  private static _addRulesToConfiguration(
+    configuration: Webpack.Configuration,
     rules: Webpack.RuleSetRule[]
   ): void {
-    WebpackConfigurationUpdater._addRulesToConfiguration(
-      options.configuration,
-      [
-        ...rules,
-        {
-          test: {
-            and: [
-              (filePath: string) => !options.locFiles.has(filePath),
-              (filePath: string) => !options.filesToIgnore.has(filePath),
-              Constants.RESX_OR_LOC_JSON_REGEX
-            ]
-          },
-          loader: path.resolve(__dirname, 'loaders', 'MissingLocDataWarningLoader.js')
-        }
-      ]
-    );
-  }
-
-  private static _addRulesToConfiguration(configuration: Webpack.Configuration, rules: Webpack.RuleSetRule[]): void {
     if (!configuration.module) {
       configuration.module = {
         rules: []
@@ -194,5 +143,18 @@ export class WebpackConfigurationUpdater {
     }
 
     configuration.module.rules.push(...rules);
+  }
+
+  private static _tryUpdateSourceMapFilename(configuration: Webpack.Configuration): void {
+    if (!configuration.output) {
+      configuration.output = {}; // This should never happen
+    }
+
+    if (configuration.output.sourceMapFilename !== undefined) {
+      configuration.output.sourceMapFilename = configuration.output.sourceMapFilename.replace(
+        FILE_TOKEN_REGEX,
+        Constants.NO_LOCALE_SOURCE_MAP_FILENAME_TOKEN
+      );
+    }
   }
 }

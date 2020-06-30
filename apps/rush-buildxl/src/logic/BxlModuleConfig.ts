@@ -3,7 +3,7 @@
 
 import * as path from 'path';
 
-import { FileSystem } from '@microsoft/node-core-library';
+import { FileSystem } from '@rushstack/node-core-library';
 
 export class BxlModuleConfig {
   private _name: string;
@@ -21,8 +21,7 @@ export class BxlModuleConfig {
   }
 
   public async writeFile(): Promise<void> {
-    const contents: string =
-`package({
+    const contents: string = `package({
   name: "${this._name}",
   nameResolutionSemantics: NameResolutionSemantics.implicitProjectReferences,
   projects: [

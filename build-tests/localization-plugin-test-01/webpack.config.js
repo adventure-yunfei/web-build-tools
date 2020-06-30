@@ -4,13 +4,13 @@ const path = require('path');
 const webpack = require('webpack');
 
 const { LocalizationPlugin } = require('@rushstack/localization-plugin');
-const { SetPublicPathPlugin } = require('@microsoft/set-webpack-public-path-plugin');
+const { SetPublicPathPlugin } = require('@rushstack/set-webpack-public-path-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = function(env) {
-  const configuration = {
-    mode: 'production',
+function generateConfiguration(mode, outputFolderName) {
+  return {
+    mode: mode,
     module: {
       rules: [
         {
@@ -30,10 +30,10 @@ module.exports = function(env) {
     },
     entry: {
       'localization-test-A': path.join(__dirname, 'src', 'indexA.ts'),
-      'localization-test-B': path.join(__dirname, 'src', 'indexB.ts'),
+      'localization-test-B': path.join(__dirname, 'src', 'indexB.ts')
     },
     output: {
-      path: path.join(__dirname, 'dist'),
+      path: path.join(__dirname, outputFolderName),
       filename: '[name]_[locale]_[contenthash].js',
       chunkFilename: '[id].[name]_[locale]_[contenthash].js'
     },
@@ -43,15 +43,21 @@ module.exports = function(env) {
     plugins: [
       new webpack.optimize.ModuleConcatenationPlugin(),
       new LocalizationPlugin({
-        localizedStrings: {},
-        defaultLocale: {
-          usePassthroughLocale: true
+        localizedData: {
+          defaultLocale: {
+            localeName: 'en-us'
+          },
+          passthroughLocale: {
+            usePassthroughLocale: true
+          }
         },
         typingsOptions: {
           generatedTsFolder: path.resolve(__dirname, 'temp', 'loc-json-ts'),
           sourceRoot: path.resolve(__dirname, 'src')
         },
-        localizationStatsDropPath: path.resolve(__dirname, 'temp', 'localization-stats.json')
+        localizationStats: {
+          dropPath: path.resolve(__dirname, 'temp', 'localization-stats.json')
+        }
       }),
       new BundleAnalyzerPlugin({
         openAnalyzer: false,
@@ -63,13 +69,15 @@ module.exports = function(env) {
       }),
       new SetPublicPathPlugin({
         scriptName: {
-          name: '[name]_[locale]_[contenthash].js',
-          isTokenized: true
+          useAssetName: true
         }
       }),
       new HtmlWebpackPlugin()
     ]
   };
-
-  return configuration;
 }
+
+module.exports = [
+  generateConfiguration('development', 'dist-dev'),
+  generateConfiguration('production', 'dist-prod')
+];

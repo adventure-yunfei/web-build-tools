@@ -1,7 +1,4 @@
-
-import {
-  ICommandLineStringDefinition
-} from '@microsoft/ts-command-line';
+import { ICommandLineStringDefinition } from '@rushstack/ts-command-line';
 
 /**
  * Namespace for utilities relating to the Variants feature.

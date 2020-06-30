@@ -5,7 +5,7 @@ import * as colors from 'colors';
 import * as glob from 'glob';
 import * as path from 'path';
 import * as builtinPackageNames from 'builtin-modules';
-import { FileSystem } from '@microsoft/node-core-library';
+import { FileSystem } from '@rushstack/node-core-library';
 
 import { RushCommandLineParser } from '../RushCommandLineParser';
 import { BaseConfiglessRushAction } from './BaseRushAction';
@@ -15,14 +15,15 @@ export class ScanAction extends BaseConfiglessRushAction {
     super({
       actionName: 'scan',
       summary: 'Scan the current project folder and display a report of imported packages.',
-      documentation: `The NPM system allows a project to import dependencies without explicitly`
-        + ` listing them in its package.json file. This is a dangerous practice, because`
-        + ` there is no guarantee you will get a compatible version. The "rush scan" command`
-        + ` reports a list of packages that are imported by your code, which you can`
-        + ` compare against your package.json file to find mistakes. It searches the "./src"`
-        + ` and "./lib" folders for typical import syntaxes such as "import __ from '__'",`
-        + ` "require('__')", "System.import('__'), etc.  The results are only approximate,`
-        + ` but generally pretty accurate.`,
+      documentation:
+        `The NPM system allows a project to import dependencies without explicitly` +
+        ` listing them in its package.json file. This is a dangerous practice, because` +
+        ` there is no guarantee you will get a compatible version. The "rush scan" command` +
+        ` reports a list of packages that are imported by your code, which you can` +
+        ` compare against your package.json file to find mistakes. It searches the "./src"` +
+        ` and "./lib" folders for typical import syntaxes such as "import __ from '__'",` +
+        ` "require('__')", "System.import('__'), etc.  The results are only approximate,` +
+        ` but generally pretty accurate.`,
       safeForSimultaneousRushProcesses: true,
       parser
     });
@@ -40,19 +41,19 @@ export class ScanAction extends BaseConfiglessRushAction {
     }
 
     const requireRegExps: RegExp[] = [
-      // Example: require('someting')
+      // Example: require('something')
       /\brequire\s*\(\s*[']([^']+\s*)[']\)/,
       /\brequire\s*\(\s*["]([^"]+)["]\s*\)/,
 
-      // Example: require.ensure('someting')
+      // Example: require.ensure('something')
       /\brequire.ensure\s*\(\s*[']([^']+\s*)[']\)/,
       /\brequire.ensure\s*\(\s*["]([^"]+)["]\s*\)/,
 
-      // Example: require.resolve('someting')
+      // Example: require.resolve('something')
       /\brequire.resolve\s*\(\s*[']([^']+\s*)[']\)/,
       /\brequire.resolve\s*\(\s*["]([^"]+)["]\s*\)/,
 
-      // Example: System.import('someting')
+      // Example: System.import('something')
       /\bSystem.import\s*\(\s*[']([^']+\s*)[']\)/,
       /\bSystem.import\s*\(\s*["]([^"]+)["]\s*\)/,
 

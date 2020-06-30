@@ -1,6 +1,53 @@
 # Change Log - @rushstack/eslint-config
 
-This log was last generated on Tue, 21 Jan 2020 21:56:13 GMT and should not be manually modified.
+This log was last generated on Thu, 25 Jun 2020 06:43:34 GMT and should not be manually modified.
+
+## 1.0.2
+Thu, 25 Jun 2020 06:43:34 GMT
+
+### Patches
+
+- Enable variableDeclarationIgnoreFunction for the "@typescript-eslint/typedef" rule
+
+## 1.0.1
+Wed, 24 Jun 2020 09:50:48 GMT
+
+### Patches
+
+- Fix an issue with the published file set
+
+## 1.0.0
+Wed, 24 Jun 2020 09:04:28 GMT
+
+### Breaking changes
+
+- Upgrade to ESLint 7. Breaking change: patch-eslint6.js has been renamed to patch-eslint-resolver.js
+
+## 0.5.8
+Wed, 27 May 2020 05:15:10 GMT
+
+### Patches
+
+- Relax "max-lines" lint rule to 2,000 lines instead of 1,000 lines
+
+## 0.5.7
+Wed, 08 Apr 2020 04:07:33 GMT
+
+### Patches
+
+- Improve the error message text for the "ban-types" rule
+
+## 0.5.6
+Sat, 28 Mar 2020 00:37:16 GMT
+
+### Patches
+
+- Upgrade to eslint-plugin-tsdoc version 0.2.4
+
+## 0.5.5
+Wed, 18 Mar 2020 15:07:47 GMT
+
+*Version update only*
 
 ## 0.5.4
 Tue, 21 Jan 2020 21:56:13 GMT

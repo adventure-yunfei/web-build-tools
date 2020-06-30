@@ -3,10 +3,13 @@
 
 import * as colors from 'colors';
 import * as semver from 'semver';
-import { PackageName, FileSystem } from '@microsoft/node-core-library';
+import { FileSystem } from '@rushstack/node-core-library';
 
 import { RushConstants } from '../../logic/RushConstants';
 import { DependencySpecifier } from '../DependencySpecifier';
+import { IPolicyValidatorOptions } from '../policy/PolicyValidator';
+import { PackageManagerOptionsConfigurationBase } from '../../api/RushConfiguration';
+import { PackageNameParsers } from '../../api/PackageNameParsers';
 
 /**
  * This class is a parser for both npm's npm-shrinkwrap.json and pnpm's pnpm-lock.yaml file formats.
@@ -22,11 +25,30 @@ export abstract class BaseShrinkwrapFile {
   }
 
   /**
+   * Return whether or not the committed shrinkwrap file should be forcibly rechecked for changes.
+   *
+   * @virtual
+   */
+  public shouldForceRecheck(): boolean {
+    return false;
+  }
+
+  /**
    * Serializes and saves the shrinkwrap file to specified location
    */
   public save(filePath: string): void {
     FileSystem.writeFile(filePath, this.serialize());
   }
+
+  /**
+   * Validate the shrinkwrap using the provided policy options.
+   *
+   * @virtual
+   */
+  public validate(
+    packageManagerOptionsConfig: PackageManagerOptionsConfigurationBase,
+    policyOptions: IPolicyValidatorOptions
+  ): void {}
 
   /**
    * Returns true if the shrinkwrap file includes a top-level package that would satisfy the specified
@@ -35,8 +57,9 @@ export abstract class BaseShrinkwrapFile {
    * @virtual
    */
   public hasCompatibleTopLevelDependency(dependencySpecifier: DependencySpecifier): boolean {
-    const shrinkwrapDependency: DependencySpecifier | undefined
-      = this.getTopLevelDependencyVersion(dependencySpecifier.packageName);
+    const shrinkwrapDependency: DependencySpecifier | undefined = this.getTopLevelDependencyVersion(
+      dependencySpecifier.packageName
+    );
     if (!shrinkwrapDependency) {
       return false;
     }
@@ -63,9 +86,16 @@ export abstract class BaseShrinkwrapFile {
    *
    * @virtual
    */
-  public tryEnsureCompatibleDependency(dependencySpecifier: DependencySpecifier, tempProjectName: string): boolean {
-    const shrinkwrapDependency: DependencySpecifier | undefined =
-      this.tryEnsureDependencyVersion(dependencySpecifier, tempProjectName);
+  public tryEnsureCompatibleDependency(
+    dependencySpecifier: DependencySpecifier,
+    tempProjectName: string,
+    tryReusingPackageVersionsFromShrinkwrap: boolean = true
+  ): boolean {
+    const shrinkwrapDependency: DependencySpecifier | undefined = this.tryEnsureDependencyVersion(
+      dependencySpecifier,
+      tempProjectName,
+      tryReusingPackageVersionsFromShrinkwrap
+    );
     if (!shrinkwrapDependency) {
       return false;
     }
@@ -82,8 +112,11 @@ export abstract class BaseShrinkwrapFile {
   public abstract getTempProjectNames(): ReadonlyArray<string>;
 
   /** @virtual */
-  protected abstract tryEnsureDependencyVersion(dependencySpecifier: DependencySpecifier,
-    tempProjectName: string): DependencySpecifier | undefined;
+  protected abstract tryEnsureDependencyVersion(
+    dependencySpecifier: DependencySpecifier,
+    tempProjectName: string,
+    tryReusingPackageVersionsFromShrinkwrap: boolean
+  ): DependencySpecifier | undefined;
 
   /** @virtual */
   protected abstract getTopLevelDependencyVersion(dependencyName: string): DependencySpecifier | undefined;
@@ -91,21 +124,22 @@ export abstract class BaseShrinkwrapFile {
   /** @virtual */
   protected abstract serialize(): string;
 
-  protected _getTempProjectNames(dependencies: { [key: string]: {} } ): ReadonlyArray<string> {
+  protected _getTempProjectNames(dependencies: { [key: string]: {} }): ReadonlyArray<string> {
     const result: string[] = [];
     for (const key of Object.keys(dependencies)) {
       // If it starts with @rush-temp, then include it:
-      if (PackageName.getScope(key) === RushConstants.rushTempNpmScope) {
+      if (PackageNameParsers.permissive.getScope(key) === RushConstants.rushTempNpmScope) {
         result.push(key);
       }
     }
-    result.sort();  // make the result deterministic
+    result.sort(); // make the result deterministic
     return result;
   }
 
-  private _checkDependencyVersion(projectDependency: DependencySpecifier,
-    shrinkwrapDependency: DependencySpecifier): boolean {
-
+  private _checkDependencyVersion(
+    projectDependency: DependencySpecifier,
+    shrinkwrapDependency: DependencySpecifier
+  ): boolean {
     let normalizedProjectDependency: DependencySpecifier = projectDependency;
     let normalizedShrinkwrapDependency: DependencySpecifier = shrinkwrapDependency;
 
@@ -138,8 +172,10 @@ export abstract class BaseShrinkwrapFile {
     switch (normalizedProjectDependency.specifierType) {
       case 'version':
       case 'range':
-        return semver.satisfies(normalizedShrinkwrapDependency.versionSpecifier,
-          normalizedProjectDependency.versionSpecifier);
+        return semver.satisfies(
+          normalizedShrinkwrapDependency.versionSpecifier,
+          normalizedProjectDependency.versionSpecifier
+        );
       default:
         // For other version specifier types like "file:./blah.tgz" or "git://github.com/npm/cli.git#v1.0.27"
         // we allow the installation to continue but issue a warning.  The "rush install" checks will not work
@@ -148,8 +184,12 @@ export abstract class BaseShrinkwrapFile {
         // Only warn once for each versionSpecifier
         if (!this._alreadyWarnedSpecs.has(projectDependency.versionSpecifier)) {
           this._alreadyWarnedSpecs.add(projectDependency.versionSpecifier);
-          console.log(colors.yellow(`WARNING: Not validating ${projectDependency.specifierType}-based`
-            + ` specifier: "${projectDependency.versionSpecifier}"`));
+          console.log(
+            colors.yellow(
+              `WARNING: Not validating ${projectDependency.specifierType}-based` +
+                ` specifier: "${projectDependency.versionSpecifier}"`
+            )
+          );
         }
         return true;
     }

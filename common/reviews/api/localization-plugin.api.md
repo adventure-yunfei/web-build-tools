@@ -4,22 +4,27 @@
 
 ```ts
 
-import { Terminal } from '@microsoft/node-core-library';
+import { NewlineKind } from '@rushstack/node-core-library';
+import { StringValuesTypingsGenerator } from '@rushstack/typings-generator';
+import { Terminal } from '@rushstack/node-core-library';
 import * as Webpack from 'webpack';
 
 // @public (undocumented)
 export interface IDefaultLocaleOptions {
-    // (undocumented)
-    locale?: string;
-    passthroughLocaleName?: string;
-    // (undocumented)
-    usePassthroughLocale?: boolean;
+    fillMissingTranslationStrings?: boolean;
+    localeName: string;
 }
 
 // @public (undocumented)
-export interface ILocale {
+export interface ILocaleData {
     // (undocumented)
-    [locFilePath: string]: ILocaleFileData;
+    [locFilePath: string]: string | ILocaleFileData;
+}
+
+// @public (undocumented)
+export interface ILocaleElementMap {
+    // (undocumented)
+    [locale: string]: string;
 }
 
 // @public (undocumented)
@@ -28,27 +33,18 @@ export interface ILocaleFileData {
     [stringName: string]: string;
 }
 
-// @public (undocumented)
-export interface ILocales {
+// @internal (undocumented)
+export interface _ILocalizationFile {
     // (undocumented)
-    [locale: string]: ILocale;
+    [stringName: string]: _ILocalizedString;
 }
 
 // @public
 export interface ILocalizationPluginOptions {
-    // (undocumented)
-    defaultLocale: IDefaultLocaleOptions;
-    // (undocumented)
-    exportAsDefault?: boolean;
-    // (undocumented)
     filesToIgnore?: string[];
-    // (undocumented)
-    localizationStatsCallback?: (stats: ILocalizationStats) => void;
-    // (undocumented)
-    localizationStatsDropPath?: string;
-    // (undocumented)
-    localizedStrings: ILocales;
-    // (undocumented)
+    localizationStats?: ILocalizationStatsOptions;
+    localizedData: ILocalizedData;
+    noStringsLocaleName?: string;
     typingsOptions?: ITypingsGenerationOptions;
 }
 
@@ -67,31 +63,99 @@ export interface ILocalizationStats {
 // @public (undocumented)
 export interface ILocalizationStatsChunkGroup {
     // (undocumented)
-    localizedAssets: {
-        [locale: string]: string;
-    };
+    localizedAssets: ILocaleElementMap;
 }
 
 // @public (undocumented)
 export interface ILocalizationStatsEntrypoint {
     // (undocumented)
-    localizedAssets: {
+    localizedAssets: ILocaleElementMap;
+}
+
+// @public
+export interface ILocalizationStatsOptions {
+    callback?: (stats: ILocalizationStats) => void;
+    dropPath?: string;
+}
+
+// @public (undocumented)
+export interface ILocalizedData {
+    defaultLocale: IDefaultLocaleOptions;
+    normalizeResxNewlines?: 'lf' | 'crlf';
+    passthroughLocale?: IPassthroughLocaleOptions;
+    pseudolocales?: IPseudolocalesOptions;
+    resolveMissingTranslatedStrings?: (locales: string[], filePath: string) => IResolvedMissingTranslations;
+    translatedStrings: ILocalizedStrings;
+}
+
+// @internal (undocumented)
+export interface _ILocalizedString {
+    // (undocumented)
+    comment?: string;
+    // (undocumented)
+    value: string;
+}
+
+// @public (undocumented)
+export interface ILocalizedStrings {
+    // (undocumented)
+    [locale: string]: ILocaleData;
+}
+
+// @public (undocumented)
+export interface ILocalizedWebpackChunk extends Webpack.compilation.Chunk {
+    // (undocumented)
+    localizedFiles?: {
         [locale: string]: string;
     };
 }
 
+// @internal (undocumented)
+export interface _IParseLocFileOptions {
+    // (undocumented)
+    content: string;
+    // (undocumented)
+    filePath: string;
+    // (undocumented)
+    resxNewlineNormalization: NewlineKind | undefined;
+    // (undocumented)
+    terminal: Terminal;
+}
+
+// @public
+export interface IPassthroughLocaleOptions {
+    passthroughLocaleName?: string;
+    usePassthroughLocale?: boolean;
+}
+
+// @public
+export interface IPseudolocaleOptions {
+    // (undocumented)
+    append?: string;
+    // (undocumented)
+    delimiter?: string;
+    // (undocumented)
+    endDelimiter?: string;
+    // (undocumented)
+    extend?: number;
+    // (undocumented)
+    override?: string;
+    // (undocumented)
+    prepend?: string;
+    // (undocumented)
+    startDelimiter?: string;
+}
+
+// @public
+export interface IPseudolocalesOptions {
+    // (undocumented)
+    [pseudoLocaleName: string]: IPseudolocaleOptions;
+}
+
 // @public (undocumented)
-export interface ILocFilePreprocessorOptions {
+export interface IResolvedMissingTranslations {
     // (undocumented)
-    exportAsDefault?: boolean;
-    // (undocumented)
-    filesToIgnore?: string[];
-    // (undocumented)
-    generatedTsFolder: string;
-    // (undocumented)
-    srcFolder: string;
-    // (undocumented)
-    terminal?: Terminal;
+    [localeName: string]: string | ILocaleFileData;
 }
 
 // @internal (undocumented)
@@ -102,30 +166,55 @@ export interface _IStringPlaceholder {
     value: string;
 }
 
-// @public (undocumented)
+// @public
 export interface ITypingsGenerationOptions {
+    exportAsDefault?: boolean;
+    generatedTsFolder: string;
+    sourceRoot?: string;
+}
+
+// @public (undocumented)
+export interface ITypingsGeneratorOptions {
+    // (undocumented)
+    exportAsDefault?: boolean;
+    // (undocumented)
+    filesToIgnore?: string[];
     // (undocumented)
     generatedTsFolder: string;
     // (undocumented)
-    sourceRoot?: string;
+    resxNewlineNormalization?: NewlineKind | undefined;
+    // (undocumented)
+    srcFolder: string;
+    // (undocumented)
+    terminal?: Terminal;
 }
 
 // @public
 export class LocalizationPlugin implements Webpack.Plugin {
     constructor(options: ILocalizationPluginOptions);
+    // Warning: (ae-forgotten-export) The symbol "IAddDefaultLocFileResult" needs to be exported by the entry point index.d.ts
+    //
+    // @internal (undocumented)
+    addDefaultLocFile(terminal: Terminal, localizedResourcePath: string, localizedResourceData: _ILocalizationFile): IAddDefaultLocFileResult;
     // (undocumented)
     apply(compiler: Webpack.Compiler): void;
+    // Warning: (ae-forgotten-export) The symbol "IStringSerialNumberData" needs to be exported by the entry point index.d.ts
+    //
+    // @internal (undocumented)
+    getDataForSerialNumber(serialNumber: string): IStringSerialNumberData | undefined;
     // @internal (undocumented)
     stringKeys: Map<string, _IStringPlaceholder>;
     }
 
+// @internal (undocumented)
+export class _LocFileParser {
+    // (undocumented)
+    static parseLocFile(options: _IParseLocFileOptions): _ILocalizationFile;
+}
+
 // @public
-export class LocFilePreprocessor {
-    constructor(options: ILocFilePreprocessorOptions);
-    // (undocumented)
-    generateTypings(): void;
-    // (undocumented)
-    runWatcher(): void;
+export class TypingsGenerator extends StringValuesTypingsGenerator {
+    constructor(options: ITypingsGeneratorOptions);
 }
 
 

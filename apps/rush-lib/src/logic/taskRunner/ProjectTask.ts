@@ -3,9 +3,9 @@
 
 import * as child_process from 'child_process';
 import * as path from 'path';
-import { JsonFile, Text, FileSystem, JsonObject } from '@microsoft/node-core-library';
-import { ITaskWriter } from '@microsoft/stream-collator';
-import { IPackageDeps } from '@microsoft/package-deps-hash';
+import { JsonFile, Text, FileSystem, JsonObject } from '@rushstack/node-core-library';
+import { ITaskWriter } from '@rushstack/stream-collator';
+import { IPackageDeps } from '@rushstack/package-deps-hash';
 
 import { RushConfiguration } from '../../api/RushConfiguration';
 import { RushConfigurationProject } from '../../api/RushConfigurationProject';
@@ -31,13 +31,13 @@ export interface IProjectTaskOptions {
 function _areShallowEqual(object1: JsonObject, object2: JsonObject, writer: ITaskWriter): boolean {
   for (const n in object1) {
     if (!(n in object2) || object1[n] !== object2[n]) {
-      writer.writeLine(`Found mismatch: "${n}": "${object1[n]}" !== "${object2[n]}"`);
+      // writer.writeLine(`Found mismatch: "${n}": "${object1[n]}" !== "${object2[n]}"`);
       return false;
     }
   }
   for (const n in object2) {
     if (!(n in object1)) {
-      writer.writeLine(`Found new prop in obj2: "${n}" value="${object2[n]}"`);
+      // writer.writeLine(`Found new prop in obj2: "${n}" value="${object2[n]}"`);
       return false;
     }
   }
@@ -69,7 +69,7 @@ export class ProjectTask implements ITaskDefinition {
     this.isIncrementalBuildAllowed = options.isIncrementalBuildAllowed;
     this._packageChangeAnalyzer = options.packageChangeAnalyzer;
     this._packageDepsFilename = options.packageDepsFilename;
-}
+  }
 
   public execute(writer: ITaskWriter): Promise<TaskStatus> {
     try {
@@ -85,15 +85,15 @@ export class ProjectTask implements ITaskDefinition {
 
   private _getPackageDependencies(writer: ITaskWriter): IPackageDependencies | undefined {
     let deps: IPackageDependencies | undefined = undefined;
-    this._rushConfiguration = this._rushConfiguration;
     try {
       deps = {
         files: this._packageChangeAnalyzer.getPackageDepsHash(this._rushProject.packageName)!.files,
         arguments: this._commandToRun
       };
     } catch (error) {
-      writer.writeLine('Unable to calculate incremental build state. ' +
-        'Instead running full rebuild. ' + error.toString());
+      writer.writeLine(
+        'Unable to calculate incremental build state. Instead running full rebuild. ' + error.toString()
+      );
     }
 
     return deps;
@@ -113,7 +113,10 @@ export class ProjectTask implements ITaskDefinition {
       // TODO: Remove legacyDepsPath with the next major release of Rush
       const legacyDepsPath: string = path.join(this._rushProject.projectFolder, 'package-deps.json');
 
-      const currentDepsPath: string = path.join(this._rushProject.projectRushTempFolder, this._packageDepsFilename);
+      const currentDepsPath: string = path.join(
+        this._rushProject.projectRushTempFolder,
+        this._packageDepsFilename
+      );
 
       if (FileSystem.exists(currentDepsPath)) {
         try {
@@ -122,18 +125,16 @@ export class ProjectTask implements ITaskDefinition {
           // Warn and ignore - treat failing to load the file as the project being not built.
           writer.writeLine(
             `Warning: error parsing ${this._packageDepsFilename}: ${e}. Ignoring and ` +
-            `treating the command "${this._commandToRun}" as not run.`
+              `treating the command "${this._commandToRun}" as not run.`
           );
         }
       }
 
-      const isPackageUnchanged: boolean = (
-        !!(
-          lastPackageDeps &&
-          currentPackageDeps &&
-          (currentPackageDeps.arguments === lastPackageDeps.arguments &&
-          _areShallowEqual(currentPackageDeps.files, lastPackageDeps.files, writer))
-        )
+      const isPackageUnchanged: boolean = !!(
+        lastPackageDeps &&
+        currentPackageDeps &&
+        currentPackageDeps.arguments === lastPackageDeps.arguments &&
+        _areShallowEqual(currentPackageDeps.files, lastPackageDeps.files, writer)
       );
 
       if (isPackageUnchanged && this.isIncrementalBuildAllowed) {
@@ -146,8 +147,10 @@ export class ProjectTask implements ITaskDefinition {
         FileSystem.deleteFile(legacyDepsPath);
 
         if (!this._commandToRun) {
-          writer.writeLine(`The task command "${this._commandToRun}" was registered in the package.json but is blank,`
-            + ` so no action will be taken.`);
+          writer.writeLine(
+            `The task command "${this._commandToRun}" was registered in the package.json but is blank,` +
+              ` so no action will be taken.`
+          );
 
           // Write deps on success.
           if (currentPackageDeps) {
@@ -162,18 +165,15 @@ export class ProjectTask implements ITaskDefinition {
         // Run the task
 
         writer.writeLine(this._commandToRun);
-        const task: child_process.ChildProcess = Utilities.executeLifecycleCommandAsync(
-          this._commandToRun,
-          {
-            rushConfiguration: this._rushConfiguration,
-            workingDirectory: projectFolder,
-            initCwd: this._rushConfiguration.commonTempFolder,
-            handleOutput: true,
-            environmentPathOptions: {
-              includeProjectBin: true
-            }
+        const task: child_process.ChildProcess = Utilities.executeLifecycleCommandAsync(this._commandToRun, {
+          rushConfiguration: this._rushConfiguration,
+          workingDirectory: projectFolder,
+          initCwd: this._rushConfiguration.commonTempFolder,
+          handleOutput: true,
+          environmentPathOptions: {
+            includeProjectBin: true
           }
-        );
+        });
 
         // Hook into events, in order to get live streaming of build log
         if (task.stdout !== null) {
@@ -230,7 +230,10 @@ export class ProjectTask implements ITaskDefinition {
       // eslint-disable-next-line no-control-regex
       const stderr: string = writer.getStdError().replace(/\x1B[[(?);]{0,2}(;?\d)*./g, '');
       if (stderr) {
-        FileSystem.writeFile(path.join(this._rushProject.projectFolder, logFilename + '.build.error.log'), stderr);
+        FileSystem.writeFile(
+          path.join(this._rushProject.projectFolder, logFilename + '.build.error.log'),
+          stderr
+        );
       }
     } catch (e) {
       console.log(`Error writing logs to disk: ${e}`);
