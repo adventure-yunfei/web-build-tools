@@ -73,7 +73,10 @@ export class ExportAnalyzer {
   private readonly _importableAmbientSourceFiles: Set<ts.SourceFile> = new Set<ts.SourceFile>();
 
   private readonly _astImportsByKey: Map<string, AstImport> = new Map<string, AstImport>();
-  private readonly _astImportInternalsByAstModule: Map<AstModule, AstImportInternal> = new Map<AstModule, AstImportInternal>();
+  private readonly _astImportInternalsByAstModule: Map<AstModule, AstImportInternal> = new Map<
+    AstModule,
+    AstImportInternal
+  >();
 
   public constructor(
     program: ts.Program,
@@ -488,7 +491,9 @@ export class ExportAnalyzer {
 
         if (externalModulePath === undefined) {
           const astModule: AstModule = this._fetchSpecifierAstModule(importDeclaration, declarationSymbol);
-          let astImportInternal: AstImportInternal | undefined = this._astImportInternalsByAstModule.get(astModule);
+          let astImportInternal: AstImportInternal | undefined = this._astImportInternalsByAstModule.get(
+            astModule
+          );
           if (!astImportInternal) {
             astImportInternal = new AstImportInternal({
               importKind: AstImportInternalKind.StarImport,
@@ -611,8 +616,6 @@ export class ExportAnalyzer {
             exportName: variableName
           });
         }
-      } else {
-        // throw new InternalError('Unsupported Equal Module Import for local file.');
       }
     }
 
@@ -702,7 +705,6 @@ export class ExportAnalyzer {
       if (astEntity !== undefined) {
         if (starExportedModule.externalModulePath !== undefined) {
           // This entity was obtained from an external module, so return an AstImport instead
-          // TODO-
           const astSymbol: AstSymbol = astEntity as AstSymbol;
           return this._fetchAstImport(astSymbol.followedSymbol, {
             importKind: AstImportKind.NamedImport,
