@@ -108,7 +108,7 @@ export class DtsRollupGenerator {
           : ReleaseTag.None;
 
         if (this._shouldIncludeReleaseTag(maxEffectiveReleaseTag, dtsKind)) {
-          DtsEmitHelpers.emitImport(writer, entity, astImport);
+          DtsEmitHelpers.emitImport(writer, collector, entity, astImport);
         }
       }
     }

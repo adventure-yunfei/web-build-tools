@@ -440,6 +440,13 @@ export class Collector {
           this._createEntityForIndirectReferences(referencedAstEntity, alreadySeenAstEntities);
         }
       });
+    } else if (astEntity instanceof AstImport) {
+      const referencedImport: AstImport | undefined = this.astSymbolTable.tryGetReferencedAstImport(
+        astEntity
+      );
+      if (referencedImport) {
+        this._createCollectorEntity(referencedImport, undefined);
+      }
     }
 
     if (astEntity instanceof AstNamespaceImport) {
