@@ -221,6 +221,10 @@ export class AstSymbolTable {
     return this._entitiesByIdentifierNode.get(identifier);
   }
 
+  public tryGetReferencedAstImport(astImport: AstImport): AstImport | undefined {
+    return this._exportAnalyzer.tryGetReferencedAstImport(astImport);
+  }
+
   /**
    * Builds an AstSymbol.localName for a given ts.Symbol.  In the current implementation, the localName is
    * a TypeScript-like expression that may be a string literal or ECMAScript symbol expression.

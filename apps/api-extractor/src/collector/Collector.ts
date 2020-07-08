@@ -23,6 +23,7 @@ import { TypeScriptInternals, IGlobalVariableAnalyzer } from '../analyzer/TypeSc
 import { MessageRouter } from './MessageRouter';
 import { AstReferenceResolver } from '../analyzer/AstReferenceResolver';
 import { ExtractorConfig } from '../api/ExtractorConfig';
+import { AstImport } from '../analyzer/AstImport';
 
 /**
  * Options for Collector constructor.
@@ -436,6 +437,13 @@ export class Collector {
           this._createEntityForIndirectReferences(referencedAstEntity, alreadySeenAstEntities);
         }
       });
+    } else if (astEntity instanceof AstImport) {
+      const referencedImport: AstImport | undefined = this.astSymbolTable.tryGetReferencedAstImport(
+        astEntity
+      );
+      if (referencedImport) {
+        this._createCollectorEntity(referencedImport, undefined);
+      }
     }
   }
 

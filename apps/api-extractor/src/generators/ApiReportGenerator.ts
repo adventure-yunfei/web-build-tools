@@ -56,7 +56,7 @@ export class ApiReportGenerator {
     let importsEmitted: boolean = false;
     for (const entity of collector.entities) {
       if (entity.astEntity instanceof AstImport) {
-        DtsEmitHelpers.emitImport(stringWriter, entity, entity.astEntity);
+        DtsEmitHelpers.emitImport(stringWriter, collector, entity, entity.astEntity);
         importsEmitted = true;
       }
     }
