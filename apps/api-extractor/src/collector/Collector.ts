@@ -447,12 +447,14 @@ export class Collector {
         }
       });
     } else if (astEntity instanceof AstImportInternal) {
-      this.astSymbolTable.fetchAstModuleExportInfo(astEntity.astModule).exportedLocalEntities.forEach((exportedEntity: AstEntity) => {
-        // Create a CollectorEntity for each top-level export of AstImportInternal entity
-        this._createCollectorEntity(exportedEntity, undefined);
+      this.astSymbolTable
+        .fetchAstModuleExportInfo(astEntity.astModule)
+        .exportedLocalEntities.forEach((exportedEntity: AstEntity) => {
+          // Create a CollectorEntity for each top-level export of AstImportInternal entity
+          this._createCollectorEntity(exportedEntity, undefined);
 
-        this._createEntityForIndirectReferences(exportedEntity, alreadySeenAstEntities); // TODO- create entity for module export
-      });
+          this._createEntityForIndirectReferences(exportedEntity, alreadySeenAstEntities); // TODO- create entity for module export
+        });
     }
   }
 
@@ -525,7 +527,11 @@ export class Collector {
       let nameForEmit: string = idealNameForEmit;
 
       // Choose a name that doesn't conflict with usedNames or a global name
-      while (usedNames.has(nameForEmit) || this.globalVariableAnalyzer.hasGlobalName(nameForEmit)) {
+      while (
+        nameForEmit === 'default' ||
+        usedNames.has(nameForEmit) ||
+        this.globalVariableAnalyzer.hasGlobalName(nameForEmit)
+      ) {
         nameForEmit = `${idealNameForEmit}_${++suffix}`;
       }
       entity.nameForEmit = nameForEmit;
