@@ -66,6 +66,78 @@ export class ApiReportGenerator {
       stringWriter.writeLine();
     }
 
+    /**
+     * Emit Api Report for local module import.
+     *
+     * TODO: won't handle duplicate case,
+     * AstImportInternal will be emitted multiple times if multi-exported
+     */
+    function emitForAstImportInternal(
+      targetStringWriter: StringWriter,
+      entity: CollectorEntity,
+      astEntity: AstImportInternal,
+      shouldInlineExport: boolean
+    ): void {
+      const childrenStringWriter: StringWriter = new StringWriter();
+      if (shouldInlineExport) {
+        targetStringWriter.write('export ');
+      }
+      targetStringWriter.writeLine(`namespace ${entity.nameForEmit} {`);
+      collector.astSymbolTable
+        .fetchAstModuleExportInfo(astEntity.astModule)
+        .exportedLocalEntities.forEach((childAstEntity, exportName) => {
+          const childEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(childAstEntity);
+          if (!childEntity) {
+            throw new Error(`Cannot find CollectorEntity for AstEntity "${childAstEntity.localName}"`);
+          }
+          const shouldChildInlineExport: boolean = childEntity.nameForEmit === exportName;
+          if (childAstEntity instanceof AstSymbol) {
+            childrenStringWriter.writeLine();
+            // Copy from AstSymbol entity, but only pick emit-declarations part.
+            for (const astDeclaration of childAstEntity.astDeclarations || []) {
+              const span: Span = new Span(astDeclaration.declaration);
+              const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
+              if (apiItemMetadata.isPreapproved) {
+                ApiReportGenerator._modifySpanForPreapproved(span);
+              } else {
+                ApiReportGenerator._modifySpan(
+                  collector,
+                  span,
+                  shouldChildInlineExport,
+                  astDeclaration,
+                  false
+                );
+              }
+              span.writeModifiedText(childrenStringWriter.stringBuilder);
+              childrenStringWriter.writeLine();
+            }
+          } else if (childAstEntity instanceof AstImportInternal) {
+            childrenStringWriter.writeLine();
+            emitForAstImportInternal(
+              childrenStringWriter,
+              childEntity,
+              childAstEntity,
+              shouldChildInlineExport
+            );
+          } else {
+            return;
+          }
+          if (!shouldChildInlineExport) {
+            DtsEmitHelpers.emitNamedExport(childrenStringWriter, exportName, childEntity);
+          }
+        });
+
+      // indent "namespace" declaration for AstImportInternal
+      targetStringWriter.write(
+        childrenStringWriter
+          .toString()
+          .split(/\n/)
+          .map((s) => (s ? '  ' + s : s))
+          .join('\n')
+      );
+      targetStringWriter.writeLine(`}`);
+    }
+
     // Emit the regular declarations
     for (const entity of collector.entities) {
       if (entity.exported) {
@@ -119,14 +191,21 @@ export class ApiReportGenerator {
             if (apiItemMetadata.isPreapproved) {
               ApiReportGenerator._modifySpanForPreapproved(span);
             } else {
-              ApiReportGenerator._modifySpan(collector, span, entity, astDeclaration, false);
+              ApiReportGenerator._modifySpan(
+                collector,
+                span,
+                entity.shouldInlineExport,
+                astDeclaration,
+                false
+              );
             }
 
             span.writeModifiedText(stringWriter.stringBuilder);
             stringWriter.writeLine('\n');
           }
         } else if (entity.astEntity instanceof AstImportInternal) {
-          throw new InternalError('Unsupported AstImportInternal');
+          emitForAstImportInternal(stringWriter, entity, entity.astEntity, entity.shouldInlineExport);
+          stringWriter.writeLine();
         }
 
         // Now emit the export statements for this entity.
@@ -182,7 +261,7 @@ export class ApiReportGenerator {
   private static _modifySpan(
     collector: Collector,
     span: Span,
-    entity: CollectorEntity,
+    shouldInlineExport: boolean,
     astDeclaration: AstDeclaration,
     insideTypeLiteral: boolean
   ): void {
@@ -222,7 +301,7 @@ export class ApiReportGenerator {
         // Replace the stuff we possibly deleted above
         let replacedModifiers: string = '';
 
-        if (entity.shouldInlineExport) {
+        if (shouldInlineExport) {
           replacedModifiers = 'export ' + replacedModifiers;
         }
 
@@ -272,7 +351,7 @@ export class ApiReportGenerator {
           span.modification.prefix = listPrefix + span.modification.prefix;
           span.modification.suffix = ';';
 
-          if (entity.shouldInlineExport) {
+          if (shouldInlineExport) {
             span.modification.prefix = 'export ' + span.modification.prefix;
           }
         }
@@ -339,7 +418,13 @@ export class ApiReportGenerator {
           }
         }
 
-        ApiReportGenerator._modifySpan(collector, child, entity, childAstDeclaration, insideTypeLiteral);
+        ApiReportGenerator._modifySpan(
+          collector,
+          child,
+          shouldInlineExport,
+          childAstDeclaration,
+          insideTypeLiteral
+        );
       }
     }
   }
