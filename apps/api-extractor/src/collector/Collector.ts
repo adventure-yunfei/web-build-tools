@@ -455,6 +455,13 @@ export class Collector {
 
           this._createEntityForIndirectReferences(exportedEntity, alreadySeenAstEntities); // TODO- create entity for module export
         });
+    } else if (astEntity instanceof AstImport) {
+      const referencedImport: AstImport | undefined = this.astSymbolTable.tryGetReferencedAstImport(
+        astEntity
+      );
+      if (referencedImport) {
+        this._createCollectorEntity(referencedImport, undefined);
+      }
     }
   }
 

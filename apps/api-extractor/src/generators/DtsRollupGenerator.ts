@@ -102,7 +102,7 @@ export class DtsRollupGenerator {
           : ReleaseTag.None;
 
         if (this._shouldIncludeReleaseTag(maxEffectiveReleaseTag, dtsKind)) {
-          DtsEmitHelpers.emitImport(stringWriter, entity, astImport);
+          DtsEmitHelpers.emitImport(stringWriter, collector, entity, astImport);
         }
       }
     }
@@ -145,7 +145,9 @@ export class DtsRollupGenerator {
           }
         }
       } else if (entity.astEntity instanceof AstImportInternal) {
-        const astModuleExportInfo: AstModuleExportInfo = collector.astSymbolTable.fetchAstModuleExportInfo(entity.astEntity.astModule);
+        const astModuleExportInfo: AstModuleExportInfo = collector.astSymbolTable.fetchAstModuleExportInfo(
+          entity.astEntity.astModule
+        );
         if (!entity.nameForEmit) {
           // This should never happen
           throw new InternalError('referencedEntry.nameForEmit is undefined');
@@ -160,11 +162,15 @@ export class DtsRollupGenerator {
         // all local exports of local imported module are just references to top-level declarations
         stringWriter.writeLine('  export {');
         astModuleExportInfo.exportedLocalEntities.forEach((exportedEntity, exportedName) => {
-          const collectorEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(exportedEntity);
+          const collectorEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(
+            exportedEntity
+          );
           if (!collectorEntity) {
             // This should never happen
             // top-level exports of local imported module should be added as collector entities before
-            throw new Error(`Cannot find collector entity for ${entity.nameForEmit}.${exportedEntity.localName}`);
+            throw new Error(
+              `Cannot find collector entity for ${entity.nameForEmit}.${exportedEntity.localName}`
+            );
           }
           if (collectorEntity.nameForEmit === exportedName) {
             stringWriter.writeLine(`    ${collectorEntity.nameForEmit},`);
@@ -175,7 +181,9 @@ export class DtsRollupGenerator {
         stringWriter.writeLine('  }'); // end of "export { ... }"
 
         if (astModuleExportInfo.starExportedExternalModules.size > 0) {
-          throw new Error(`Unsupported star export of external module inside namespace imported module: ${entity.nameForEmit}`);
+          throw new Error(
+            `Unsupported star export of external module inside namespace imported module: ${entity.nameForEmit}`
+          );
         }
 
         stringWriter.writeLine('}'); // end of "declare namespace { ... }"

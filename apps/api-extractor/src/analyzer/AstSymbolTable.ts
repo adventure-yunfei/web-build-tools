@@ -207,13 +207,15 @@ export class AstSymbolTable {
     // mark before actual analyzing, to handle module cyclic reexport
     astImportInternal.analyzed = true;
 
-    this.fetchAstModuleExportInfo(astImportInternal.astModule).exportedLocalEntities.forEach(exportedEntity => {
-      if (exportedEntity instanceof AstImportInternal) {
-        this._analyzeAstImportInternal(exportedEntity);
-      } else if (exportedEntity instanceof AstSymbol) {
-        this.analyzeAstSymbol(exportedEntity);
+    this.fetchAstModuleExportInfo(astImportInternal.astModule).exportedLocalEntities.forEach(
+      (exportedEntity) => {
+        if (exportedEntity instanceof AstImportInternal) {
+          this._analyzeAstImportInternal(exportedEntity);
+        } else if (exportedEntity instanceof AstSymbol) {
+          this.analyzeAstSymbol(exportedEntity);
+        }
       }
-    });
+    );
   }
 
   /**
@@ -249,6 +251,10 @@ export class AstSymbolTable {
       throw new InternalError('tryGetEntityForIdentifier() called for an identifier that was not analyzed');
     }
     return this._entitiesByIdentifierNode.get(identifier);
+  }
+
+  public tryGetReferencedAstImport(astImport: AstImport): AstImport | undefined {
+    return this._exportAnalyzer.tryGetReferencedAstImport(astImport);
   }
 
   /**
