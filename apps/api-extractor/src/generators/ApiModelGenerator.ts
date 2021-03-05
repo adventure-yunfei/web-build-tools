@@ -30,7 +30,9 @@ import {
   ApiVariable,
   ApiTypeAlias,
   ApiCallSignature,
-  IApiTypeParameterOptions
+  IApiTypeParameterOptions,
+  ApiItem,
+  ApiDeclaredItem
 } from '@microsoft/api-extractor-model';
 
 import { Collector } from '../collector/Collector';
@@ -40,11 +42,14 @@ import { AstSymbol } from '../analyzer/AstSymbol';
 import { DeclarationReferenceGenerator } from './DeclarationReferenceGenerator';
 import { ApiItemMetadata } from '../collector/ApiItemMetadata';
 import { DeclarationMetadata } from '../collector/DeclarationMetadata';
+import { DeclarationReference } from '@microsoft/tsdoc/lib-commonjs/beta/DeclarationReference';
 
 export class ApiModelGenerator {
   private readonly _collector: Collector;
   private readonly _apiModel: ApiModel;
   private readonly _referenceGenerator: DeclarationReferenceGenerator;
+  /** Record the generated api items by corresponding symbol */
+  private readonly _apiItemsBySymbol: Map<ts.Symbol, ApiItem> = new Map();
 
   public constructor(collector: Collector) {
     this._collector = collector;
@@ -90,7 +95,61 @@ export class ApiModelGenerator {
       }
     }
 
+    // Create a CollectorEntity for each top-level unexported
+    const apiNamespaceForUnexported: ApiNamespace = new ApiNamespace({
+      name: 'UNEXPORTED',
+      docComment: undefined,
+      releaseTag: ReleaseTag.Public,
+      excerptTokens: [],
+    });
+    apiEntryPoint.addMember(apiNamespaceForUnexported);
+    for (const entity of this._collector.entities) {
+      if (!entity.exported) {
+        if (entity.astEntity instanceof AstSymbol && this._apiItemsBySymbol.get(entity.astEntity.followedSymbol) === undefined) {
+          // Skip ancillary declarations; we will process them with the main declaration
+          for (const astDeclaration of this._collector.getNonAncillaryDeclarations(entity.astEntity)) {
+            this._processDeclaration(astDeclaration, entity.nameForEmit, apiNamespaceForUnexported);
+          }
+        } else {
+          // TODO: Figure out how to represent reexported AstImport objects.  Basically we need to introduce a new
+          // ApiItem subclass for "export alias", similar to a type alias, but representing declarations of the
+          // form "export { X } from 'external-package'".  We can also use this to solve GitHub issue #950.
+        }
+      }
+    }
+
+    this._replaceReferencePlaceholder(apiPackage);
+
     return apiPackage;
+  }
+
+  private _getApiItemBySymbol: (followedSymbol: ts.Symbol) => ApiItem | undefined = (followedSymbol) => {
+    return this._apiItemsBySymbol.get(followedSymbol);
+  };
+  private _replaceReferencePlaceholder(apiItem: ApiItem): void {
+    if (apiItem instanceof ApiDeclaredItem) {
+      apiItem.excerptTokens.forEach((excerptToken) => {
+        if (excerptToken.canonicalReference !== undefined && DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)) {
+          const actualReference: DeclarationReference | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
+              excerptToken.canonicalReference,
+              this._getApiItemBySymbol
+            );
+          // @ts-ignore
+          excerptToken._canonicalReference = actualReference;
+        }
+      });
+    }
+    if (ApiItemContainerMixin.isBaseClassOf(apiItem)) {
+      apiItem.members.forEach((child) => {
+        this._replaceReferencePlaceholder(child);
+      });
+    }
+  }
+
+  private _onApiItemCreated(apiItem: ApiItem, astDeclaration: AstDeclaration) {
+    if (this._apiItemsBySymbol.get(astDeclaration.astSymbol.followedSymbol) === undefined) {
+      this._apiItemsBySymbol.set(astDeclaration.astSymbol.followedSymbol, apiItem);
+    }
   }
 
   private _processDeclaration(
@@ -238,6 +297,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiCallSignature);
+      this._onApiItemCreated(apiCallSignature, astDeclaration);
     }
   }
 
@@ -277,6 +337,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiConstructor);
+      this._onApiItemCreated(apiConstructor, astDeclaration);
     }
   }
 
@@ -334,6 +395,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiClass);
+      this._onApiItemCreated(apiClass, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, exportedName, apiClass);
@@ -385,6 +447,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiConstructSignature);
+      this._onApiItemCreated(apiConstructSignature, astDeclaration);
     }
   }
 
@@ -406,6 +469,7 @@ export class ApiModelGenerator {
 
       apiEnum = new ApiEnum({ name, docComment, releaseTag, excerptTokens });
       parentApiItem.addMember(apiEnum);
+      this._onApiItemCreated(apiEnum, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, exportedName, apiEnum);
@@ -445,6 +509,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiEnumMember);
+      this._onApiItemCreated(apiEnumMember, astDeclaration);
     }
   }
 
@@ -498,6 +563,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiFunction);
+      this._onApiItemCreated(apiFunction, astDeclaration);
     }
   }
 
@@ -541,6 +607,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiIndexSignature);
+      this._onApiItemCreated(apiIndexSignature, astDeclaration);
     }
   }
 
@@ -593,6 +660,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiInterface);
+      this._onApiItemCreated(apiInterface, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, exportedName, apiInterface);
@@ -653,6 +721,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiMethod);
+      this._onApiItemCreated(apiMethod, astDeclaration);
     }
   }
 
@@ -708,6 +777,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiMethodSignature);
+      this._onApiItemCreated(apiMethodSignature, astDeclaration);
     }
   }
 
@@ -731,6 +801,7 @@ export class ApiModelGenerator {
 
       apiNamespace = new ApiNamespace({ name, docComment, releaseTag, excerptTokens });
       parentApiItem.addMember(apiNamespace);
+      this._onApiItemCreated(apiNamespace, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, exportedName, apiNamespace);
@@ -774,6 +845,7 @@ export class ApiModelGenerator {
         propertyTypeTokenRange
       });
       parentApiItem.addMember(apiProperty);
+      this._onApiItemCreated(apiProperty, astDeclaration);
     } else {
       // If the property was already declared before (via a merged interface declaration),
       // we assume its signature is identical, because the language requires that.
@@ -817,6 +889,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiPropertySignature);
+      this._onApiItemCreated(apiPropertySignature, astDeclaration);
     } else {
       // If the property was already declared before (via a merged interface declaration),
       // we assume its signature is identical, because the language requires that.
@@ -864,6 +937,7 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiTypeAlias);
+      this._onApiItemCreated(apiTypeAlias, astDeclaration);
     }
   }
 
@@ -894,6 +968,7 @@ export class ApiModelGenerator {
       apiVariable = new ApiVariable({ name, docComment, releaseTag, excerptTokens, variableTypeTokenRange });
 
       parentApiItem.addMember(apiVariable);
+      this._onApiItemCreated(apiVariable, astDeclaration);
     }
   }
 
