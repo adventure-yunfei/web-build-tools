@@ -94,20 +94,18 @@ export class ApiModelGenerator {
       name: 'UNEXPORTED',
       docComment: undefined,
       releaseTag: ReleaseTag.Public,
-      excerptTokens: [],
+      excerptTokens: []
     });
     apiEntryPoint.addMember(apiNamespaceForUnexported);
     for (const entity of this._collector.entities) {
       if (!entity.exported) {
-        if (entity.astEntity instanceof AstSymbol && this._apiItemsBySymbol.get(entity.astEntity.followedSymbol) === undefined) {
-          // Skip ancillary declarations; we will process them with the main declaration
-          for (const astDeclaration of this._collector.getNonAncillaryDeclarations(entity.astEntity)) {
-            this._processDeclaration(astDeclaration, entity.nameForEmit, apiNamespaceForUnexported);
-          }
-        } else {
-          // TODO: Figure out how to represent reexported AstImport objects.  Basically we need to introduce a new
-          // ApiItem subclass for "export alias", similar to a type alias, but representing declarations of the
-          // form "export { X } from 'external-package'".  We can also use this to solve GitHub issue #950.
+        if (
+          (entity.astEntity instanceof AstSymbol &&
+            this._apiItemsBySymbol.get(entity.astEntity.followedSymbol) === undefined) ||
+          (entity.astEntity instanceof AstImportInternal &&
+            this._apiItemsBySymbol.get(entity.astEntity.astModule.moduleSymbol) === undefined)
+        ) {
+          this._processAstEntity(entity.astEntity, entity.nameForEmit, apiNamespaceForUnexported);
         }
       }
     }
@@ -123,11 +121,16 @@ export class ApiModelGenerator {
   private _replaceReferencePlaceholder(apiItem: ApiItem): void {
     if (apiItem instanceof ApiDeclaredItem) {
       apiItem.excerptTokens.forEach((excerptToken) => {
-        if (excerptToken.canonicalReference !== undefined && DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)) {
-          const actualReference: DeclarationReference | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
-              excerptToken.canonicalReference,
-              this._getApiItemBySymbol
-            );
+        if (
+          excerptToken.canonicalReference !== undefined &&
+          DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)
+        ) {
+          const actualReference:
+            | DeclarationReference
+            | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
+            excerptToken.canonicalReference,
+            this._getApiItemBySymbol
+          );
           // @ts-ignore
           excerptToken._canonicalReference = actualReference;
         }
@@ -140,15 +143,21 @@ export class ApiModelGenerator {
     }
   }
 
-  private _onApiItemCreated(apiItem: ApiItem, astDeclaration: AstDeclaration) {
-    if (this._apiItemsBySymbol.get(astDeclaration.astSymbol.followedSymbol) === undefined) {
-      this._apiItemsBySymbol.set(astDeclaration.astSymbol.followedSymbol, apiItem);
+  private _onApiItemCreated(apiItem: ApiItem, astDeclaration: AstDeclaration | AstModule) {
+    const followedSymbol =
+      astDeclaration instanceof AstDeclaration
+        ? astDeclaration.astSymbol.followedSymbol
+        : astDeclaration.moduleSymbol;
+    if (this._apiItemsBySymbol.get(followedSymbol) === undefined) {
+      this._apiItemsBySymbol.set(followedSymbol, apiItem);
     }
   }
 
-  private _processAstEntity(astEntity: AstEntity, exportedName: string | undefined,
-    parentApiItem: ApiItemContainerMixin): void {
-
+  private _processAstEntity(
+    astEntity: AstEntity,
+    exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin
+  ): void {
     if (astEntity instanceof AstSymbol) {
       // Skip ancillary declarations; we will process them with the main declaration
       for (const astDeclaration of this._collector.getNonAncillaryDeclarations(astEntity)) {
@@ -163,22 +172,34 @@ export class ApiModelGenerator {
     }
   }
 
-  private _processModuleImport(astModule: AstModule, exportedName: string | undefined,
-    parentApiItem: ApiItemContainerMixin): void {
-
+  private _processModuleImport(
+    astModule: AstModule,
+    exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin
+  ): void {
     const name: string = exportedName ? exportedName : astModule.moduleSymbol.name;
     const containerKey: string = ApiNamespace.getContainerKey(name);
 
-    let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMemberByKey(containerKey) as ApiNamespace;
+    let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMemberByKey(
+      containerKey
+    ) as ApiNamespace;
 
     if (apiNamespace === undefined) {
-      apiNamespace = new ApiNamespace({ name, docComment: undefined, releaseTag: ReleaseTag.None, excerptTokens: [] });
+      apiNamespace = new ApiNamespace({
+        name,
+        docComment: undefined,
+        releaseTag: ReleaseTag.None,
+        excerptTokens: []
+      });
       parentApiItem.addMember(apiNamespace);
+      this._onApiItemCreated(apiNamespace, astModule);
     }
 
-    astModule.astModuleExportInfo!.exportedLocalEntities.forEach((exportedEntity: AstEntity, exportedName: string) => {
-      this._processAstEntity(exportedEntity, exportedName, apiNamespace!);
-    });
+    astModule.astModuleExportInfo!.exportedLocalEntities.forEach(
+      (exportedEntity: AstEntity, exportedName: string) => {
+        this._processAstEntity(exportedEntity, exportedName, apiNamespace!);
+      }
+    );
   }
 
   private _processDeclaration(
