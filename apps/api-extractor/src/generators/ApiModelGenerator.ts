@@ -95,12 +95,14 @@ export class ApiModelGenerator {
       name: 'UNEXPORTED',
       docComment: undefined,
       releaseTag: ReleaseTag.Public,
-      excerptTokens: [],
+      excerptTokens: []
     });
-    apiEntryPoint.addMember(apiNamespaceForUnexported);
     for (const entity of this._collector.entities) {
       if (!entity.exported) {
-        if (entity.astEntity instanceof AstSymbol && this._apiItemsBySymbol.get(entity.astEntity.followedSymbol) === undefined) {
+        if (
+          entity.astEntity instanceof AstSymbol &&
+          this._apiItemsBySymbol.get(entity.astEntity.followedSymbol) === undefined
+        ) {
           // Skip ancillary declarations; we will process them with the main declaration
           for (const astDeclaration of this._collector.getNonAncillaryDeclarations(entity.astEntity)) {
             this._processDeclaration(astDeclaration, entity.nameForEmit, apiNamespaceForUnexported);
@@ -111,6 +113,9 @@ export class ApiModelGenerator {
           // form "export { X } from 'external-package'".  We can also use this to solve GitHub issue #950.
         }
       }
+    }
+    if (apiNamespaceForUnexported.members.length) {
+      apiEntryPoint.addMember(apiNamespaceForUnexported);
     }
 
     this._replaceReferencePlaceholder(apiPackage);
@@ -190,11 +195,16 @@ export class ApiModelGenerator {
   private _replaceReferencePlaceholder(apiItem: ApiItem): void {
     if (apiItem instanceof ApiDeclaredItem) {
       apiItem.excerptTokens.forEach((excerptToken) => {
-        if (excerptToken.canonicalReference !== undefined && DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)) {
-          const actualReference: DeclarationReference | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
-              excerptToken.canonicalReference,
-              this._getApiItemBySymbol
-            );
+        if (
+          excerptToken.canonicalReference !== undefined &&
+          DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)
+        ) {
+          const actualReference:
+            | DeclarationReference
+            | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
+            excerptToken.canonicalReference,
+            this._getApiItemBySymbol
+          );
           // @ts-ignore
           excerptToken._canonicalReference = actualReference;
         }
