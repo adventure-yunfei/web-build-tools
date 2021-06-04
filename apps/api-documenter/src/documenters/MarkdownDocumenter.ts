@@ -123,13 +123,13 @@ export class MarkdownDocumenter {
 
     switch (apiItem.kind) {
       case ApiItemKind.Class:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} class` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 类` }));
         break;
       case ApiItemKind.Enum:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} enum` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 枚举类型` }));
         break;
       case ApiItemKind.Interface:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} interface` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 接口类型` }));
         break;
       case ApiItemKind.Constructor:
       case ApiItemKind.ConstructSignature:
@@ -137,31 +137,31 @@ export class MarkdownDocumenter {
         break;
       case ApiItemKind.Method:
       case ApiItemKind.MethodSignature:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} method` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 方法` }));
         break;
       case ApiItemKind.Function:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} function` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 函数` }));
         break;
       case ApiItemKind.Model:
-        output.appendNode(new DocHeading({ configuration, title: `API Reference` }));
+        output.appendNode(new DocHeading({ configuration, title: `API SDK` }));
         break;
       case ApiItemKind.Namespace:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} namespace` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 命名空间` }));
         break;
       case ApiItemKind.Package:
         console.log(`Writing ${apiItem.displayName} package`);
         const unscopedPackageName: string = PackageName.getUnscopedName(apiItem.displayName);
-        output.appendNode(new DocHeading({ configuration, title: `${unscopedPackageName} package` }));
+        output.appendNode(new DocHeading({ configuration, title: `${unscopedPackageName} 包` }));
         break;
       case ApiItemKind.Property:
       case ApiItemKind.PropertySignature:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} property` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 属性` }));
         break;
       case ApiItemKind.TypeAlias:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} type` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 类型` }));
         break;
       case ApiItemKind.Variable:
-        output.appendNode(new DocHeading({ configuration, title: `${scopedName} variable` }));
+        output.appendNode(new DocHeading({ configuration, title: `${scopedName} 变量` }));
         break;
       default:
         throw new Error('Unsupported API item kind: ' + apiItem.kind);
@@ -191,7 +191,7 @@ export class MarkdownDocumenter {
               new DocParagraph({ configuration: this._tsdocConfiguration }, [
                 new DocPlainText({
                   configuration: this._tsdocConfiguration,
-                  text: 'Warning: This API is now obsolete. '
+                  text: '警告: 该接口已废弃. '
                 })
               ]),
               ...tsdocComment.deprecatedBlock.content.nodes
@@ -205,6 +205,7 @@ export class MarkdownDocumenter {
 
     if (apiItem instanceof ApiDeclaredItem) {
       if (apiItem.excerpt.text.length > 0) {
+        /*
         output.appendNode(
           new DocParagraph({ configuration }, [
             new DocEmphasisSpan({ configuration, bold: true }, [
@@ -219,12 +220,17 @@ export class MarkdownDocumenter {
             language: 'typescript'
           })
         );
+        */
 
         // show api references if there're.
-        if (apiItem.excerptTokens.some((token) => token.kind === ExcerptTokenKind.Reference && token.canonicalReference !== undefined)) {
+        if (
+          apiItem.excerptTokens.some(
+            (token) => token.kind === ExcerptTokenKind.Reference && token.canonicalReference !== undefined
+          )
+        ) {
           const signatureLinkParagraph: DocParagraph = new DocParagraph({ configuration }, [
             new DocEmphasisSpan({ configuration, bold: true }, [
-              new DocPlainText({ configuration, text: 'Links: ' })
+              new DocPlainText({ configuration, text: '引用类型链接: ' })
             ])
           ]);
           output.appendNode(new DocNoteBox({ configuration }, [signatureLinkParagraph]));
@@ -239,7 +245,7 @@ export class MarkdownDocumenter {
       output.appendNode(
         new DocParagraph({ configuration }, [
           new DocEmphasisSpan({ configuration, bold: true }, [
-            new DocPlainText({ configuration, text: 'Decorators:' })
+            new DocPlainText({ configuration, text: '修饰符:' })
           ])
         ])
       );
@@ -340,7 +346,7 @@ export class MarkdownDocumenter {
       if (apiItem.extendsType) {
         const extendsParagraph: DocParagraph = new DocParagraph({ configuration }, [
           new DocEmphasisSpan({ configuration, bold: true }, [
-            new DocPlainText({ configuration, text: 'Extends: ' })
+            new DocPlainText({ configuration, text: '继承: ' })
           ])
         ]);
         this._appendExcerptWithHyperlinks(extendsParagraph, apiItem.extendsType.excerpt);
@@ -349,7 +355,7 @@ export class MarkdownDocumenter {
       if (apiItem.implementsTypes.length > 0) {
         const extendsParagraph: DocParagraph = new DocParagraph({ configuration }, [
           new DocEmphasisSpan({ configuration, bold: true }, [
-            new DocPlainText({ configuration, text: 'Implements: ' })
+            new DocPlainText({ configuration, text: '实现: ' })
           ])
         ]);
         let needsComma: boolean = false;
@@ -368,7 +374,7 @@ export class MarkdownDocumenter {
       if (apiItem.extendsTypes.length > 0) {
         const extendsParagraph: DocParagraph = new DocParagraph({ configuration }, [
           new DocEmphasisSpan({ configuration, bold: true }, [
-            new DocPlainText({ configuration, text: 'Extends: ' })
+            new DocPlainText({ configuration, text: '继承: ' })
           ])
         ]);
         let needsComma: boolean = false;
@@ -393,7 +399,7 @@ export class MarkdownDocumenter {
       if (refs.length > 0) {
         const referencesParagraph: DocParagraph = new DocParagraph({ configuration }, [
           new DocEmphasisSpan({ configuration, bold: true }, [
-            new DocPlainText({ configuration, text: 'References: ' })
+            new DocPlainText({ configuration, text: '类型引用: ' })
           ])
         ]);
         let needsComma: boolean = false;
@@ -423,7 +429,7 @@ export class MarkdownDocumenter {
       if (tsdocComment) {
         // Write the @remarks block
         if (tsdocComment.remarksBlock) {
-          output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Remarks' }));
+          output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '备注' }));
           this._appendSection(output, tsdocComment.remarksBlock.content);
         }
 
@@ -434,7 +440,7 @@ export class MarkdownDocumenter {
 
         let exampleNumber: number = 1;
         for (const exampleBlock of exampleBlocks) {
-          const heading: string = exampleBlocks.length > 1 ? `Example ${exampleNumber}` : 'Example';
+          const heading: string = exampleBlocks.length > 1 ? `示例 ${exampleNumber}` : '示例';
 
           output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: heading }));
 
@@ -457,7 +463,7 @@ export class MarkdownDocumenter {
         );
 
         if (throwsBlocks.length > 0) {
-          const heading: string = 'Exceptions';
+          const heading: string = '异常';
           output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: heading }));
 
           for (const throwsBlock of throwsBlocks) {
@@ -476,7 +482,7 @@ export class MarkdownDocumenter {
 
     const packagesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Package', 'Description']
+      headerTitles: ['包名', '描述']
     });
 
     for (const apiMember of apiModel.members) {
@@ -494,7 +500,7 @@ export class MarkdownDocumenter {
     }
 
     if (packagesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Packages' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '包列表' }));
       output.appendNode(packagesTable);
     }
   }
@@ -507,37 +513,37 @@ export class MarkdownDocumenter {
 
     const classesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Class', 'Description']
+      headerTitles: ['类名', '描述']
     });
 
     const enumerationsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Enumeration', 'Description']
+      headerTitles: ['枚举名称', '描述']
     });
 
     const functionsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Function', 'Description']
+      headerTitles: ['函数名', '描述']
     });
 
     const interfacesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Interface', 'Description']
+      headerTitles: ['接口名称', '描述']
     });
 
     const namespacesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Namespace', 'Description']
+      headerTitles: ['命名空间名称', '描述']
     });
 
     const variablesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Variable', 'Description']
+      headerTitles: ['变量名', '描述']
     });
 
     const typeAliasesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Type Alias', 'Description']
+      headerTitles: ['类型别名', '描述']
     });
 
     const apiMembers: ReadonlyArray<ApiItem> =
@@ -590,36 +596,36 @@ export class MarkdownDocumenter {
     }
 
     if (classesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Classes' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '类' }));
       output.appendNode(classesTable);
     }
 
     if (enumerationsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Enumerations' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '枚举' }));
       output.appendNode(enumerationsTable);
     }
     if (functionsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Functions' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '函数' }));
       output.appendNode(functionsTable);
     }
 
     if (interfacesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Interfaces' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '接口' }));
       output.appendNode(interfacesTable);
     }
 
     if (namespacesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Namespaces' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '命名空间' }));
       output.appendNode(namespacesTable);
     }
 
     if (variablesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Variables' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '变量' }));
       output.appendNode(variablesTable);
     }
 
     if (typeAliasesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Type Aliases' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '类型别名' }));
       output.appendNode(typeAliasesTable);
     }
   }
@@ -632,22 +638,22 @@ export class MarkdownDocumenter {
 
     const eventsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Property', 'Modifiers', 'Type', 'Description']
+      headerTitles: ['属性名', '修饰符', '类型', '描述']
     });
 
     const constructorsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Constructor', 'Modifiers', 'Description']
+      headerTitles: ['构造函数签名', '修饰符', '描述']
     });
 
     const propertiesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Property', 'Modifiers', 'Type', 'Description']
+      headerTitles: ['属性名', '修饰符', '类型', '描述']
     });
 
     const methodsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Method', 'Modifiers', 'Description']
+      headerTitles: ['方法名', '修饰符', '描述']
     });
 
     for (const apiMember of apiClass.members) {
@@ -704,22 +710,22 @@ export class MarkdownDocumenter {
     }
 
     if (eventsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Events' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '事件' }));
       output.appendNode(eventsTable);
     }
 
     if (constructorsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Constructors' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '构造函数' }));
       output.appendNode(constructorsTable);
     }
 
     if (propertiesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Properties' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '属性' }));
       output.appendNode(propertiesTable);
     }
 
     if (methodsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Methods' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '方法' }));
       output.appendNode(methodsTable);
     }
   }
@@ -732,7 +738,7 @@ export class MarkdownDocumenter {
 
     const enumMembersTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Member', 'Value', 'Description']
+      headerTitles: ['名称', '值', '描述']
     });
 
     for (const apiEnumMember of apiEnum.members) {
@@ -756,9 +762,7 @@ export class MarkdownDocumenter {
     }
 
     if (enumMembersTable.rows.length > 0) {
-      output.appendNode(
-        new DocHeading({ configuration: this._tsdocConfiguration, title: 'Enumeration Members' })
-      );
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '枚举值' }));
       output.appendNode(enumMembersTable);
     }
   }
@@ -771,17 +775,17 @@ export class MarkdownDocumenter {
 
     const eventsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Property', 'Type', 'Description']
+      headerTitles: ['属性名', '类型', '描述']
     });
 
     const propertiesTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Property', 'Type', 'Description']
+      headerTitles: ['属性名', '类型', '描述']
     });
 
     const methodsTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Method', 'Description']
+      headerTitles: ['方法名', '描述']
     });
 
     for (const apiMember of apiClass.members) {
@@ -824,17 +828,17 @@ export class MarkdownDocumenter {
     }
 
     if (eventsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Events' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '事件' }));
       output.appendNode(eventsTable);
     }
 
     if (propertiesTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Properties' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '属性' }));
       output.appendNode(propertiesTable);
     }
 
     if (methodsTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Methods' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '方法' }));
       output.appendNode(methodsTable);
     }
   }
@@ -847,7 +851,7 @@ export class MarkdownDocumenter {
 
     const parametersTable: DocTable = new DocTable({
       configuration,
-      headerTitles: ['Parameter', 'Type', 'Description']
+      headerTitles: ['参数名', '类型', '描述']
     });
     for (const apiParameter of apiParameterListMixin.parameters) {
       const parameterDescription: DocSection = new DocSection({ configuration });
@@ -871,7 +875,7 @@ export class MarkdownDocumenter {
     }
 
     if (parametersTable.rows.length > 0) {
-      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: 'Parameters' }));
+      output.appendNode(new DocHeading({ configuration: this._tsdocConfiguration, title: '参数' }));
       output.appendNode(parametersTable);
     }
 
@@ -880,7 +884,7 @@ export class MarkdownDocumenter {
       output.appendNode(
         new DocParagraph({ configuration }, [
           new DocEmphasisSpan({ configuration, bold: true }, [
-            new DocPlainText({ configuration, text: 'Returns:' })
+            new DocPlainText({ configuration, text: '返回:' })
           ])
         ])
       );
@@ -901,7 +905,7 @@ export class MarkdownDocumenter {
     const paragraph: DocParagraph = new DocParagraph({ configuration });
 
     if (!excerpt.text.trim()) {
-      paragraph.appendNode(new DocPlainText({ configuration, text: '(not declared)' }));
+      paragraph.appendNode(new DocPlainText({ configuration, text: '(未声明)' }));
     } else {
       this._appendExcerptWithHyperlinks(paragraph, excerpt);
     }
@@ -993,7 +997,7 @@ export class MarkdownDocumenter {
     if (ApiOptionalMixin.isBaseClassOf(apiItem) && apiItem.isOptional) {
       section.appendNodesInParagraph([
         new DocEmphasisSpan({ configuration, italic: true }, [
-          new DocPlainText({ configuration, text: '(Optional)' })
+          new DocPlainText({ configuration, text: '(可选)' })
         ]),
         new DocPlainText({ configuration, text: ' ' })
       ]);
@@ -1039,7 +1043,7 @@ export class MarkdownDocumenter {
       new DocLinkTag({
         configuration: this._tsdocConfiguration,
         tagName: '@link',
-        linkText: 'Home',
+        linkText: '主页',
         urlDestination: this._getLinkFilenameForApiItem(this._apiModel)
       })
     );
