@@ -2,6 +2,10 @@
 
 This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be manually modified.
 
+## 7.12.3-rc.0
+
+- 新增完整的引用类型链接支持
+
 ## 7.12.3
 Fri, 08 Jan 2021 07:28:50 GMT
 
@@ -1765,7 +1769,7 @@ Wed, 21 Mar 2018 21:05:22 GMT
 ### Patches
 
 - Change heading for code snippets section from `## Snippets` to `#### Examples`.
-- Customize the `API Set #.#` hyperlink target by host. 
+- Customize the `API Set #.#` hyperlink target by host.
 - Designate proper language for each code snippet (TypeScript or JavaScript).
 
 ## 1.1.24

@@ -2,6 +2,12 @@
 
 This log was last generated on Thu, 10 Dec 2020 23:25:49 GMT and should not be manually modified.
 
+## 7.12.1-rc.4
+
+- 新增 `import * as foo from './local-module';` 局部模块 namespace 导入支持
+- 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）
+- 新增完整的引用类型链接支持, 包括未导出的类型
+
 ## 7.12.1
 Thu, 10 Dec 2020 23:25:49 GMT
 
@@ -1071,7 +1077,7 @@ Thu, 25 Oct 2018 08:56:02 GMT
 
 ### Patches
 
-- Fix issue where `DocErrorText.text` returned `[object Object]` instead of the text 
+- Fix issue where `DocErrorText.text` returned `[object Object]` instead of the text
 
 ## 6.0.7
 Wed, 24 Oct 2018 16:03:10 GMT
