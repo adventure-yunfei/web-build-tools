@@ -1039,6 +1039,7 @@ export class MarkdownDocumenter {
   }
 
   private _writeBreadcrumb(output: DocSection, apiItem: ApiItem): void {
+    /*
     output.appendNodeInParagraph(
       new DocLinkTag({
         configuration: this._tsdocConfiguration,
@@ -1047,7 +1048,9 @@ export class MarkdownDocumenter {
         urlDestination: this._getLinkFilenameForApiItem(this._apiModel)
       })
     );
+    */
 
+    let isFirst: boolean = true;
     for (const hierarchyItem of apiItem.getHierarchy()) {
       switch (hierarchyItem.kind) {
         case ApiItemKind.Model:
@@ -1057,18 +1060,23 @@ export class MarkdownDocumenter {
           // this may change in the future.
           break;
         default:
-          output.appendNodesInParagraph([
-            new DocPlainText({
-              configuration: this._tsdocConfiguration,
-              text: ' > '
-            }),
+          if (!isFirst) {
+            output.appendNodeInParagraph(
+              new DocPlainText({
+                configuration: this._tsdocConfiguration,
+                text: ' > '
+              })
+            );
+          }
+          isFirst = false;
+          output.appendNodeInParagraph(
             new DocLinkTag({
               configuration: this._tsdocConfiguration,
               tagName: '@link',
               linkText: hierarchyItem.displayName,
               urlDestination: this._getLinkFilenameForApiItem(hierarchyItem)
             })
-          ]);
+          );
       }
     }
   }
