@@ -2,6 +2,11 @@
 
 This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be manually modified.
 
+## 7.12.3-new.0
+
+- 翻译为中文
+- 兼容 mdx@1.x 语法
+
 ## 7.12.3-rc.0
 
 - 新增完整的引用类型链接支持
