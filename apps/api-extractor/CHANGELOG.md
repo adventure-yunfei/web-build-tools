@@ -2,6 +2,11 @@
 
 This log was last generated on Thu, 10 Dec 2020 23:25:49 GMT and should not be manually modified.
 
+
+## 7.12.1-rc.5
+
+- 优化 `import Foo = Bar.Baz;` 语法支持：dts rollup 结果中移除 namespace 中多余的该语法
+
 ## 7.12.1-rc.4
 
 - 新增 `import * as foo from './local-module';` 局部模块 namespace 导入支持
