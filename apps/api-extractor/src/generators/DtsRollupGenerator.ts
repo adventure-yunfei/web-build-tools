@@ -191,6 +191,11 @@ export class DtsRollupGenerator {
         span.modification.skipAll();
         break;
 
+      case ts.SyntaxKind.ImportEqualsDeclaration:
+        // Delete "import Foo = Bar.Baz;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
+        span.modification.skipAll();
+        break;
+
       case ts.SyntaxKind.InterfaceKeyword:
       case ts.SyntaxKind.ClassKeyword:
       case ts.SyntaxKind.EnumKeyword:
