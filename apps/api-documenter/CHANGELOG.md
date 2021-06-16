@@ -1,3 +1,9 @@
+# Change Log - api-extractor custom version
+
+## 7.12.3-rc.0
+
+- 新增完整的引用类型链接支持
+
 # Change Log - @microsoft/api-documenter
 
 This log was last generated on Tue, 15 Jun 2021 20:38:35 GMT and should not be manually modified.
@@ -205,10 +211,6 @@ _Version update only_
 Wed, 13 Jan 2021 01:11:06 GMT
 
 _Version update only_
-
-## 7.12.3-rc.0
-
-- 新增完整的引用类型链接支持
 
 ## 7.12.3
 Fri, 08 Jan 2021 07:28:50 GMT

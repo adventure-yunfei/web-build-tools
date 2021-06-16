@@ -1,3 +1,20 @@
+# Change Log - api-extractor custom version
+
+## 7.16.1.rc.1
+
+- 合并主分支代码
+- fix：修复 API JSON 中的导出命名
+
+## 7.12.1-rc.5
+
+- 优化 `import Foo = Bar.Baz;` 语法支持：dts rollup 结果中移除 namespace 中多余的该语法
+
+## 7.12.1-rc.4
+
+- 新增 `import * as foo from './local-module';` 局部模块 namespace 导入支持
+- 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）
+- 新增完整的引用类型链接支持, 包括未导出的类型
+
 # Change Log - @microsoft/api-extractor
 
 This log was last generated on Fri, 04 Jun 2021 19:59:53 GMT and should not be manually modified.
@@ -69,17 +86,6 @@ Wed, 13 Jan 2021 01:11:06 GMT
 ### Minor changes
 
 - Upgrade the bundled compiler engine to TypeScript 4.1
-
-
-## 7.12.1-rc.5
-
-- 优化 `import Foo = Bar.Baz;` 语法支持：dts rollup 结果中移除 namespace 中多余的该语法
-
-## 7.12.1-rc.4
-
-- 新增 `import * as foo from './local-module';` 局部模块 namespace 导入支持
-- 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）
-- 新增完整的引用类型链接支持, 包括未导出的类型
 
 ## 7.12.1
 Thu, 10 Dec 2020 23:25:49 GMT
