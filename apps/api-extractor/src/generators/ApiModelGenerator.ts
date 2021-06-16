@@ -86,7 +86,8 @@ export class ApiModelGenerator {
     // Create a CollectorEntity for each top-level export
     for (const entity of this._collector.entities) {
       if (entity.exported) {
-        this._processAstEntity(entity.astEntity, entity.nameForEmit, apiEntryPoint);
+        const exportedName: string | undefined = Array.from(entity.exportNames)[0] || entity.nameForEmit;
+        this._processAstEntity(entity.astEntity, exportedName, apiEntryPoint);
       }
     }
 
@@ -123,9 +124,11 @@ export class ApiModelGenerator {
     return apiPackage;
   }
 
-  private _processAstEntity(astEntity: AstEntity, exportedName: string | undefined,
-    parentApiItem: ApiItemContainerMixin): void {
-
+  private _processAstEntity(
+    astEntity: AstEntity,
+    exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin
+  ): void {
     if (astEntity instanceof AstSymbol) {
       // Skip ancillary declarations; we will process them with the main declaration
       for (const astDeclaration of this._collector.getNonAncillaryDeclarations(astEntity)) {
@@ -140,22 +143,33 @@ export class ApiModelGenerator {
     }
   }
 
-  private _processModuleImport(astModule: AstModule, exportedName: string | undefined,
-    parentApiItem: ApiItemContainerMixin): void {
-
+  private _processModuleImport(
+    astModule: AstModule,
+    exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin
+  ): void {
     const name: string = exportedName ? exportedName : astModule.moduleSymbol.name;
     const containerKey: string = ApiNamespace.getContainerKey(name);
 
-    let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMemberByKey(containerKey) as ApiNamespace;
+    let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMemberByKey(
+      containerKey
+    ) as ApiNamespace;
 
     if (apiNamespace === undefined) {
-      apiNamespace = new ApiNamespace({ name, docComment: undefined, releaseTag: ReleaseTag.None, excerptTokens: [] });
+      apiNamespace = new ApiNamespace({
+        name,
+        docComment: undefined,
+        releaseTag: ReleaseTag.None,
+        excerptTokens: []
+      });
       parentApiItem.addMember(apiNamespace);
     }
 
-    astModule.astModuleExportInfo!.exportedLocalEntities.forEach((exportedEntity: AstEntity, exportedName: string) => {
-      this._processAstEntity(exportedEntity, exportedName, apiNamespace!);
-    });
+    astModule.astModuleExportInfo!.exportedLocalEntities.forEach(
+      (exportedEntity: AstEntity, exportedName: string) => {
+        this._processAstEntity(exportedEntity, exportedName, apiNamespace!);
+      }
+    );
   }
 
   private _getApiItemBySymbol: (followedSymbol: ts.Symbol) => ApiItem | undefined = (followedSymbol) => {
@@ -168,12 +182,11 @@ export class ApiModelGenerator {
           excerptToken.canonicalReference !== undefined &&
           DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)
         ) {
-          const actualReference:
-            | DeclarationReference
-            | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
-            excerptToken.canonicalReference,
-            this._getApiItemBySymbol
-          );
+          const actualReference: DeclarationReference | undefined =
+            this._referenceGenerator.getDeclarationReferenceForPlaceholder(
+              excerptToken.canonicalReference,
+              this._getApiItemBySymbol
+            );
           // @ts-ignore
           excerptToken._canonicalReference = actualReference;
         }
