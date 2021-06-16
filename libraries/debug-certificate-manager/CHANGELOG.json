@@ -2,6 +2,657 @@
   "name": "@rushstack/debug-certificate-manager",
   "entries": [
     {
+      "version": "1.0.36",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.36",
+      "date": "Tue, 15 Jun 2021 20:38:35 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.1.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.35",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.35",
+      "date": "Fri, 11 Jun 2021 23:26:16 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.31`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.34",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.34",
+      "date": "Fri, 11 Jun 2021 00:34:02 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.32.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.30`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.33",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.33",
+      "date": "Thu, 10 Jun 2021 15:08:16 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.31.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.29`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.32",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.32",
+      "date": "Fri, 04 Jun 2021 19:59:53 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.39.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.31.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.28`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.31",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.31",
+      "date": "Fri, 04 Jun 2021 15:08:20 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.31.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.27`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.30",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.30",
+      "date": "Fri, 04 Jun 2021 00:08:34 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.31.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.26`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.29",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.29",
+      "date": "Tue, 01 Jun 2021 18:29:26 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.31.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.25`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.28",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.28",
+      "date": "Sat, 29 May 2021 01:05:06 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.31.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.24`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.27",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.27",
+      "date": "Fri, 28 May 2021 06:19:58 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.7`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.23`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.26",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.26",
+      "date": "Tue, 25 May 2021 00:12:21 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.6`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.22`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.25",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.25",
+      "date": "Wed, 19 May 2021 00:11:39 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.38.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.21`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.24",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.24",
+      "date": "Thu, 13 May 2021 01:52:46 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.20`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.23",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.23",
+      "date": "Tue, 11 May 2021 22:19:17 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.19`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.22",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.22",
+      "date": "Mon, 03 May 2021 15:10:28 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.37.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.18`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.21",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.21",
+      "date": "Fri, 30 Apr 2021 00:30:52 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue where certmgr.exe sometimes could not be found on Windows."
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.20",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.20",
+      "date": "Thu, 29 Apr 2021 23:26:50 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.17`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.19",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.19",
+      "date": "Thu, 29 Apr 2021 01:07:29 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.30.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.16`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.18",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.18",
+      "date": "Fri, 23 Apr 2021 22:00:07 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.29.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.15`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.17",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.17",
+      "date": "Fri, 23 Apr 2021 15:11:21 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.29.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.14`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.16",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.16",
+      "date": "Wed, 21 Apr 2021 15:12:28 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.28.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.13`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.15",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.15",
+      "date": "Tue, 20 Apr 2021 04:59:51 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.28.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.12`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.14",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.14",
+      "date": "Thu, 15 Apr 2021 02:59:25 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.28.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.11`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.13",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.13",
+      "date": "Mon, 12 Apr 2021 15:10:29 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.36.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/eslint-config\" to `2.3.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.28.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.10`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.12",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.12",
+      "date": "Thu, 08 Apr 2021 20:41:54 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.28.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.9`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.11",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.11",
+      "date": "Thu, 08 Apr 2021 06:05:32 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.28.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.8`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.10",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.10",
+      "date": "Thu, 08 Apr 2021 00:10:18 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.27.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.7`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.9",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.9",
+      "date": "Tue, 06 Apr 2021 15:14:22 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.36.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/eslint-config\" to `2.3.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.26.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.6`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.8",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.8",
+      "date": "Wed, 31 Mar 2021 15:10:36 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.25.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.5`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.7",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.7",
+      "date": "Mon, 29 Mar 2021 05:02:06 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.25.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.4`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.6",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.6",
+      "date": "Thu, 25 Mar 2021 04:57:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix bug resolving the path of certutil.exe on Windows."
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.5",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.5",
+      "date": "Fri, 19 Mar 2021 22:31:38 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.25.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.4",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.4",
+      "date": "Wed, 17 Mar 2021 05:04:38 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.25.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.3",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.3",
+      "date": "Fri, 12 Mar 2021 01:13:27 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.25.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.2",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.2",
+      "date": "Wed, 10 Mar 2021 06:23:29 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `1.0.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.1",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.1",
+      "date": "Wed, 10 Mar 2021 05:10:06 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.25.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.7`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "1.0.0",
+      "tag": "@rushstack/debug-certificate-manager_v1.0.0",
+      "date": "Tue, 09 Mar 2021 23:31:46 GMT",
+      "comments": {
+        "major": [
+          {
+            "comment": "Make the trust/untrust APIs async."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.113",
+      "tag": "@rushstack/debug-certificate-manager_v0.2.113",
+      "date": "Thu, 04 Mar 2021 01:11:31 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.24.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.6`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.112",
+      "tag": "@rushstack/debug-certificate-manager_v0.2.112",
+      "date": "Tue, 02 Mar 2021 23:25:05 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.24.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.5`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.111",
+      "tag": "@rushstack/debug-certificate-manager_v0.2.111",
+      "date": "Fri, 05 Feb 2021 16:10:42 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.36.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.24.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.4`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.110",
+      "tag": "@rushstack/debug-certificate-manager_v0.2.110",
+      "date": "Fri, 22 Jan 2021 05:39:22 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.24.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.109",
+      "tag": "@rushstack/debug-certificate-manager_v0.2.109",
+      "date": "Thu, 21 Jan 2021 04:19:00 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.24.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.108",
+      "tag": "@rushstack/debug-certificate-manager_v0.2.108",
+      "date": "Wed, 13 Jan 2021 01:11:06 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.23.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `0.2.1`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.2.107",
       "tag": "@rushstack/debug-certificate-manager_v0.2.107",
       "date": "Fri, 08 Jan 2021 07:28:50 GMT",

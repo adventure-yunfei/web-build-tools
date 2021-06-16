@@ -2,6 +2,577 @@
   "name": "@rushstack/heft",
   "entries": [
     {
+      "version": "0.32.0",
+      "tag": "@rushstack/heft_v0.32.0",
+      "date": "Fri, 11 Jun 2021 00:34:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "(BREAKING CHANGE) Remove Jest plugin from Heft. To consume the Jest plugin, add @rushstack/heft-jest-plugin as a dependency and include it in heft.json. See UPGRADING.md for more information."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.5.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.5",
+      "tag": "@rushstack/heft_v0.31.5",
+      "date": "Thu, 10 Jun 2021 15:08:15 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update the version compatibility warning to indicate that TypeScript 4.x is supported by Heft"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.4",
+      "tag": "@rushstack/heft_v0.31.4",
+      "date": "Fri, 04 Jun 2021 19:59:53 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Add IBuildStage output property 'isTypeScriptProject' and populate in TypeScriptPlugin"
+          },
+          {
+            "comment": "Fix bug in CopyFilesPlugin that caused 0-length files to be generated"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.4.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.39.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.7`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.16.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.3",
+      "tag": "@rushstack/heft_v0.31.3",
+      "date": "Fri, 04 Jun 2021 15:08:20 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.16.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.2",
+      "tag": "@rushstack/heft_v0.31.2",
+      "date": "Fri, 04 Jun 2021 00:08:34 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.4.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.1",
+      "tag": "@rushstack/heft_v0.31.1",
+      "date": "Tue, 01 Jun 2021 18:29:25 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue where NodeServicePlugin launched the service when \"heft build --watch\" was invoked"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.31.0",
+      "tag": "@rushstack/heft_v0.31.0",
+      "date": "Sat, 29 May 2021 01:05:06 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add a new \"node-service\" task that enables \"heft start\" to launch a Node.js service (GitHub #2717)"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.4.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.7",
+      "tag": "@rushstack/heft_v0.30.7",
+      "date": "Fri, 28 May 2021 06:19:57 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Prepare to split JestPlugin into a dedicated package"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.6",
+      "tag": "@rushstack/heft_v0.30.6",
+      "date": "Tue, 25 May 2021 00:12:21 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Report an error to prevent two different TypeScript module kinds from being emitted into nested folders"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.5",
+      "tag": "@rushstack/heft_v0.30.5",
+      "date": "Wed, 19 May 2021 00:11:39 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.22`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.38.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.6`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.15.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.4",
+      "tag": "@rushstack/heft_v0.30.4",
+      "date": "Thu, 13 May 2021 01:52:46 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue where Heft would return only the sourcemap if the compiled .js file is missing the sourceMappingURL comment."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.3",
+      "tag": "@rushstack/heft_v0.30.3",
+      "date": "Tue, 11 May 2021 22:19:17 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix the \"sources\" paths in emitted sourcemap files."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.2",
+      "tag": "@rushstack/heft_v0.30.2",
+      "date": "Mon, 03 May 2021 15:10:28 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Move forEachLimitAsync implementation out of heft"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.21`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.37.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.5`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.15.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.1",
+      "tag": "@rushstack/heft_v0.30.1",
+      "date": "Thu, 29 Apr 2021 23:26:50 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.15.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.30.0",
+      "tag": "@rushstack/heft_v0.30.0",
+      "date": "Thu, 29 Apr 2021 01:07:29 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Implement a workaround for an intermittent Jest error \"A worker process has failed to exit gracefully and has been force exited.\" (Jest issue #11354)"
+          }
+        ],
+        "minor": [
+          {
+            "comment": "Add a command-line option \"--detect-open-handles\" for troubleshooting Jest issues"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.29.1",
+      "tag": "@rushstack/heft_v0.29.1",
+      "date": "Fri, 23 Apr 2021 22:00:06 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Ensure TypeScript uses file paths with correct casing."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.29.0",
+      "tag": "@rushstack/heft_v0.29.0",
+      "date": "Fri, 23 Apr 2021 15:11:20 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add emitCjsExtensionForCommonJS and emitMjsExtensionForESModule options to config/typescript.json to support emitting commonJS and ESModule output files with the \".cjs\" and \".mjs\" respectively, alongside the normal \".js\" output files."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.5",
+      "tag": "@rushstack/heft_v0.28.5",
+      "date": "Wed, 21 Apr 2021 15:12:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue where an exception is thrown when running multiple TypeScript compilations in --debug mode"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.4",
+      "tag": "@rushstack/heft_v0.28.4",
+      "date": "Tue, 20 Apr 2021 04:59:51 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.14.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.3",
+      "tag": "@rushstack/heft_v0.28.3",
+      "date": "Thu, 15 Apr 2021 02:59:25 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix incremental TypeScript compilation, optimize architecture"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.2",
+      "tag": "@rushstack/heft_v0.28.2",
+      "date": "Mon, 12 Apr 2021 15:10:29 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.20`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.36.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/rig-package\" to `0.2.12`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.7.10`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.4`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.13.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/eslint-config\" to `2.3.4`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.1",
+      "tag": "@rushstack/heft_v0.28.1",
+      "date": "Thu, 08 Apr 2021 20:41:54 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Include mention of heft-webpack5-plugin in an error message."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.19`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.28.0",
+      "tag": "@rushstack/heft_v0.28.0",
+      "date": "Thu, 08 Apr 2021 06:05:31 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Fix parameter name typo."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.13.4`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.27.0",
+      "tag": "@rushstack/heft_v0.27.0",
+      "date": "Thu, 08 Apr 2021 00:10:18 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "(BREAKING) Move Webpack functionality into its own package (@rushstack/heft-webpack4-plugin)."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.26.0",
+      "tag": "@rushstack/heft_v0.26.0",
+      "date": "Tue, 06 Apr 2021 15:14:22 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add an \"afterCompile\" hook that runs after compilation."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.18`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.36.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/rig-package\" to `0.2.11`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.7.9`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.3`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.13.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/eslint-config\" to `2.3.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.5",
+      "tag": "@rushstack/heft_v0.25.5",
+      "date": "Wed, 31 Mar 2021 15:10:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an outdated path in an error message."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.4",
+      "tag": "@rushstack/heft_v0.25.4",
+      "date": "Mon, 29 Mar 2021 05:02:06 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.3",
+      "tag": "@rushstack/heft_v0.25.3",
+      "date": "Fri, 19 Mar 2021 22:31:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Improve README.md"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.2",
+      "tag": "@rushstack/heft_v0.25.2",
+      "date": "Wed, 17 Mar 2021 05:04:37 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue where heft would crash when copying static assets in --watch mode."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.1",
+      "tag": "@rushstack/heft_v0.25.1",
+      "date": "Fri, 12 Mar 2021 01:13:27 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update node-sass to support Node 15."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.25.0",
+      "tag": "@rushstack/heft_v0.25.0",
+      "date": "Wed, 10 Mar 2021 05:10:05 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "(BREAKING CHANGE) Change the logic that resolves typescript, eslint, tslint, and api-extractor to look for a devDependency in the current project, and then for a dependency in the rig project, and then as any kind of dependency in the current project."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.4",
+      "tag": "@rushstack/heft_v0.24.4",
+      "date": "Thu, 04 Mar 2021 01:11:31 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.17`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/rig-package\" to `0.2.10`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.13.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.3",
+      "tag": "@rushstack/heft_v0.24.3",
+      "date": "Tue, 02 Mar 2021 23:25:05 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue where build would continue even if TS reported errors."
+          },
+          {
+            "comment": "Determine the default static assets destination folder from the TSConfig's \"outDir\" property, instead of hardcoding \"lib.\""
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.2",
+      "tag": "@rushstack/heft_v0.24.2",
+      "date": "Fri, 05 Feb 2021 16:10:42 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.3.16`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.36.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/typings-generator\" to `0.3.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.13.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.1",
+      "tag": "@rushstack/heft_v0.24.1",
+      "date": "Fri, 22 Jan 2021 05:39:22 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix an issue with webpack in \"heft start\" mode where \"bundle\" would continue too quickly."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.24.0",
+      "tag": "@rushstack/heft_v0.24.0",
+      "date": "Thu, 21 Jan 2021 04:19:00 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update jest-shared.config.json to specify a default \"collectCoverageFrom\" that includes all \"src\" files excluding test files"
+          },
+          {
+            "comment": "Update jest-shared.config.json to configure \"coverageDirectory\" to use \"./temp/coverage\" (instead of \"./coverage\")"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.23.2",
+      "tag": "@rushstack/heft_v0.23.2",
+      "date": "Wed, 13 Jan 2021 01:11:06 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.13.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.23.1",
       "tag": "@rushstack/heft_v0.23.1",
       "date": "Wed, 06 Jan 2021 16:10:43 GMT",

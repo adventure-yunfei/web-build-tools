@@ -160,9 +160,8 @@ export class ApiReportGenerator {
           // Emit all the declarations for this entity
           for (const astDeclaration of entity.astEntity.astDeclarations || []) {
             // Get the messages associated with this declaration
-            const fetchedMessages: ExtractorMessage[] = collector.messageRouter.fetchAssociatedMessagesForReviewFile(
-              astDeclaration
-            );
+            const fetchedMessages: ExtractorMessage[] =
+              collector.messageRouter.fetchAssociatedMessagesForReviewFile(astDeclaration);
 
             // Peel off the messages associated with an export statement and store them
             // in IExportToEmit.associatedMessages (to be processed later).  The remaining messages will
@@ -227,7 +226,8 @@ export class ApiReportGenerator {
     DtsEmitHelpers.emitStarExports(stringWriter, collector);
 
     // Write the unassociated warnings at the bottom of the file
-    const unassociatedMessages: ExtractorMessage[] = collector.messageRouter.fetchUnassociatedMessagesForReviewFile();
+    const unassociatedMessages: ExtractorMessage[] =
+      collector.messageRouter.fetchUnassociatedMessagesForReviewFile();
     if (unassociatedMessages.length > 0) {
       stringWriter.writeLine();
       ApiReportGenerator._writeLineAsComments(stringWriter, 'Warnings were encountered during analysis:');
@@ -401,9 +401,8 @@ export class ApiReportGenerator {
           }
 
           if (!insideTypeLiteral) {
-            const messagesToReport: ExtractorMessage[] = collector.messageRouter.fetchAssociatedMessagesForReviewFile(
-              childAstDeclaration
-            );
+            const messagesToReport: ExtractorMessage[] =
+              collector.messageRouter.fetchAssociatedMessagesForReviewFile(childAstDeclaration);
             const aedocSynopsis: string = ApiReportGenerator._getAedocSynopsis(
               collector,
               childAstDeclaration,

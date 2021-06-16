@@ -75,7 +75,8 @@ export class ApiModelGenerator {
 
     const apiPackage: ApiPackage = new ApiPackage({
       name: this._collector.workingPackage.name,
-      docComment: packageDocComment
+      docComment: packageDocComment,
+      tsdocConfiguration: this._collector.extractorConfig.tsdocConfiguration
     });
     this._apiModel.addMember(apiPackage);
 
@@ -85,7 +86,8 @@ export class ApiModelGenerator {
     // Create a CollectorEntity for each top-level export
     for (const entity of this._collector.entities) {
       if (entity.exported) {
-        this._processAstEntity(entity.astEntity, entity.nameForEmit, apiEntryPoint);
+        const exportedName: string | undefined = Array.from(entity.exportNames)[0] || entity.nameForEmit;
+        this._processAstEntity(entity.astEntity, exportedName, apiEntryPoint);
       }
     }
 
@@ -122,9 +124,11 @@ export class ApiModelGenerator {
     return apiPackage;
   }
 
-  private _processAstEntity(astEntity: AstEntity, exportedName: string | undefined,
-    parentApiItem: ApiItemContainerMixin): void {
-
+  private _processAstEntity(
+    astEntity: AstEntity,
+    exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin
+  ): void {
     if (astEntity instanceof AstSymbol) {
       // Skip ancillary declarations; we will process them with the main declaration
       for (const astDeclaration of this._collector.getNonAncillaryDeclarations(astEntity)) {
@@ -139,22 +143,33 @@ export class ApiModelGenerator {
     }
   }
 
-  private _processModuleImport(astModule: AstModule, exportedName: string | undefined,
-    parentApiItem: ApiItemContainerMixin): void {
-
+  private _processModuleImport(
+    astModule: AstModule,
+    exportedName: string | undefined,
+    parentApiItem: ApiItemContainerMixin
+  ): void {
     const name: string = exportedName ? exportedName : astModule.moduleSymbol.name;
     const containerKey: string = ApiNamespace.getContainerKey(name);
 
-    let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMemberByKey(containerKey) as ApiNamespace;
+    let apiNamespace: ApiNamespace | undefined = parentApiItem.tryGetMemberByKey(
+      containerKey
+    ) as ApiNamespace;
 
     if (apiNamespace === undefined) {
-      apiNamespace = new ApiNamespace({ name, docComment: undefined, releaseTag: ReleaseTag.None, excerptTokens: [] });
+      apiNamespace = new ApiNamespace({
+        name,
+        docComment: undefined,
+        releaseTag: ReleaseTag.None,
+        excerptTokens: []
+      });
       parentApiItem.addMember(apiNamespace);
     }
 
-    astModule.astModuleExportInfo!.exportedLocalEntities.forEach((exportedEntity: AstEntity, exportedName: string) => {
-      this._processAstEntity(exportedEntity, exportedName, apiNamespace!);
-    });
+    astModule.astModuleExportInfo!.exportedLocalEntities.forEach(
+      (exportedEntity: AstEntity, exportedName: string) => {
+        this._processAstEntity(exportedEntity, exportedName, apiNamespace!);
+      }
+    );
   }
 
   private _getApiItemBySymbol: (followedSymbol: ts.Symbol) => ApiItem | undefined = (followedSymbol) => {
@@ -167,12 +182,11 @@ export class ApiModelGenerator {
           excerptToken.canonicalReference !== undefined &&
           DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)
         ) {
-          const actualReference:
-            | DeclarationReference
-            | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
-            excerptToken.canonicalReference,
-            this._getApiItemBySymbol
-          );
+          const actualReference: DeclarationReference | undefined =
+            this._referenceGenerator.getDeclarationReferenceForPlaceholder(
+              excerptToken.canonicalReference,
+              this._getApiItemBySymbol
+            );
           // @ts-ignore
           excerptToken._canonicalReference = actualReference;
         }
@@ -303,7 +317,8 @@ export class ApiModelGenerator {
     ) as ApiCallSignature;
 
     if (apiCallSignature === undefined) {
-      const callSignature: ts.CallSignatureDeclaration = astDeclaration.declaration as ts.CallSignatureDeclaration;
+      const callSignature: ts.CallSignatureDeclaration =
+        astDeclaration.declaration as ts.CallSignatureDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -353,7 +368,8 @@ export class ApiModelGenerator {
     ) as ApiConstructor;
 
     if (apiConstructor === undefined) {
-      const constructorDeclaration: ts.ConstructorDeclaration = astDeclaration.declaration as ts.ConstructorDeclaration;
+      const constructorDeclaration: ts.ConstructorDeclaration =
+        astDeclaration.declaration as ts.ConstructorDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -453,7 +469,8 @@ export class ApiModelGenerator {
     ) as ApiConstructSignature;
 
     if (apiConstructSignature === undefined) {
-      const constructSignature: ts.ConstructSignatureDeclaration = astDeclaration.declaration as ts.ConstructSignatureDeclaration;
+      const constructSignature: ts.ConstructSignatureDeclaration =
+        astDeclaration.declaration as ts.ConstructSignatureDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -565,7 +582,8 @@ export class ApiModelGenerator {
     let apiFunction: ApiFunction | undefined = parentApiItem.tryGetMemberByKey(containerKey) as ApiFunction;
 
     if (apiFunction === undefined) {
-      const functionDeclaration: ts.FunctionDeclaration = astDeclaration.declaration as ts.FunctionDeclaration;
+      const functionDeclaration: ts.FunctionDeclaration =
+        astDeclaration.declaration as ts.FunctionDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -619,7 +637,8 @@ export class ApiModelGenerator {
     ) as ApiIndexSignature;
 
     if (apiIndexSignature === undefined) {
-      const indexSignature: ts.IndexSignatureDeclaration = astDeclaration.declaration as ts.IndexSignatureDeclaration;
+      const indexSignature: ts.IndexSignatureDeclaration =
+        astDeclaration.declaration as ts.IndexSignatureDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -663,7 +682,8 @@ export class ApiModelGenerator {
     ) as ApiInterface;
 
     if (apiInterface === undefined) {
-      const interfaceDeclaration: ts.InterfaceDeclaration = astDeclaration.declaration as ts.InterfaceDeclaration;
+      const interfaceDeclaration: ts.InterfaceDeclaration =
+        astDeclaration.declaration as ts.InterfaceDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -860,7 +880,8 @@ export class ApiModelGenerator {
     let apiProperty: ApiProperty | undefined = parentApiItem.tryGetMemberByKey(containerKey) as ApiProperty;
 
     if (apiProperty === undefined) {
-      const propertyDeclaration: ts.PropertyDeclaration = astDeclaration.declaration as ts.PropertyDeclaration;
+      const propertyDeclaration: ts.PropertyDeclaration =
+        astDeclaration.declaration as ts.PropertyDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -949,7 +970,8 @@ export class ApiModelGenerator {
     ) as ApiTypeAlias;
 
     if (apiTypeAlias === undefined) {
-      const typeAliasDeclaration: ts.TypeAliasDeclaration = astDeclaration.declaration as ts.TypeAliasDeclaration;
+      const typeAliasDeclaration: ts.TypeAliasDeclaration =
+        astDeclaration.declaration as ts.TypeAliasDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 
@@ -992,7 +1014,8 @@ export class ApiModelGenerator {
     let apiVariable: ApiVariable | undefined = parentApiItem.tryGetMemberByKey(containerKey) as ApiVariable;
 
     if (apiVariable === undefined) {
-      const variableDeclaration: ts.VariableDeclaration = astDeclaration.declaration as ts.VariableDeclaration;
+      const variableDeclaration: ts.VariableDeclaration =
+        astDeclaration.declaration as ts.VariableDeclaration;
 
       const nodesToCapture: IExcerptBuilderNodeToCapture[] = [];
 

@@ -18,10 +18,12 @@ export class TestAction extends BuildAction {
   private _noBuildFlag!: CommandLineFlagParameter;
   private _updateSnapshotsFlag!: CommandLineFlagParameter;
   private _findRelatedTests!: CommandLineStringListParameter;
+  private _passWithNoTests!: CommandLineFlagParameter;
   private _silent!: CommandLineFlagParameter;
   private _testNamePattern!: CommandLineStringParameter;
   private _testPathPattern!: CommandLineStringListParameter;
   private _testTimeout!: CommandLineIntegerParameter;
+  private _detectOpenHandles!: CommandLineFlagParameter;
   private _debugHeftReporter!: CommandLineFlagParameter;
   private _maxWorkers!: CommandLineStringParameter;
 
@@ -64,6 +66,13 @@ export class TestAction extends BuildAction {
         ' This corresponds to the "--findRelatedTests" parameter in Jest\'s documentation.'
     });
 
+    this._passWithNoTests = this.defineFlagParameter({
+      parameterLongName: '--pass-with-no-tests',
+      description:
+        'Allow the test suite to pass when no test files are found.' +
+        ' This corresponds to the "--passWithNoTests" parameter in Jest\'s documentation.'
+    });
+
     this._silent = this.defineFlagParameter({
       parameterLongName: '--silent',
       description:
@@ -99,6 +108,14 @@ export class TestAction extends BuildAction {
         ' milliseconds, it will fail. Individual tests can override the default. If unspecified, ' +
         ' the default is normally 5000 ms.' +
         ' This corresponds to the "--testTimeout" parameter in Jest\'s documentation.'
+    });
+
+    this._detectOpenHandles = this.defineFlagParameter({
+      parameterLongName: '--detect-open-handles',
+      description:
+        'Attempt to collect and print open handles preventing Jest from exiting cleanly.' +
+        ' This option has a significant performance penalty and should only be used for debugging.' +
+        ' This corresponds to the "--detectOpenHandles" parameter in Jest\'s documentation.'
     });
 
     this._debugHeftReporter = this.defineFlagParameter({
@@ -154,10 +171,12 @@ export class TestAction extends BuildAction {
         updateSnapshots: this._updateSnapshotsFlag.value,
 
         findRelatedTests: this._findRelatedTests.values,
+        passWithNoTests: this._passWithNoTests.value,
         silent: this._silent.value,
         testNamePattern: this._testNamePattern.value,
         testPathPattern: this._testPathPattern.values,
         testTimeout: this._testTimeout.value,
+        detectOpenHandles: this._detectOpenHandles.value,
         debugHeftReporter: this._debugHeftReporter.value,
         maxWorkers: this._maxWorkers.value
       };

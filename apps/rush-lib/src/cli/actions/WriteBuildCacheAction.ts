@@ -1,8 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
+import * as path from 'path';
 import { AlreadyReportedError, ConsoleTerminalProvider, Terminal } from '@rushstack/node-core-library';
-import { CommandLineStringParameter } from '@rushstack/ts-command-line';
+import { CommandLineFlagParameter, CommandLineStringParameter } from '@rushstack/ts-command-line';
 
 import { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import { BaseRushAction } from './BaseRushAction';
@@ -13,9 +14,12 @@ import { ProjectBuilder } from '../../logic/taskRunner/ProjectBuilder';
 import { PackageChangeAnalyzer } from '../../logic/PackageChangeAnalyzer';
 import { Utilities } from '../../utilities/Utilities';
 import { TaskSelector } from '../../logic/TaskSelector';
+import { RushConstants } from '../../logic/RushConstants';
+import { CommandLineConfiguration } from '../../api/CommandLineConfiguration';
 
 export class WriteBuildCacheAction extends BaseRushAction {
   private _command!: CommandLineStringParameter;
+  private _verboseFlag!: CommandLineFlagParameter;
 
   public constructor(parser: RushCommandLineParser) {
     super({
@@ -38,6 +42,12 @@ export class WriteBuildCacheAction extends BaseRushAction {
       description:
         '(Required) The command run in the current project that produced the current project state.'
     });
+
+    this._verboseFlag = this.defineFlagParameter({
+      parameterLongName: '--verbose',
+      parameterShortName: '-v',
+      description: 'Display verbose log information.'
+    });
   }
 
   public async runAsync(): Promise<void> {
@@ -52,20 +62,12 @@ export class WriteBuildCacheAction extends BaseRushAction {
       );
     }
 
-    const terminal: Terminal = new Terminal(new ConsoleTerminalProvider());
-    const buildCacheConfiguration:
-      | BuildCacheConfiguration
-      | undefined = await BuildCacheConfiguration.loadFromDefaultPathAsync(terminal, this.rushConfiguration);
-    if (!buildCacheConfiguration) {
-      const buildCacheConfigurationFilePath: string = BuildCacheConfiguration.getBuildCacheConfigFilePath(
-        this.rushConfiguration
-      );
-      terminal.writeErrorLine(
-        `The a build cache has not been configured. Configure it by creating a ` +
-          `"${buildCacheConfigurationFilePath}" file.`
-      );
-      throw new AlreadyReportedError();
-    }
+    const terminal: Terminal = new Terminal(
+      new ConsoleTerminalProvider({ verboseEnabled: this._verboseFlag.value })
+    );
+
+    const buildCacheConfiguration: BuildCacheConfiguration =
+      await BuildCacheConfiguration.loadAndRequireEnabledAsync(terminal, this.rushConfiguration);
 
     const command: string = this._command.value!;
     const commandToRun: string | undefined = TaskSelector.getScriptToRun(project, command, []);
@@ -75,6 +77,7 @@ export class WriteBuildCacheAction extends BaseRushAction {
       rushProject: project,
       rushConfiguration: this.rushConfiguration,
       buildCacheConfiguration,
+      commandName: command,
       commandToRun: commandToRun || '',
       isIncrementalBuildAllowed: false,
       packageChangeAnalyzer,
@@ -82,14 +85,22 @@ export class WriteBuildCacheAction extends BaseRushAction {
     });
 
     const trackedFiles: string[] = Array.from(
-      packageChangeAnalyzer.getPackageDeps(project.packageName)!.keys()
+      (await packageChangeAnalyzer.getPackageDeps(project.packageName, terminal))!.keys()
     );
+    const commandLineConfigFilePath: string = path.join(
+      this.rushConfiguration.commonRushConfigFolder,
+      RushConstants.commandLineFilename
+    );
+    const repoCommandLineConfiguration: CommandLineConfiguration | undefined =
+      CommandLineConfiguration.loadFromFileOrDefault(commandLineConfigFilePath);
+
     const cacheWriteSuccess: boolean | undefined = await projectBuilder.tryWriteCacheEntryAsync(
       terminal,
-      trackedFiles
+      trackedFiles,
+      repoCommandLineConfiguration
     );
     if (cacheWriteSuccess === undefined) {
-      // We already projectBuilder already reported that the project doesn't support caching
+      terminal.writeErrorLine('This project does not support caching or Git is not present.');
       throw new AlreadyReportedError();
     } else if (cacheWriteSuccess === false) {
       terminal.writeErrorLine('Writing cache entry failed.');

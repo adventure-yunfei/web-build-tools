@@ -1,6 +1,209 @@
 # Change Log - @rushstack/heft-web-rig
 
-This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be manually modified.
+This log was last generated on Tue, 15 Jun 2021 20:38:35 GMT and should not be manually modified.
+
+## 0.3.0
+Tue, 15 Jun 2021 20:38:35 GMT
+
+### Minor changes
+
+- Disable the allowUnreachableCode TypeScript compiler option.
+
+## 0.2.38
+Fri, 11 Jun 2021 23:26:16 GMT
+
+_Version update only_
+
+## 0.2.37
+Fri, 11 Jun 2021 00:34:02 GMT
+
+### Patches
+
+- Add @rushstack/heft-jest-plugin to run during tests
+
+## 0.2.36
+Thu, 10 Jun 2021 15:08:16 GMT
+
+_Version update only_
+
+## 0.2.35
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 0.2.34
+Fri, 04 Jun 2021 15:08:20 GMT
+
+_Version update only_
+
+## 0.2.33
+Fri, 04 Jun 2021 00:08:34 GMT
+
+_Version update only_
+
+## 0.2.32
+Tue, 01 Jun 2021 18:29:26 GMT
+
+_Version update only_
+
+## 0.2.31
+Sat, 29 May 2021 01:05:06 GMT
+
+_Version update only_
+
+## 0.2.30
+Fri, 28 May 2021 06:19:58 GMT
+
+_Version update only_
+
+## 0.2.29
+Tue, 25 May 2021 00:12:21 GMT
+
+_Version update only_
+
+## 0.2.28
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 0.2.27
+Thu, 13 May 2021 01:52:46 GMT
+
+_Version update only_
+
+## 0.2.26
+Tue, 11 May 2021 22:19:17 GMT
+
+_Version update only_
+
+## 0.2.25
+Mon, 03 May 2021 15:10:28 GMT
+
+_Version update only_
+
+## 0.2.24
+Thu, 29 Apr 2021 23:26:50 GMT
+
+_Version update only_
+
+## 0.2.23
+Thu, 29 Apr 2021 01:07:29 GMT
+
+_Version update only_
+
+## 0.2.22
+Fri, 23 Apr 2021 22:00:07 GMT
+
+_Version update only_
+
+## 0.2.21
+Fri, 23 Apr 2021 15:11:21 GMT
+
+_Version update only_
+
+## 0.2.20
+Wed, 21 Apr 2021 15:12:28 GMT
+
+_Version update only_
+
+## 0.2.19
+Tue, 20 Apr 2021 04:59:51 GMT
+
+_Version update only_
+
+## 0.2.18
+Thu, 15 Apr 2021 02:59:25 GMT
+
+### Patches
+
+- Explicitly set the noEmitOnError TypeScript compiler option to false in the base tsconfig.
+
+## 0.2.17
+Mon, 12 Apr 2021 15:10:29 GMT
+
+_Version update only_
+
+## 0.2.16
+Thu, 08 Apr 2021 20:41:54 GMT
+
+_Version update only_
+
+## 0.2.15
+Thu, 08 Apr 2021 06:05:32 GMT
+
+_Version update only_
+
+## 0.2.14
+Thu, 08 Apr 2021 00:10:18 GMT
+
+### Patches
+
+- For compatibility with Heft 0.25.5 and earlier versions, add a dependency on the "@rushstack/heft-webpack4-plugin" package and update heft.json to load it.
+
+## 0.2.13
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 0.2.12
+Wed, 31 Mar 2021 15:10:36 GMT
+
+_Version update only_
+
+## 0.2.11
+Mon, 29 Mar 2021 05:02:07 GMT
+
+_Version update only_
+
+## 0.2.10
+Fri, 19 Mar 2021 22:31:38 GMT
+
+_Version update only_
+
+## 0.2.9
+Wed, 17 Mar 2021 05:04:38 GMT
+
+_Version update only_
+
+## 0.2.8
+Fri, 12 Mar 2021 01:13:27 GMT
+
+_Version update only_
+
+## 0.2.7
+Wed, 10 Mar 2021 05:10:06 GMT
+
+_Version update only_
+
+## 0.2.6
+Thu, 04 Mar 2021 01:11:31 GMT
+
+_Version update only_
+
+## 0.2.5
+Tue, 02 Mar 2021 23:25:05 GMT
+
+_Version update only_
+
+## 0.2.4
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
+
+## 0.2.3
+Fri, 22 Jan 2021 05:39:22 GMT
+
+_Version update only_
+
+## 0.2.2
+Thu, 21 Jan 2021 04:19:01 GMT
+
+_Version update only_
+
+## 0.2.1
+Wed, 13 Jan 2021 01:11:06 GMT
+
+_Version update only_
 
 ## 0.2.0
 Fri, 08 Jan 2021 07:28:50 GMT

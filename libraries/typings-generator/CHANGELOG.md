@@ -1,6 +1,43 @@
 # Change Log - @rushstack/typings-generator
 
-This log was last generated on Wed, 06 Jan 2021 16:10:43 GMT and should not be manually modified.
+This log was last generated on Fri, 04 Jun 2021 19:59:53 GMT and should not be manually modified.
+
+## 0.3.7
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 0.3.6
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 0.3.5
+Mon, 03 May 2021 15:10:29 GMT
+
+_Version update only_
+
+## 0.3.4
+Mon, 12 Apr 2021 15:10:28 GMT
+
+_Version update only_
+
+## 0.3.3
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 0.3.2
+Mon, 29 Mar 2021 05:02:06 GMT
+
+### Patches
+
+- Fix a bug where watched files would not honor typings generation excludeFiles settings
+
+## 0.3.1
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
 
 ## 0.3.0
 Wed, 06 Jan 2021 16:10:43 GMT

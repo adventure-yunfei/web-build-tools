@@ -14,6 +14,7 @@ import { ITypeScriptConfigurationJson } from '../plugins/TypeScriptPlugin/TypeSc
 import { HeftConfiguration } from '../configuration/HeftConfiguration';
 import { Terminal } from '@rushstack/node-core-library';
 import { ISassConfigurationJson } from '../plugins/SassTypingsPlugin/SassTypingsPlugin';
+import { INodeServicePluginConfiguration } from '../plugins/NodeServicePlugin';
 
 export enum HeftEvent {
   clean = 'clean',
@@ -108,6 +109,9 @@ export class CoreConfigFiles {
   private static _typeScriptConfigurationFileLoader:
     | ConfigurationFile<ITypeScriptConfigurationJson>
     | undefined;
+  private static _nodeServiceConfigurationLoader:
+    | ConfigurationFile<INodeServicePluginConfiguration>
+    | undefined;
   private static _sassConfigurationFileLoader: ConfigurationFile<ISassConfigurationJson> | undefined;
 
   /**
@@ -142,17 +146,15 @@ export class CoreConfigFiles {
     terminal: Terminal,
     heftConfiguration: HeftConfiguration
   ): Promise<IHeftEventActions> {
-    let result: IHeftEventActions | undefined = CoreConfigFiles._heftConfigFileEventActionsCache.get(
-      heftConfiguration
-    );
+    let result: IHeftEventActions | undefined =
+      CoreConfigFiles._heftConfigFileEventActionsCache.get(heftConfiguration);
     if (!result) {
-      const heftConfigJson:
-        | IHeftConfigurationJson
-        | undefined = await CoreConfigFiles.heftConfigFileLoader.tryLoadConfigurationFileForProjectAsync(
-        terminal,
-        heftConfiguration.buildFolder,
-        heftConfiguration.rigConfig
-      );
+      const heftConfigJson: IHeftConfigurationJson | undefined =
+        await CoreConfigFiles.heftConfigFileLoader.tryLoadConfigurationFileForProjectAsync(
+          terminal,
+          heftConfiguration.buildFolder,
+          heftConfiguration.rigConfig
+        );
 
       result = {
         copyFiles: new Map<HeftEvent, IHeftConfigurationCopyFilesEventAction[]>(),
@@ -194,17 +196,14 @@ export class CoreConfigFiles {
   /**
    * Returns the loader for the `config/api-extractor-task.json` config file.
    */
-  public static get apiExtractorTaskConfigurationLoader(): ConfigurationFile<
-    IApiExtractorPluginConfiguration
-  > {
+  public static get apiExtractorTaskConfigurationLoader(): ConfigurationFile<IApiExtractorPluginConfiguration> {
     if (!CoreConfigFiles._apiExtractorTaskConfigurationLoader) {
       const schemaPath: string = path.resolve(__dirname, '..', 'schemas', 'api-extractor-task.schema.json');
-      CoreConfigFiles._apiExtractorTaskConfigurationLoader = new ConfigurationFile<
-        IApiExtractorPluginConfiguration
-      >({
-        projectRelativeFilePath: 'config/api-extractor-task.json',
-        jsonSchemaPath: schemaPath
-      });
+      CoreConfigFiles._apiExtractorTaskConfigurationLoader =
+        new ConfigurationFile<IApiExtractorPluginConfiguration>({
+          projectRelativeFilePath: 'config/api-extractor-task.json',
+          jsonSchemaPath: schemaPath
+        });
     }
 
     return CoreConfigFiles._apiExtractorTaskConfigurationLoader;
@@ -216,32 +215,47 @@ export class CoreConfigFiles {
   public static get typeScriptConfigurationFileLoader(): ConfigurationFile<ITypeScriptConfigurationJson> {
     if (!CoreConfigFiles._typeScriptConfigurationFileLoader) {
       const schemaPath: string = path.resolve(__dirname, '..', 'schemas', 'typescript.schema.json');
-      CoreConfigFiles._typeScriptConfigurationFileLoader = new ConfigurationFile<
-        ITypeScriptConfigurationJson
-      >({
-        projectRelativeFilePath: 'config/typescript.json',
-        jsonSchemaPath: schemaPath,
-        propertyInheritance: {
-          staticAssetsToCopy: {
-            inheritanceType: InheritanceType.custom,
-            inheritanceFunction: (
-              currentObject: ISharedCopyConfiguration,
-              parentObject: ISharedCopyConfiguration
-            ): ISharedCopyConfiguration => {
-              const result: ISharedCopyConfiguration = {};
+      CoreConfigFiles._typeScriptConfigurationFileLoader =
+        new ConfigurationFile<ITypeScriptConfigurationJson>({
+          projectRelativeFilePath: 'config/typescript.json',
+          jsonSchemaPath: schemaPath,
+          propertyInheritance: {
+            staticAssetsToCopy: {
+              inheritanceType: InheritanceType.custom,
+              inheritanceFunction: (
+                currentObject: ISharedCopyConfiguration,
+                parentObject: ISharedCopyConfiguration
+              ): ISharedCopyConfiguration => {
+                const result: ISharedCopyConfiguration = {};
 
-              CoreConfigFiles._inheritArray(result, 'fileExtensions', currentObject, parentObject);
-              CoreConfigFiles._inheritArray(result, 'includeGlobs', currentObject, parentObject);
-              CoreConfigFiles._inheritArray(result, 'excludeGlobs', currentObject, parentObject);
+                CoreConfigFiles._inheritArray(result, 'fileExtensions', currentObject, parentObject);
+                CoreConfigFiles._inheritArray(result, 'includeGlobs', currentObject, parentObject);
+                CoreConfigFiles._inheritArray(result, 'excludeGlobs', currentObject, parentObject);
 
-              return result;
+                return result;
+              }
             }
           }
-        }
-      } as IConfigurationFileOptions<ITypeScriptConfigurationJson>);
+        } as IConfigurationFileOptions<ITypeScriptConfigurationJson>);
     }
 
     return CoreConfigFiles._typeScriptConfigurationFileLoader;
+  }
+
+  /**
+   * Returns the loader for the `config/api-extractor-task.json` config file.
+   */
+  public static get nodeServiceConfigurationLoader(): ConfigurationFile<INodeServicePluginConfiguration> {
+    if (!CoreConfigFiles._nodeServiceConfigurationLoader) {
+      const schemaPath: string = path.resolve(__dirname, '..', 'schemas', 'node-service.schema.json');
+      CoreConfigFiles._nodeServiceConfigurationLoader =
+        new ConfigurationFile<INodeServicePluginConfiguration>({
+          projectRelativeFilePath: 'config/node-service.json',
+          jsonSchemaPath: schemaPath
+        });
+    }
+
+    return CoreConfigFiles._nodeServiceConfigurationLoader;
   }
 
   public static get sassConfigurationFileLoader(): ConfigurationFile<ISassConfigurationJson> {

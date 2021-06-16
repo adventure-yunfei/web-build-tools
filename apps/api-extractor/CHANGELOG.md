@@ -1,12 +1,91 @@
-# Change Log - @microsoft/api-extractor
+# Change Log - api-extractor custom version
 
-This log was last generated on Thu, 10 Dec 2020 23:25:49 GMT and should not be manually modified.
+## 7.16.1.rc.1
+
+- 合并主分支代码
+- fix：修复 API JSON 中的导出命名
+
+## 7.12.1-rc.5
+
+- 优化 `import Foo = Bar.Baz;` 语法支持：dts rollup 结果中移除 namespace 中多余的该语法
 
 ## 7.12.1-rc.4
 
 - 新增 `import * as foo from './local-module';` 局部模块 namespace 导入支持
 - 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）
 - 新增完整的引用类型链接支持, 包括未导出的类型
+
+# Change Log - @microsoft/api-extractor
+
+This log was last generated on Fri, 04 Jun 2021 19:59:53 GMT and should not be manually modified.
+
+## 7.16.1
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 7.16.0
+Fri, 04 Jun 2021 15:08:20 GMT
+
+### Minor changes
+
+- Upgrade the bundled compiler engine to TypeScript 4.3
+
+## 7.15.2
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 7.15.1
+Mon, 03 May 2021 15:10:29 GMT
+
+_Version update only_
+
+## 7.15.0
+Thu, 29 Apr 2021 23:26:50 GMT
+
+### Minor changes
+
+- Upgrade the bundled compiler engine to TypeScript 4.2
+
+## 7.14.0
+Tue, 20 Apr 2021 04:59:51 GMT
+
+### Minor changes
+
+- Projects can now define custom tags using a tsdoc.json file
+
+## 7.13.5
+Mon, 12 Apr 2021 15:10:28 GMT
+
+_Version update only_
+
+## 7.13.4
+Thu, 08 Apr 2021 06:05:31 GMT
+
+_Version update only_
+
+## 7.13.3
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 7.13.2
+Thu, 04 Mar 2021 01:11:31 GMT
+
+_Version update only_
+
+## 7.13.1
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
+
+## 7.13.0
+Wed, 13 Jan 2021 01:11:06 GMT
+
+### Minor changes
+
+- Upgrade the bundled compiler engine to TypeScript 4.1
 
 ## 7.12.1
 Thu, 10 Dec 2020 23:25:49 GMT

@@ -137,7 +137,9 @@ export class ExportAnalyzer {
           );
 
           // Ignore virtual symbols that don't have any declarations
-          if (TypeScriptHelpers.hasAnyDeclarations(followedSymbol)) {
+          const arbitraryDeclaration: ts.Declaration | undefined =
+            TypeScriptHelpers.tryGetADeclaration(followedSymbol);
+          if (arbitraryDeclaration) {
             const astSymbol: AstSymbol | undefined = this._astSymbolTable.fetchAstSymbol({
               followedSymbol: followedSymbol,
               isExternal: astModule.isExternal,
@@ -148,7 +150,7 @@ export class ExportAnalyzer {
             if (!astSymbol) {
               throw new Error(
                 `Unsupported export ${JSON.stringify(exportedSymbol.name)}:\n` +
-                  SourceFileLocationFormatter.formatDeclaration(followedSymbol.declarations[0])
+                  SourceFileLocationFormatter.formatDeclaration(arbitraryDeclaration)
               );
             }
 
@@ -420,9 +422,8 @@ export class ExportAnalyzer {
     declaration: ts.Declaration,
     declarationSymbol: ts.Symbol
   ): AstEntity | undefined {
-    const exportDeclaration: ts.ExportDeclaration | undefined = TypeScriptHelpers.findFirstParent<
-      ts.ExportDeclaration
-    >(declaration, ts.SyntaxKind.ExportDeclaration);
+    const exportDeclaration: ts.ExportDeclaration | undefined =
+      TypeScriptHelpers.findFirstParent<ts.ExportDeclaration>(declaration, ts.SyntaxKind.ExportDeclaration);
 
     if (exportDeclaration) {
       let exportName: string | undefined = undefined;
@@ -480,9 +481,8 @@ export class ExportAnalyzer {
     declaration: ts.Declaration,
     declarationSymbol: ts.Symbol
   ): AstEntity | undefined {
-    const importDeclaration: ts.ImportDeclaration | undefined = TypeScriptHelpers.findFirstParent<
-      ts.ImportDeclaration
-    >(declaration, ts.SyntaxKind.ImportDeclaration);
+    const importDeclaration: ts.ImportDeclaration | undefined =
+      TypeScriptHelpers.findFirstParent<ts.ImportDeclaration>(declaration, ts.SyntaxKind.ImportDeclaration);
 
     if (importDeclaration) {
       const externalModulePath: string | undefined = this._tryGetExternalModulePath(
@@ -828,9 +828,8 @@ export class ExportAnalyzer {
     exportSymbol: ts.Symbol
   ): string | undefined {
     // The name of the module, which could be like "./SomeLocalFile' or like 'external-package/entry/point'
-    const moduleSpecifier: string | undefined = TypeScriptHelpers.getModuleSpecifier(
-      importOrExportDeclaration
-    );
+    const moduleSpecifier: string | undefined =
+      TypeScriptHelpers.getModuleSpecifier(importOrExportDeclaration);
     if (!moduleSpecifier) {
       throw new InternalError(
         'Unable to parse module specifier\n' +
@@ -856,9 +855,8 @@ export class ExportAnalyzer {
     exportSymbol: ts.Symbol
   ): AstModule {
     // The name of the module, which could be like "./SomeLocalFile' or like 'external-package/entry/point'
-    const moduleSpecifier: string | undefined = TypeScriptHelpers.getModuleSpecifier(
-      importOrExportDeclaration
-    );
+    const moduleSpecifier: string | undefined =
+      TypeScriptHelpers.getModuleSpecifier(importOrExportDeclaration);
     if (!moduleSpecifier) {
       throw new InternalError(
         'Unable to parse module specifier\n' +

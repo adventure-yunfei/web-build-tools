@@ -36,13 +36,20 @@ const HEFT_STAGE_TAP: TapOptions<'promise'> = {
 
 interface ICopyFileDescriptor {
   sourceFilePath: string;
-  destinationFilePaths: string[];
+  destinationFilePath: string;
   hardlink: boolean;
+}
+
+export interface IResolvedDestinationCopyConfiguration extends IExtendedSharedCopyConfiguration {
+  /**
+   * Fully-qualified folder paths to which files should be copied.
+   */
+  resolvedDestinationFolderPaths: string[];
 }
 
 export interface ICopyFilesOptions {
   buildFolder: string;
-  copyConfigurations: IExtendedSharedCopyConfiguration[];
+  copyConfigurations: IResolvedDestinationCopyConfiguration[];
   logger: ScopedLogger;
   watchMode: boolean;
 }
@@ -94,9 +101,16 @@ export class CopyFilesPlugin implements IHeftPlugin {
       heftConfiguration
     );
 
-    const copyConfigurations: IExtendedSharedCopyConfiguration[] = [];
+    const copyConfigurations: IResolvedDestinationCopyConfiguration[] = [];
     for (const copyFilesEventAction of eventActions.copyFiles.get(heftEvent) || []) {
-      copyConfigurations.push(...copyFilesEventAction.copyOperations);
+      for (const copyOperation of copyFilesEventAction.copyOperations) {
+        copyConfigurations.push({
+          ...copyOperation,
+          resolvedDestinationFolderPaths: copyOperation.destinationFolders.map((destinationFolder) =>
+            path.join(heftConfiguration.buildFolder, destinationFolder)
+          )
+        });
+      }
     }
 
     await this.runCopyAsync({
@@ -121,7 +135,7 @@ export class CopyFilesPlugin implements IHeftPlugin {
       return;
     }
 
-    const { copiedFileCount, linkedFileCount } = await this.copyFilesAsync(copyDescriptors);
+    const { copiedFileCount, linkedFileCount } = await this._copyFilesAsync(copyDescriptors);
     const duration: number = performance.now() - startTime;
     logger.terminal.writeLine(
       `Copied ${copiedFileCount} file${copiedFileCount === 1 ? '' : 's'} and ` +
@@ -134,7 +148,7 @@ export class CopyFilesPlugin implements IHeftPlugin {
     }
   }
 
-  protected async copyFilesAsync(copyDescriptors: ICopyFileDescriptor[]): Promise<ICopyFilesResult> {
+  private async _copyFilesAsync(copyDescriptors: ICopyFileDescriptor[]): Promise<ICopyFilesResult> {
     if (copyDescriptors.length === 0) {
       return { copiedFileCount: 0, linkedFileCount: 0 };
     }
@@ -146,35 +160,19 @@ export class CopyFilesPlugin implements IHeftPlugin {
       Constants.maxParallelism,
       async (copyDescriptor: ICopyFileDescriptor) => {
         if (copyDescriptor.hardlink) {
-          const hardlinkPromises: Promise<void>[] = copyDescriptor.destinationFilePaths.map(
-            (destinationFilePath) => {
-              return FileSystem.createHardLinkAsync({
-                linkTargetPath: copyDescriptor.sourceFilePath,
-                newLinkPath: destinationFilePath,
-                alreadyExistsBehavior: AlreadyExistsBehavior.Overwrite
-              });
-            }
-          );
-          await Promise.all(hardlinkPromises);
-
           linkedFileCount++;
+          await FileSystem.createHardLinkAsync({
+            linkTargetPath: copyDescriptor.sourceFilePath,
+            newLinkPath: copyDescriptor.destinationFilePath,
+            alreadyExistsBehavior: AlreadyExistsBehavior.Overwrite
+          });
         } else {
-          // If it's a copy, we will call the copy function
-          if (copyDescriptor.destinationFilePaths.length === 1) {
-            await FileSystem.copyFileAsync({
-              sourcePath: copyDescriptor.sourceFilePath,
-              destinationPath: copyDescriptor.destinationFilePaths[0],
-              alreadyExistsBehavior: AlreadyExistsBehavior.Overwrite
-            });
-          } else {
-            await FileSystem.copyFileToManyAsync({
-              sourcePath: copyDescriptor.sourceFilePath,
-              destinationPaths: copyDescriptor.destinationFilePaths,
-              alreadyExistsBehavior: AlreadyExistsBehavior.Overwrite
-            });
-          }
-
           copiedFileCount++;
+          await FileSystem.copyFileAsync({
+            sourcePath: copyDescriptor.sourceFilePath,
+            destinationPath: copyDescriptor.destinationFilePath,
+            alreadyExistsBehavior: AlreadyExistsBehavior.Overwrite
+          });
         }
       }
     );
@@ -187,13 +185,13 @@ export class CopyFilesPlugin implements IHeftPlugin {
 
   private async _getCopyFileDescriptorsAsync(
     buildFolder: string,
-    copyConfigurations: IExtendedSharedCopyConfiguration[]
+    copyConfigurations: IResolvedDestinationCopyConfiguration[]
   ): Promise<ICopyFileDescriptor[]> {
-    // Create a map to deduplicate and prevent double-writes. The key in this map is the copy/link destination
-    // file path
+    const processedCopyDescriptors: ICopyFileDescriptor[] = [];
+
+    // Create a map to deduplicate and prevent double-writes
+    // resolvedDestinationFilePath -> descriptor
     const destinationCopyDescriptors: Map<string, ICopyFileDescriptor> = new Map();
-    // And a map to contain the actual results. The key in this map is the copy/link source file path
-    const sourceCopyDescriptors: Map<string, ICopyFileDescriptor> = new Map();
 
     for (const copyConfiguration of copyConfigurations) {
       // Resolve the source folder path which is where the glob will be run from
@@ -208,21 +206,19 @@ export class CopyFilesPlugin implements IHeftPlugin {
       );
 
       // Dedupe and throw if a double-write is detected
-      for (const destinationFolderRelativePath of copyConfiguration.destinationFolders) {
+      for (const destinationFolderPath of copyConfiguration.resolvedDestinationFolderPaths) {
         for (const sourceFileRelativePath of sourceFileRelativePaths) {
           // Only include the relative path from the sourceFolder if flatten is false
           const resolvedSourceFilePath: string = path.join(resolvedSourceFolderPath, sourceFileRelativePath);
           const resolvedDestinationFilePath: string = path.resolve(
-            buildFolder,
-            destinationFolderRelativePath,
+            destinationFolderPath,
             copyConfiguration.flatten ? '.' : path.dirname(sourceFileRelativePath),
             path.basename(sourceFileRelativePath)
           );
 
           // Throw if a duplicate copy target with a different source or options is specified
-          const existingDestinationCopyDescriptor:
-            | ICopyFileDescriptor
-            | undefined = destinationCopyDescriptors.get(resolvedDestinationFilePath);
+          const existingDestinationCopyDescriptor: ICopyFileDescriptor | undefined =
+            destinationCopyDescriptors.get(resolvedDestinationFilePath);
           if (existingDestinationCopyDescriptor) {
             if (
               existingDestinationCopyDescriptor.sourceFilePath === resolvedSourceFilePath &&
@@ -236,29 +232,20 @@ export class CopyFilesPlugin implements IHeftPlugin {
             );
           }
 
-          // Finally, add to the map and default hardlink to false
-          let sourceCopyDescriptor: ICopyFileDescriptor | undefined = sourceCopyDescriptors.get(
-            resolvedSourceFilePath
-          );
-          if (!sourceCopyDescriptor) {
-            sourceCopyDescriptor = {
-              sourceFilePath: resolvedSourceFilePath,
-              destinationFilePaths: [resolvedDestinationFilePath],
-              hardlink: !!copyConfiguration.hardlink
-            };
-            sourceCopyDescriptors.set(resolvedSourceFilePath, sourceCopyDescriptor);
-          } else {
-            sourceCopyDescriptor.destinationFilePaths.push(resolvedDestinationFilePath);
-          }
-
-          // Add to other map to allow deduping
-          destinationCopyDescriptors.set(resolvedDestinationFilePath, sourceCopyDescriptor);
+          // Finally, default hardlink to false, add to the result, and add to the map for deduping
+          const processedCopyDescriptor: ICopyFileDescriptor = {
+            sourceFilePath: resolvedSourceFilePath,
+            destinationFilePath: resolvedDestinationFilePath,
+            hardlink: !!copyConfiguration.hardlink
+          };
+          processedCopyDescriptors.push(processedCopyDescriptor);
+          destinationCopyDescriptors.set(resolvedDestinationFilePath, processedCopyDescriptor);
         }
       }
     }
 
     // We're done with the map, grab the values and return
-    return Array.from(sourceCopyDescriptors.values());
+    return processedCopyDescriptors;
   }
 
   private _getIncludedGlobPatterns(copyConfiguration: IExtendedSharedCopyConfiguration): string[] {
@@ -300,11 +287,6 @@ export class CopyFilesPlugin implements IHeftPlugin {
       const globsToWatch: string[] = this._getIncludedGlobPatterns(copyConfiguration);
       if (globsToWatch.length) {
         const resolvedSourceFolderPath: string = path.join(buildFolder, copyConfiguration.sourceFolder);
-        const resolvedDestinationFolderPaths: string[] = copyConfiguration.destinationFolders.map(
-          (destinationFolder) => {
-            return path.join(buildFolder, destinationFolder);
-          }
-        );
 
         const watcher: chokidar.FSWatcher = chokidar.watch(globsToWatch, {
           cwd: resolvedSourceFolderPath,
@@ -312,19 +294,19 @@ export class CopyFilesPlugin implements IHeftPlugin {
           ignored: copyConfiguration.excludeGlobs
         });
 
-        const copyAsset: (assetPath: string) => Promise<void> = async (assetPath: string) => {
-          const { copiedFileCount, linkedFileCount } = await this.copyFilesAsync([
-            {
-              sourceFilePath: path.join(resolvedSourceFolderPath, assetPath),
-              destinationFilePaths: resolvedDestinationFolderPaths.map((resolvedDestinationFolderPath) => {
-                return path.join(
+        const copyAsset: (relativeAssetPath: string) => Promise<void> = async (relativeAssetPath: string) => {
+          const { copiedFileCount, linkedFileCount } = await this._copyFilesAsync(
+            copyConfiguration.resolvedDestinationFolderPaths.map((resolvedDestinationFolderPath) => {
+              return {
+                sourceFilePath: path.join(resolvedSourceFolderPath, relativeAssetPath),
+                destinationFilePath: path.join(
                   resolvedDestinationFolderPath,
-                  copyConfiguration.flatten ? path.basename(assetPath) : assetPath
-                );
-              }),
-              hardlink: !!copyConfiguration.hardlink
-            }
-          ]);
+                  copyConfiguration.flatten ? path.basename(relativeAssetPath) : relativeAssetPath
+                ),
+                hardlink: !!copyConfiguration.hardlink
+              };
+            })
+          );
           logger.terminal.writeLine(
             copyConfiguration.hardlink
               ? `Linked ${linkedFileCount} file${linkedFileCount === 1 ? '' : 's'}`
@@ -332,16 +314,20 @@ export class CopyFilesPlugin implements IHeftPlugin {
           );
         };
 
+        const deleteAsset: (relativeAssetPath: string) => Promise<void> = async (relativeAssetPath) => {
+          const deletePromises: Promise<void>[] = copyConfiguration.resolvedDestinationFolderPaths.map(
+            (resolvedDestinationFolderPath) =>
+              FileSystem.deleteFileAsync(path.resolve(resolvedDestinationFolderPath, relativeAssetPath))
+          );
+          await Promise.all(deletePromises);
+          logger.terminal.writeLine(
+            `Deleted ${deletePromises.length} file${deletePromises.length === 1 ? '' : 's'}`
+          );
+        };
+
         watcher.on('add', copyAsset);
         watcher.on('change', copyAsset);
-        watcher.on('unlink', (assetPath) => {
-          let deleteCount: number = 0;
-          for (const resolvedDestinationFolder of resolvedDestinationFolderPaths) {
-            FileSystem.deleteFile(path.resolve(resolvedDestinationFolder, assetPath));
-            deleteCount++;
-          }
-          logger.terminal.writeLine(`Deleted ${deleteCount} file${deleteCount === 1 ? '' : 's'}`);
-        });
+        watcher.on('unlink', deleteAsset);
       }
     }
 

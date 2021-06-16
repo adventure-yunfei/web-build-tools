@@ -2,7 +2,7 @@
 // See LICENSE in the project root for license information.
 
 import * as path from 'path';
-import colors from 'colors';
+import colors from 'colors/safe';
 import { BaseRushAction } from './BaseRushAction';
 import { RushCommandLineParser } from '../RushCommandLineParser';
 import { CommandLineStringParameter } from '@rushstack/ts-command-line';
@@ -69,9 +69,8 @@ export class InitDeployAction extends BaseRushAction {
     console.log(colors.green('Creating scenario file: ') + scenarioFilePath);
 
     const shortProjectName: string = this._project.value!;
-    const rushProject:
-      | RushConfigurationProject
-      | undefined = this.rushConfiguration.findProjectByShorthandName(shortProjectName);
+    const rushProject: RushConfigurationProject | undefined =
+      this.rushConfiguration.findProjectByShorthandName(shortProjectName);
     if (!rushProject) {
       throw new Error(`The specified project was not found in rush.json: "${shortProjectName}"`);
     }

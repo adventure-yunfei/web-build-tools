@@ -1,6 +1,4 @@
-# Change Log - @microsoft/api-documenter
-
-This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be manually modified.
+# Change Log - api-extractor custom version
 
 ## 7.12.3-new.0
 
@@ -10,6 +8,214 @@ This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be m
 ## 7.12.3-rc.0
 
 - 新增完整的引用类型链接支持
+
+# Change Log - @microsoft/api-documenter
+
+This log was last generated on Tue, 15 Jun 2021 20:38:35 GMT and should not be manually modified.
+
+## 7.13.20
+Tue, 15 Jun 2021 20:38:35 GMT
+
+_Version update only_
+
+## 7.13.19
+Fri, 11 Jun 2021 23:26:16 GMT
+
+_Version update only_
+
+## 7.13.18
+Fri, 11 Jun 2021 00:34:02 GMT
+
+_Version update only_
+
+## 7.13.17
+Thu, 10 Jun 2021 15:08:16 GMT
+
+_Version update only_
+
+## 7.13.16
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 7.13.15
+Fri, 04 Jun 2021 15:08:20 GMT
+
+_Version update only_
+
+## 7.13.14
+Fri, 04 Jun 2021 00:08:34 GMT
+
+_Version update only_
+
+## 7.13.13
+Tue, 01 Jun 2021 18:29:26 GMT
+
+_Version update only_
+
+## 7.13.12
+Sat, 29 May 2021 01:05:06 GMT
+
+_Version update only_
+
+## 7.13.11
+Fri, 28 May 2021 06:19:57 GMT
+
+_Version update only_
+
+## 7.13.10
+Tue, 25 May 2021 00:12:21 GMT
+
+_Version update only_
+
+## 7.13.9
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 7.13.8
+Thu, 13 May 2021 01:52:46 GMT
+
+_Version update only_
+
+## 7.13.7
+Tue, 11 May 2021 22:19:17 GMT
+
+_Version update only_
+
+## 7.13.6
+Mon, 03 May 2021 15:10:28 GMT
+
+_Version update only_
+
+## 7.13.5
+Thu, 29 Apr 2021 23:26:50 GMT
+
+_Version update only_
+
+## 7.13.4
+Thu, 29 Apr 2021 01:07:29 GMT
+
+_Version update only_
+
+## 7.13.3
+Fri, 23 Apr 2021 22:00:06 GMT
+
+_Version update only_
+
+## 7.13.2
+Fri, 23 Apr 2021 15:11:20 GMT
+
+_Version update only_
+
+## 7.13.1
+Wed, 21 Apr 2021 15:12:27 GMT
+
+_Version update only_
+
+## 7.13.0
+Tue, 20 Apr 2021 04:59:51 GMT
+
+### Minor changes
+
+- Add support for projects that define custom tags using a tsdoc.json file
+
+## 7.12.22
+Thu, 15 Apr 2021 02:59:25 GMT
+
+_Version update only_
+
+## 7.12.21
+Mon, 12 Apr 2021 15:10:28 GMT
+
+### Patches
+
+- split events from properties
+
+## 7.12.20
+Thu, 08 Apr 2021 20:41:54 GMT
+
+_Version update only_
+
+## 7.12.19
+Thu, 08 Apr 2021 06:05:31 GMT
+
+_Version update only_
+
+## 7.12.18
+Thu, 08 Apr 2021 00:10:18 GMT
+
+_Version update only_
+
+## 7.12.17
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 7.12.16
+Wed, 31 Mar 2021 15:10:36 GMT
+
+_Version update only_
+
+## 7.12.15
+Mon, 29 Mar 2021 05:02:06 GMT
+
+_Version update only_
+
+## 7.12.14
+Fri, 19 Mar 2021 22:31:37 GMT
+
+_Version update only_
+
+## 7.12.13
+Wed, 17 Mar 2021 05:04:37 GMT
+
+_Version update only_
+
+## 7.12.12
+Fri, 12 Mar 2021 01:13:27 GMT
+
+_Version update only_
+
+## 7.12.11
+Wed, 10 Mar 2021 06:23:29 GMT
+
+_Version update only_
+
+## 7.12.10
+Wed, 10 Mar 2021 05:10:05 GMT
+
+_Version update only_
+
+## 7.12.9
+Thu, 04 Mar 2021 01:11:31 GMT
+
+_Version update only_
+
+## 7.12.8
+Tue, 02 Mar 2021 23:25:05 GMT
+
+_Version update only_
+
+## 7.12.7
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
+
+## 7.12.6
+Fri, 22 Jan 2021 05:39:22 GMT
+
+_Version update only_
+
+## 7.12.5
+Thu, 21 Jan 2021 04:19:00 GMT
+
+_Version update only_
+
+## 7.12.4
+Wed, 13 Jan 2021 01:11:06 GMT
+
+_Version update only_
 
 ## 7.12.3
 Fri, 08 Jan 2021 07:28:50 GMT

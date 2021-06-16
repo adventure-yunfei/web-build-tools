@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors';
+import colors from 'colors/safe';
 import { EOL } from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
@@ -48,6 +48,7 @@ export class PublishAction extends BaseRushAction {
   private _commitId!: CommandLineStringParameter;
   private _releaseFolder!: CommandLineStringParameter;
   private _pack!: CommandLineFlagParameter;
+  private _ignoreGitHooksParameter!: CommandLineFlagParameter;
 
   private _prereleaseToken!: PrereleaseToken;
   private _hotfixTagOverride!: string;
@@ -83,7 +84,7 @@ export class PublishAction extends BaseRushAction {
     this._publish = this.defineFlagParameter({
       parameterLongName: '--publish',
       parameterShortName: '-p',
-      description: 'If this flag is specified, applied changes will be published to npm.'
+      description: 'If this flag is specified, applied changes will be published to the NPM registry.'
     });
     this._addCommitDetails = this.defineFlagParameter({
       parameterLongName: '--add-commit-details',
@@ -203,6 +204,10 @@ export class PublishAction extends BaseRushAction {
         `Used in conjunction with git tagging -- apply git tags at the commit hash` +
         ` specified. If not provided, the current HEAD will be tagged.`
     });
+    this._ignoreGitHooksParameter = this.defineFlagParameter({
+      parameterLongName: '--ignore-git-hooks',
+      description: `Skips execution of all git hooks. Make sure you know what you are skipping.`
+    });
   }
 
   /**
@@ -291,9 +296,10 @@ export class PublishAction extends BaseRushAction {
         // Stage, commit, and push the changes to remote temp branch.
         publishGit.addChanges(':/*');
         publishGit.commit(
-          this.rushConfiguration.gitVersionBumpCommitMessage || DEFAULT_PACKAGE_UPDATE_MESSAGE
+          this.rushConfiguration.gitVersionBumpCommitMessage || DEFAULT_PACKAGE_UPDATE_MESSAGE,
+          !this._ignoreGitHooksParameter.value
         );
-        publishGit.push(tempBranchName);
+        publishGit.push(tempBranchName, !this._ignoreGitHooksParameter.value);
 
         this._setDependenciesBeforePublish();
 
@@ -311,7 +317,7 @@ export class PublishAction extends BaseRushAction {
             const project: RushConfigurationProject | undefined = allPackages.get(change.packageName);
             if (project) {
               if (!this._packageExists(project)) {
-                this._npmPublish(change.packageName, project.projectFolder);
+                this._npmPublish(change.packageName, project.publishFolder);
               } else {
                 console.log(`Skip ${change.packageName}. Package exists.`);
               }
@@ -325,17 +331,17 @@ export class PublishAction extends BaseRushAction {
 
         // Create and push appropriate Git tags.
         this._gitAddTags(publishGit, orderedChanges);
-        publishGit.push(tempBranchName);
+        publishGit.push(tempBranchName, !this._ignoreGitHooksParameter.value);
 
         // Now merge to target branch.
         publishGit.checkout(this._targetBranch.value!);
-        publishGit.pull();
-        publishGit.merge(tempBranchName);
-        publishGit.push(this._targetBranch.value!);
-        publishGit.deleteBranch(tempBranchName);
+        publishGit.pull(!this._ignoreGitHooksParameter.value);
+        publishGit.merge(tempBranchName, !this._ignoreGitHooksParameter.value);
+        publishGit.push(this._targetBranch.value!, !this._ignoreGitHooksParameter.value);
+        publishGit.deleteBranch(tempBranchName, true, !this._ignoreGitHooksParameter.value);
       } else {
         publishGit.checkout(this._targetBranch.value!);
-        publishGit.deleteBranch(tempBranchName, false);
+        publishGit.deleteBranch(tempBranchName, false, !this._ignoreGitHooksParameter.value);
       }
     }
   }
@@ -344,6 +350,7 @@ export class PublishAction extends BaseRushAction {
     console.log(`Rush publish starts with includeAll and version policy ${this._versionPolicy.value}`);
 
     let updated: boolean = false;
+
     allPackages.forEach((packageConfig, packageName) => {
       if (
         packageConfig.shouldPublish &&
@@ -374,15 +381,16 @@ export class PublishAction extends BaseRushAction {
           applyTag(this._applyGitTagsOnPack.value);
         } else if (this._force.value || !this._packageExists(packageConfig)) {
           // Publish to npm repository
-          this._npmPublish(packageName, packageConfig.projectFolder);
+          this._npmPublish(packageName, packageConfig.publishFolder);
           applyTag(true);
         } else {
           console.log(`Skip ${packageName}. Not updated.`);
         }
       }
     });
+
     if (updated) {
-      git.push(this._targetBranch.value!);
+      git.push(this._targetBranch.value!, !this._ignoreGitHooksParameter.value);
     }
   }
 
@@ -424,10 +432,7 @@ export class PublishAction extends BaseRushAction {
         args.push(`--access`, this._npmAccessLevel.value);
       }
 
-      if (
-        this.rushConfiguration.packageManager === 'pnpm' &&
-        semver.gte(this.rushConfiguration.packageManagerToolVersion, '4.11.0')
-      ) {
+      if (this.rushConfiguration.packageManager === 'pnpm') {
         // PNPM 4.11.0 introduced a feature that may interrupt publishing and prompt the user for input.
         // See this issue for details: https://github.com/microsoft/rushstack/issues/1940
         args.push('--no-git-checks');
@@ -462,11 +467,31 @@ export class PublishAction extends BaseRushAction {
 
     const publishedVersions: string[] = Npm.publishedVersions(
       packageConfig.packageName,
-      packageConfig.projectFolder,
+      packageConfig.publishFolder,
       env,
       args
     );
-    return publishedVersions.indexOf(packageConfig.packageJson.version) >= 0;
+
+    const packageVersion: string = packageConfig.packageJsonEditor.version;
+
+    // SemVer supports an obscure (and generally deprecated) feature where "build metadata" can be
+    // appended to a version.  For example if our version is "1.2.3-beta.4+extra567", then "+extra567" is the
+    // build metadata part.  The suffix has no effect on version comparisons and is mostly ignored by
+    // the NPM registry.  Importantly, the queried version number will not include it, so we need to discard
+    // it before comparing against the list of already published versions.
+    const parsedVersion: semver.SemVer | null = semver.parse(packageVersion);
+    if (!parsedVersion) {
+      throw new Error(`The package "${packageConfig.packageName}" has an invalid "version" value`);
+    }
+
+    // For example, normalize "1.2.3-beta.4+extra567" -->"1.2.3-beta.4".
+    //
+    // This is redundant in the current API, but might change in the future:
+    // https://github.com/npm/node-semver/issues/264
+    parsedVersion.build = [];
+    const normalizedVersion: string = parsedVersion.format();
+
+    return publishedVersions.indexOf(normalizedVersion) >= 0;
   }
 
   private _npmPack(packageName: string, project: RushConfigurationProject): void {
@@ -477,14 +502,14 @@ export class PublishAction extends BaseRushAction {
       !!this._publish.value,
       this.rushConfiguration.packageManagerToolFilename,
       args,
-      project.projectFolder,
+      project.publishFolder,
       env
     );
 
     if (this._publish.value) {
       // Copy the tarball the release folder
       const tarballName: string = this._calculateTarballName(project);
-      const tarballPath: string = path.join(project.projectFolder, tarballName);
+      const tarballPath: string = path.join(project.publishFolder, tarballName);
       const destFolder: string = this._releaseFolder.value
         ? this._releaseFolder.value
         : path.join(this.rushConfiguration.commonTempFolder, 'artifacts', 'packages');
