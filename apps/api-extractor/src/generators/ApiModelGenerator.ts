@@ -80,7 +80,8 @@ export class ApiModelGenerator {
         if (entity.astEntity instanceof AstSymbol) {
           // Skip ancillary declarations; we will process them with the main declaration
           for (const astDeclaration of this._collector.getNonAncillaryDeclarations(entity.astEntity)) {
-            this._processDeclaration(astDeclaration, entity.nameForEmit, apiEntryPoint);
+            const exportedName: string | undefined = Array.from(entity.exportNames)[0] || entity.nameForEmit;
+            this._processDeclaration(astDeclaration, exportedName, apiEntryPoint);
           }
         } else {
           // TODO: Figure out how to represent reexported AstImport objects.  Basically we need to introduce a new
