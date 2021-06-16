@@ -19,11 +19,10 @@ import { TypeScriptPlugin } from '../plugins/TypeScriptPlugin/TypeScriptPlugin';
 import { DeleteGlobsPlugin } from '../plugins/DeleteGlobsPlugin';
 import { CopyStaticAssetsPlugin } from '../plugins/CopyStaticAssetsPlugin';
 import { ApiExtractorPlugin } from '../plugins/ApiExtractorPlugin/ApiExtractorPlugin';
-import { JestPlugin } from '../plugins/JestPlugin/JestPlugin';
-import { BasicConfigureWebpackPlugin } from '../plugins/Webpack/BasicConfigureWebpackPlugin';
-import { WebpackPlugin } from '../plugins/Webpack/WebpackPlugin';
 import { SassTypingsPlugin } from '../plugins/SassTypingsPlugin/SassTypingsPlugin';
 import { ProjectValidatorPlugin } from '../plugins/ProjectValidatorPlugin';
+import { ToolPackageResolver } from '../utilities/ToolPackageResolver';
+import { NodeServicePlugin } from '../plugins/NodeServicePlugin';
 
 export interface IPluginManagerOptions {
   terminal: Terminal;
@@ -45,16 +44,16 @@ export class PluginManager {
   }
 
   public initializeDefaultPlugins(): void {
-    this._applyPlugin(new TypeScriptPlugin());
+    const taskPackageResolver: ToolPackageResolver = new ToolPackageResolver();
+
+    this._applyPlugin(new TypeScriptPlugin(taskPackageResolver));
     this._applyPlugin(new CopyStaticAssetsPlugin());
     this._applyPlugin(new CopyFilesPlugin());
     this._applyPlugin(new DeleteGlobsPlugin());
-    this._applyPlugin(new ApiExtractorPlugin());
-    this._applyPlugin(new JestPlugin());
-    this._applyPlugin(new BasicConfigureWebpackPlugin());
-    this._applyPlugin(new WebpackPlugin());
+    this._applyPlugin(new ApiExtractorPlugin(taskPackageResolver));
     this._applyPlugin(new SassTypingsPlugin());
     this._applyPlugin(new ProjectValidatorPlugin());
+    this._applyPlugin(new NodeServicePlugin());
   }
 
   public initializePlugin(pluginSpecifier: string, options?: object): void {
@@ -63,13 +62,12 @@ export class PluginManager {
   }
 
   public async initializePluginsFromConfigFileAsync(): Promise<void> {
-    const heftConfigurationJson:
-      | IHeftConfigurationJson
-      | undefined = await CoreConfigFiles.heftConfigFileLoader.tryLoadConfigurationFileForProjectAsync(
-      this._heftConfiguration.globalTerminal,
-      this._heftConfiguration.buildFolder,
-      this._heftConfiguration.rigConfig
-    );
+    const heftConfigurationJson: IHeftConfigurationJson | undefined =
+      await CoreConfigFiles.heftConfigFileLoader.tryLoadConfigurationFileForProjectAsync(
+        this._heftConfiguration.globalTerminal,
+        this._heftConfiguration.buildFolder,
+        this._heftConfiguration.rigConfig
+      );
     const heftPluginSpecifiers: IHeftConfigurationJsonPluginSpecifier[] =
       heftConfigurationJson?.heftPlugins || [];
 
@@ -85,7 +83,10 @@ export class PluginManager {
   }
 
   private _initializeResolvedPlugin(resolvedPluginPath: string, options?: object): void {
-    const plugin: IHeftPlugin<object | void> = this._loadAndValidatePluginPackage(resolvedPluginPath);
+    const plugin: IHeftPlugin<object | void> = this._loadAndValidatePluginPackage(
+      resolvedPluginPath,
+      options
+    );
 
     if (this._appliedPluginNames.has(plugin.pluginName)) {
       throw new Error(
@@ -108,7 +109,7 @@ export class PluginManager {
     }
   }
 
-  private _loadAndValidatePluginPackage(resolvedPluginPath: string): IHeftPlugin {
+  private _loadAndValidatePluginPackage(resolvedPluginPath: string, options?: object): IHeftPlugin {
     let pluginPackage: IHeftPlugin;
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -118,11 +119,11 @@ export class PluginManager {
       throw new InternalError(`Error loading plugin package from "${resolvedPluginPath}": ${e}`);
     }
 
-    this._terminal.writeVerboseLine(`Loaded plugin package from "${resolvedPluginPath}"`);
-
     if (!pluginPackage) {
       throw new InternalError(`Plugin package loaded from "${resolvedPluginPath}" is null or undefined.`);
     }
+
+    this._terminal.writeVerboseLine(`Loaded plugin package from "${resolvedPluginPath}"`);
 
     if (!pluginPackage.apply || typeof pluginPackage.apply !== 'function') {
       throw new InternalError(
@@ -136,6 +137,16 @@ export class PluginManager {
         `Plugin packages must define a "pluginName" property. The plugin loaded from "${resolvedPluginPath}" ` +
           'either doesn\'t define a "pluginName" property, or its value isn\'t a string.'
       );
+    }
+
+    if (options && pluginPackage.optionsSchema) {
+      try {
+        pluginPackage.optionsSchema.validateObject(options, 'config/heft.json');
+      } catch (e) {
+        throw new Error(
+          `Provided options for plugin "${pluginPackage.pluginName}" did not match the provided plugin schema.\n${e}`
+        );
+      }
     }
 
     return pluginPackage;

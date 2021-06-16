@@ -1,6 +1,206 @@
 # Change Log - @rushstack/loader-raw-script
 
-This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be manually modified.
+This log was last generated on Tue, 15 Jun 2021 20:38:35 GMT and should not be manually modified.
+
+## 1.3.150
+Tue, 15 Jun 2021 20:38:35 GMT
+
+_Version update only_
+
+## 1.3.149
+Fri, 11 Jun 2021 23:26:16 GMT
+
+_Version update only_
+
+## 1.3.148
+Fri, 11 Jun 2021 00:34:02 GMT
+
+_Version update only_
+
+## 1.3.147
+Thu, 10 Jun 2021 15:08:16 GMT
+
+_Version update only_
+
+## 1.3.146
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 1.3.145
+Fri, 04 Jun 2021 15:08:20 GMT
+
+_Version update only_
+
+## 1.3.144
+Fri, 04 Jun 2021 00:08:34 GMT
+
+_Version update only_
+
+## 1.3.143
+Tue, 01 Jun 2021 18:29:26 GMT
+
+_Version update only_
+
+## 1.3.142
+Sat, 29 May 2021 01:05:06 GMT
+
+_Version update only_
+
+## 1.3.141
+Fri, 28 May 2021 06:19:58 GMT
+
+_Version update only_
+
+## 1.3.140
+Tue, 25 May 2021 00:12:21 GMT
+
+_Version update only_
+
+## 1.3.139
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 1.3.138
+Thu, 13 May 2021 01:52:46 GMT
+
+_Version update only_
+
+## 1.3.137
+Tue, 11 May 2021 22:19:17 GMT
+
+_Version update only_
+
+## 1.3.136
+Mon, 03 May 2021 15:10:28 GMT
+
+_Version update only_
+
+## 1.3.135
+Thu, 29 Apr 2021 23:26:50 GMT
+
+_Version update only_
+
+## 1.3.134
+Thu, 29 Apr 2021 01:07:29 GMT
+
+_Version update only_
+
+## 1.3.133
+Fri, 23 Apr 2021 22:00:07 GMT
+
+_Version update only_
+
+## 1.3.132
+Fri, 23 Apr 2021 15:11:21 GMT
+
+_Version update only_
+
+## 1.3.131
+Wed, 21 Apr 2021 15:12:28 GMT
+
+_Version update only_
+
+## 1.3.130
+Tue, 20 Apr 2021 04:59:51 GMT
+
+_Version update only_
+
+## 1.3.129
+Thu, 15 Apr 2021 02:59:25 GMT
+
+_Version update only_
+
+## 1.3.128
+Mon, 12 Apr 2021 15:10:29 GMT
+
+_Version update only_
+
+## 1.3.127
+Thu, 08 Apr 2021 20:41:54 GMT
+
+_Version update only_
+
+## 1.3.126
+Thu, 08 Apr 2021 06:05:32 GMT
+
+_Version update only_
+
+## 1.3.125
+Thu, 08 Apr 2021 00:10:18 GMT
+
+_Version update only_
+
+## 1.3.124
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 1.3.123
+Wed, 31 Mar 2021 15:10:36 GMT
+
+_Version update only_
+
+## 1.3.122
+Mon, 29 Mar 2021 05:02:07 GMT
+
+_Version update only_
+
+## 1.3.121
+Fri, 19 Mar 2021 22:31:38 GMT
+
+_Version update only_
+
+## 1.3.120
+Wed, 17 Mar 2021 05:04:38 GMT
+
+_Version update only_
+
+## 1.3.119
+Fri, 12 Mar 2021 01:13:27 GMT
+
+_Version update only_
+
+## 1.3.118
+Wed, 10 Mar 2021 06:23:29 GMT
+
+_Version update only_
+
+## 1.3.117
+Wed, 10 Mar 2021 05:10:06 GMT
+
+_Version update only_
+
+## 1.3.116
+Thu, 04 Mar 2021 01:11:31 GMT
+
+_Version update only_
+
+## 1.3.115
+Tue, 02 Mar 2021 23:25:05 GMT
+
+_Version update only_
+
+## 1.3.114
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
+
+## 1.3.113
+Fri, 22 Jan 2021 05:39:22 GMT
+
+_Version update only_
+
+## 1.3.112
+Thu, 21 Jan 2021 04:19:00 GMT
+
+_Version update only_
+
+## 1.3.111
+Wed, 13 Jan 2021 01:11:06 GMT
+
+_Version update only_
 
 ## 1.3.110
 Fri, 08 Jan 2021 07:28:50 GMT

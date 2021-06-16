@@ -1,6 +1,206 @@
 # Change Log - @microsoft/loader-load-themed-styles
 
-This log was last generated on Fri, 08 Jan 2021 07:28:50 GMT and should not be manually modified.
+This log was last generated on Tue, 15 Jun 2021 20:38:35 GMT and should not be manually modified.
+
+## 1.9.63
+Tue, 15 Jun 2021 20:38:35 GMT
+
+_Version update only_
+
+## 1.9.62
+Fri, 11 Jun 2021 23:26:16 GMT
+
+_Version update only_
+
+## 1.9.61
+Fri, 11 Jun 2021 00:34:02 GMT
+
+_Version update only_
+
+## 1.9.60
+Thu, 10 Jun 2021 15:08:16 GMT
+
+_Version update only_
+
+## 1.9.59
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 1.9.58
+Fri, 04 Jun 2021 15:08:20 GMT
+
+_Version update only_
+
+## 1.9.57
+Fri, 04 Jun 2021 00:08:34 GMT
+
+_Version update only_
+
+## 1.9.56
+Tue, 01 Jun 2021 18:29:26 GMT
+
+_Version update only_
+
+## 1.9.55
+Sat, 29 May 2021 01:05:06 GMT
+
+_Version update only_
+
+## 1.9.54
+Fri, 28 May 2021 06:19:58 GMT
+
+_Version update only_
+
+## 1.9.53
+Tue, 25 May 2021 00:12:21 GMT
+
+_Version update only_
+
+## 1.9.52
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 1.9.51
+Thu, 13 May 2021 01:52:46 GMT
+
+_Version update only_
+
+## 1.9.50
+Tue, 11 May 2021 22:19:17 GMT
+
+_Version update only_
+
+## 1.9.49
+Mon, 03 May 2021 15:10:28 GMT
+
+_Version update only_
+
+## 1.9.48
+Thu, 29 Apr 2021 23:26:50 GMT
+
+_Version update only_
+
+## 1.9.47
+Thu, 29 Apr 2021 01:07:29 GMT
+
+_Version update only_
+
+## 1.9.46
+Fri, 23 Apr 2021 22:00:07 GMT
+
+_Version update only_
+
+## 1.9.45
+Fri, 23 Apr 2021 15:11:20 GMT
+
+_Version update only_
+
+## 1.9.44
+Wed, 21 Apr 2021 15:12:28 GMT
+
+_Version update only_
+
+## 1.9.43
+Tue, 20 Apr 2021 04:59:51 GMT
+
+_Version update only_
+
+## 1.9.42
+Thu, 15 Apr 2021 02:59:25 GMT
+
+_Version update only_
+
+## 1.9.41
+Mon, 12 Apr 2021 15:10:29 GMT
+
+_Version update only_
+
+## 1.9.40
+Thu, 08 Apr 2021 20:41:54 GMT
+
+_Version update only_
+
+## 1.9.39
+Thu, 08 Apr 2021 06:05:32 GMT
+
+_Version update only_
+
+## 1.9.38
+Thu, 08 Apr 2021 00:10:18 GMT
+
+_Version update only_
+
+## 1.9.37
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 1.9.36
+Wed, 31 Mar 2021 15:10:36 GMT
+
+_Version update only_
+
+## 1.9.35
+Mon, 29 Mar 2021 05:02:06 GMT
+
+_Version update only_
+
+## 1.9.34
+Fri, 19 Mar 2021 22:31:38 GMT
+
+_Version update only_
+
+## 1.9.33
+Wed, 17 Mar 2021 05:04:38 GMT
+
+_Version update only_
+
+## 1.9.32
+Fri, 12 Mar 2021 01:13:27 GMT
+
+_Version update only_
+
+## 1.9.31
+Wed, 10 Mar 2021 06:23:29 GMT
+
+_Version update only_
+
+## 1.9.30
+Wed, 10 Mar 2021 05:10:06 GMT
+
+_Version update only_
+
+## 1.9.29
+Thu, 04 Mar 2021 01:11:31 GMT
+
+_Version update only_
+
+## 1.9.28
+Tue, 02 Mar 2021 23:25:05 GMT
+
+_Version update only_
+
+## 1.9.27
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
+
+## 1.9.26
+Fri, 22 Jan 2021 05:39:22 GMT
+
+_Version update only_
+
+## 1.9.25
+Thu, 21 Jan 2021 04:19:00 GMT
+
+_Version update only_
+
+## 1.9.24
+Wed, 13 Jan 2021 01:11:06 GMT
+
+_Version update only_
 
 ## 1.9.23
 Fri, 08 Jan 2021 07:28:50 GMT

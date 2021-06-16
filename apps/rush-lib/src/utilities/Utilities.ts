@@ -8,7 +8,7 @@ import * as tty from 'tty';
 import * as path from 'path';
 import wordwrap from 'wordwrap';
 import { JsonFile, IPackageJson, FileSystem, FileConstants, Terminal } from '@rushstack/node-core-library';
-import { Stream } from 'stream';
+import type * as stream from 'stream';
 import { CommandLineHelper } from '@rushstack/ts-command-line';
 
 import { RushConfiguration } from '../api/RushConfiguration';
@@ -464,7 +464,9 @@ export class Utilities {
    * Example: 'hello there' --> '"hello there"'
    */
   public static escapeShellParameter(parameter: string): string {
-    return `"${parameter}"`;
+    // This approach is based on what NPM 7 now does:
+    // https://github.com/npm/run-script/blob/47a4d539fb07220e7215cc0e482683b76407ef9b/lib/run-script-pkg.js#L34
+    return JSON.stringify(parameter);
   }
 
   /**
@@ -522,7 +524,8 @@ export class Utilities {
    * IMPORTANT: THIS CODE SHOULD BE KEPT UP TO DATE WITH _copyAndTrimNpmrcFile() FROM scripts/install-run.ts
    */
   public static copyAndTrimNpmrcFile(sourceNpmrcPath: string, targetNpmrcPath: string): void {
-    console.log(`Copying ${sourceNpmrcPath} --> ${targetNpmrcPath}`); // Verbose
+    console.log(`Transforming ${sourceNpmrcPath}`); // Verbose
+    console.log(`  --> "${targetNpmrcPath}"`);
     let npmrcFileLines: string[] = FileSystem.readFile(sourceNpmrcPath).split('\n');
     npmrcFileLines = npmrcFileLines.map((line) => (line || '').trim());
     const resultLines: string[] = [];
@@ -573,7 +576,8 @@ export class Utilities {
    */
   public static syncFile(sourcePath: string, destinationPath: string): void {
     if (FileSystem.exists(sourcePath)) {
-      console.log(`Updating ${destinationPath}`);
+      console.log(`Copying "${sourcePath}"`);
+      console.log(`  --> "${destinationPath}"`);
       FileSystem.copyFile({ sourcePath, destinationPath });
     } else {
       if (FileSystem.exists(destinationPath)) {
@@ -658,6 +662,18 @@ export class Utilities {
     }
   }
 
+  public static async readStreamToBufferAsync(stream: stream.Readable): Promise<Buffer> {
+    return await new Promise((resolve: (result: Buffer) => void, reject: (error: Error) => void) => {
+      const parts: Uint8Array[] = [];
+      stream.on('data', (chunk) => parts.push(chunk));
+      stream.on('error', (error) => reject(error));
+      stream.on('end', () => {
+        const result: Buffer = Buffer.concat(parts);
+        resolve(result);
+      });
+    });
+  }
+
   private static _executeLifecycleCommandInternal<TCommandResult>(
     command: string,
     spawnFunction: (
@@ -696,6 +712,10 @@ export class Utilities {
   /**
    * Returns a process.env environment suitable for executing lifecycle scripts.
    * @param initialEnvironment - an existing environment to copy instead of process.env
+   *
+   * @remarks
+   * Rush._assignRushInvokedFolder() assigns the `RUSH_INVOKED_FOLDER` variable globally
+   * via the parent process's environment.
    */
   private static _createEnvironmentForRushCommand(
     options: ICreateEnvironmentForRushCommandOptions
@@ -794,7 +814,7 @@ export class Utilities {
       | 'pipe'
       | 'ignore'
       | 'inherit'
-      | (number | 'pipe' | 'ignore' | 'inherit' | 'ipc' | Stream | null | undefined)[]
+      | (number | 'pipe' | 'ignore' | 'inherit' | 'ipc' | stream.Stream | null | undefined)[]
       | undefined,
     environment?: IEnvironment,
     keepEnvironment: boolean = false
@@ -836,6 +856,9 @@ export class Utilities {
     if (result.error && (result.error as any).errno === 'ENOENT') {
       // This is a workaround for GitHub issue #25330
       // https://github.com/nodejs/node-v0.x-archive/issues/25330
+      //
+      // TODO: The fully worked out solution for this problem is now provided by the "Executable" API
+      // from @rushstack/node-core-library
       result = child_process.spawnSync(command + '.cmd', args, options);
     }
 

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors';
+import colors from 'colors/safe';
 import * as os from 'os';
 
 import { Import } from '@rushstack/node-core-library';
@@ -133,16 +133,17 @@ export abstract class BaseInstallAction extends BaseRushAction {
 
     const installManagerOptions: IInstallManagerOptions = this.buildInstallOptions();
 
-    const installManager: BaseInstallManager = installManagerFactoryModule.InstallManagerFactory.getInstallManager(
-      this.rushConfiguration,
-      this.rushGlobalFolder,
-      purgeManager,
-      installManagerOptions
-    );
+    const installManager: BaseInstallManager =
+      installManagerFactoryModule.InstallManagerFactory.getInstallManager(
+        this.rushConfiguration,
+        this.rushGlobalFolder,
+        purgeManager,
+        installManagerOptions
+      );
 
     let installSuccessful: boolean = true;
     try {
-      await installManager.doInstall();
+      await installManager.doInstallAsync();
 
       this.eventHooksManager.handle(
         Event.postRushInstall,

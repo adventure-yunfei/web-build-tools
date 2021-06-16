@@ -362,9 +362,8 @@ export class AstSymbolTable {
           );
 
           if (identifierNode) {
-            let referencedAstEntity: AstEntity | undefined = this._entitiesByIdentifierNode.get(
-              identifierNode
-            );
+            let referencedAstEntity: AstEntity | undefined =
+              this._entitiesByIdentifierNode.get(identifierNode);
             if (!referencedAstEntity) {
               const symbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(identifierNode);
               if (!symbol) {
@@ -517,11 +516,11 @@ export class AstSymbolTable {
     const followedSymbol: ts.Symbol = options.followedSymbol;
 
     // Filter out symbols representing constructs that we don't care about
-    if (!TypeScriptHelpers.hasAnyDeclarations(followedSymbol)) {
+    const arbitraryDeclaration: ts.Declaration | undefined =
+      TypeScriptHelpers.tryGetADeclaration(followedSymbol);
+    if (!arbitraryDeclaration) {
       return undefined;
     }
-
-    const arbitraryDeclaration: ts.Declaration = followedSymbol.declarations[0];
 
     if (
       // eslint-disable-next-line no-bitwise
@@ -594,24 +593,28 @@ export class AstSymbolTable {
         // - but P1 and P2 may be different (e.g. merged namespaces containing merged interfaces)
 
         // Is there a parent AstSymbol?  First we check to see if there is a parent declaration:
-        const arbitraryParentDeclaration: ts.Node | undefined = this._tryFindFirstAstDeclarationParent(
-          followedSymbol.declarations[0]
-        );
+        const arbitraryDeclaration: ts.Node | undefined =
+          TypeScriptHelpers.tryGetADeclaration(followedSymbol);
 
-        if (arbitraryParentDeclaration) {
-          const parentSymbol: ts.Symbol = TypeScriptHelpers.getSymbolForDeclaration(
-            arbitraryParentDeclaration as ts.Declaration,
-            this._typeChecker
-          );
+        if (arbitraryDeclaration) {
+          const arbitraryParentDeclaration: ts.Node | undefined =
+            this._tryFindFirstAstDeclarationParent(arbitraryDeclaration);
 
-          parentAstSymbol = this._fetchAstSymbol({
-            followedSymbol: parentSymbol,
-            isExternal: options.isExternal,
-            includeNominalAnalysis: false,
-            addIfMissing: true
-          });
-          if (!parentAstSymbol) {
-            throw new InternalError('Unable to construct a parent AstSymbol for ' + followedSymbol.name);
+          if (arbitraryParentDeclaration) {
+            const parentSymbol: ts.Symbol = TypeScriptHelpers.getSymbolForDeclaration(
+              arbitraryParentDeclaration as ts.Declaration,
+              this._typeChecker
+            );
+
+            parentAstSymbol = this._fetchAstSymbol({
+              followedSymbol: parentSymbol,
+              isExternal: options.isExternal,
+              includeNominalAnalysis: false,
+              addIfMissing: true
+            });
+            if (!parentAstSymbol) {
+              throw new InternalError('Unable to construct a parent AstSymbol for ' + followedSymbol.name);
+            }
           }
         }
       }

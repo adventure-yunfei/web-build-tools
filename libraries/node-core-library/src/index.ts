@@ -9,14 +9,17 @@
 
 export { AlreadyReportedError } from './AlreadyReportedError';
 export { AnsiEscape, IAnsiEscapeConvertForTestsOptions } from './Terminal/AnsiEscape';
+export { Async, IAsyncParallelismOptions } from './Async';
 export { Brand } from './PrimitiveTypes';
 export { FileConstants, FolderConstants } from './Constants';
 export { Enum } from './Enum';
+export { EnvironmentMap, IEnvironmentEntry } from './EnvironmentMap';
 export {
   ExecutableStdioStreamMapping,
   ExecutableStdioMapping,
   IExecutableResolveOptions,
   IExecutableSpawnSyncOptions,
+  IExecutableSpawnOptions,
   Executable
 } from './Executable';
 export {
@@ -64,7 +67,6 @@ export {
   IFileSystemCopyFileOptions,
   IFileSystemCopyFilesAsyncOptions,
   IFileSystemCopyFilesOptions,
-  IFileSystemCopyFileToManyOptions,
   IFileSystemCreateLinkOptions,
   IFileSystemDeleteFileOptions,
   IFileSystemMoveOptions,

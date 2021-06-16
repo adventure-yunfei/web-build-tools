@@ -1,6 +1,252 @@
 # Change Log - @rushstack/heft
 
-This log was last generated on Wed, 06 Jan 2021 16:10:43 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Jun 2021 00:34:02 GMT and should not be manually modified.
+
+## 0.32.0
+Fri, 11 Jun 2021 00:34:02 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Remove Jest plugin from Heft. To consume the Jest plugin, add @rushstack/heft-jest-plugin as a dependency and include it in heft.json. See UPGRADING.md for more information.
+
+## 0.31.5
+Thu, 10 Jun 2021 15:08:15 GMT
+
+### Patches
+
+- Update the version compatibility warning to indicate that TypeScript 4.x is supported by Heft
+
+## 0.31.4
+Fri, 04 Jun 2021 19:59:53 GMT
+
+### Patches
+
+- Add IBuildStage output property 'isTypeScriptProject' and populate in TypeScriptPlugin
+- Fix bug in CopyFilesPlugin that caused 0-length files to be generated
+
+## 0.31.3
+Fri, 04 Jun 2021 15:08:20 GMT
+
+_Version update only_
+
+## 0.31.2
+Fri, 04 Jun 2021 00:08:34 GMT
+
+_Version update only_
+
+## 0.31.1
+Tue, 01 Jun 2021 18:29:25 GMT
+
+### Patches
+
+- Fix an issue where NodeServicePlugin launched the service when "heft build --watch" was invoked
+
+## 0.31.0
+Sat, 29 May 2021 01:05:06 GMT
+
+### Minor changes
+
+- Add a new "node-service" task that enables "heft start" to launch a Node.js service (GitHub #2717)
+
+## 0.30.7
+Fri, 28 May 2021 06:19:57 GMT
+
+### Patches
+
+- Prepare to split JestPlugin into a dedicated package
+
+## 0.30.6
+Tue, 25 May 2021 00:12:21 GMT
+
+### Patches
+
+- Report an error to prevent two different TypeScript module kinds from being emitted into nested folders
+
+## 0.30.5
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 0.30.4
+Thu, 13 May 2021 01:52:46 GMT
+
+### Patches
+
+- Fix an issue where Heft would return only the sourcemap if the compiled .js file is missing the sourceMappingURL comment.
+
+## 0.30.3
+Tue, 11 May 2021 22:19:17 GMT
+
+### Patches
+
+- Fix the "sources" paths in emitted sourcemap files.
+
+## 0.30.2
+Mon, 03 May 2021 15:10:28 GMT
+
+### Patches
+
+- Move forEachLimitAsync implementation out of heft
+
+## 0.30.1
+Thu, 29 Apr 2021 23:26:50 GMT
+
+_Version update only_
+
+## 0.30.0
+Thu, 29 Apr 2021 01:07:29 GMT
+
+### Minor changes
+
+- Add a command-line option "--detect-open-handles" for troubleshooting Jest issues
+
+### Patches
+
+- Implement a workaround for an intermittent Jest error "A worker process has failed to exit gracefully and has been force exited." (Jest issue #11354)
+
+## 0.29.1
+Fri, 23 Apr 2021 22:00:06 GMT
+
+### Patches
+
+- Ensure TypeScript uses file paths with correct casing.
+
+## 0.29.0
+Fri, 23 Apr 2021 15:11:20 GMT
+
+### Minor changes
+
+- Add emitCjsExtensionForCommonJS and emitMjsExtensionForESModule options to config/typescript.json to support emitting commonJS and ESModule output files with the ".cjs" and ".mjs" respectively, alongside the normal ".js" output files.
+
+## 0.28.5
+Wed, 21 Apr 2021 15:12:27 GMT
+
+### Patches
+
+- Fix an issue where an exception is thrown when running multiple TypeScript compilations in --debug mode
+
+## 0.28.4
+Tue, 20 Apr 2021 04:59:51 GMT
+
+_Version update only_
+
+## 0.28.3
+Thu, 15 Apr 2021 02:59:25 GMT
+
+### Patches
+
+- Fix incremental TypeScript compilation, optimize architecture
+
+## 0.28.2
+Mon, 12 Apr 2021 15:10:29 GMT
+
+_Version update only_
+
+## 0.28.1
+Thu, 08 Apr 2021 20:41:54 GMT
+
+### Patches
+
+- Include mention of heft-webpack5-plugin in an error message.
+
+## 0.28.0
+Thu, 08 Apr 2021 06:05:31 GMT
+
+### Minor changes
+
+- Fix parameter name typo.
+
+## 0.27.0
+Thu, 08 Apr 2021 00:10:18 GMT
+
+### Minor changes
+
+- (BREAKING) Move Webpack functionality into its own package (@rushstack/heft-webpack4-plugin).
+
+## 0.26.0
+Tue, 06 Apr 2021 15:14:22 GMT
+
+### Minor changes
+
+- Add an "afterCompile" hook that runs after compilation.
+
+## 0.25.5
+Wed, 31 Mar 2021 15:10:36 GMT
+
+### Patches
+
+- Fix an outdated path in an error message.
+
+## 0.25.4
+Mon, 29 Mar 2021 05:02:06 GMT
+
+_Version update only_
+
+## 0.25.3
+Fri, 19 Mar 2021 22:31:37 GMT
+
+### Patches
+
+- Improve README.md
+
+## 0.25.2
+Wed, 17 Mar 2021 05:04:37 GMT
+
+### Patches
+
+- Fix an issue where heft would crash when copying static assets in --watch mode.
+
+## 0.25.1
+Fri, 12 Mar 2021 01:13:27 GMT
+
+### Patches
+
+- Update node-sass to support Node 15.
+
+## 0.25.0
+Wed, 10 Mar 2021 05:10:05 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Change the logic that resolves typescript, eslint, tslint, and api-extractor to look for a devDependency in the current project, and then for a dependency in the rig project, and then as any kind of dependency in the current project.
+
+## 0.24.4
+Thu, 04 Mar 2021 01:11:31 GMT
+
+_Version update only_
+
+## 0.24.3
+Tue, 02 Mar 2021 23:25:05 GMT
+
+### Patches
+
+- Fix an issue where build would continue even if TS reported errors.
+- Determine the default static assets destination folder from the TSConfig's "outDir" property, instead of hardcoding "lib."
+
+## 0.24.2
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
+
+## 0.24.1
+Fri, 22 Jan 2021 05:39:22 GMT
+
+### Patches
+
+- Fix an issue with webpack in "heft start" mode where "bundle" would continue too quickly.
+
+## 0.24.0
+Thu, 21 Jan 2021 04:19:00 GMT
+
+### Minor changes
+
+- Update jest-shared.config.json to specify a default "collectCoverageFrom" that includes all "src" files excluding test files
+- Update jest-shared.config.json to configure "coverageDirectory" to use "./temp/coverage" (instead of "./coverage")
+
+## 0.23.2
+Wed, 13 Jan 2021 01:11:06 GMT
+
+_Version update only_
 
 ## 0.23.1
 Wed, 06 Jan 2021 16:10:43 GMT

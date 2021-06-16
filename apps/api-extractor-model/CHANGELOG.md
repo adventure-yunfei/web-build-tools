@@ -1,6 +1,50 @@
 # Change Log - @microsoft/api-extractor-model
 
-This log was last generated on Thu, 10 Dec 2020 23:25:49 GMT and should not be manually modified.
+This log was last generated on Fri, 04 Jun 2021 19:59:53 GMT and should not be manually modified.
+
+## 7.13.3
+Fri, 04 Jun 2021 19:59:53 GMT
+
+_Version update only_
+
+## 7.13.2
+Wed, 19 May 2021 00:11:39 GMT
+
+_Version update only_
+
+## 7.13.1
+Mon, 03 May 2021 15:10:29 GMT
+
+_Version update only_
+
+## 7.13.0
+Tue, 20 Apr 2021 04:59:51 GMT
+
+### Minor changes
+
+- The .api.json file format now stores the TSDoc configuration used for parsing doc comments
+
+## 7.12.5
+Mon, 12 Apr 2021 15:10:28 GMT
+
+_Version update only_
+
+## 7.12.4
+Thu, 08 Apr 2021 06:05:31 GMT
+
+### Patches
+
+- Fix minor typo in README.md
+
+## 7.12.3
+Tue, 06 Apr 2021 15:14:22 GMT
+
+_Version update only_
+
+## 7.12.2
+Fri, 05 Feb 2021 16:10:42 GMT
+
+_Version update only_
 
 ## 7.12.1
 Thu, 10 Dec 2020 23:25:49 GMT

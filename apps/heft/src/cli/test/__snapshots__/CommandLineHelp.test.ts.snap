@@ -93,8 +93,9 @@ exports[`CommandLineHelp prints the help for each action: test 1`] = `
                  [--typescript-max-write-parallelism PARALLEILSM]
                  [--max-old-space-size SIZE] [--watch] [--clean] [--no-test]
                  [--no-build] [-u] [--find-related-tests SOURCE_FILE]
-                 [--silent] [-t REGEXP] [--test-path-pattern REGEXP]
-                 [--test-timeout-ms INTEGER] [--debug-heft-reporter]
+                 [--pass-with-no-tests] [--silent] [-t REGEXP]
+                 [--test-path-pattern REGEXP] [--test-timeout-ms INTEGER]
+                 [--detect-open-handles] [--debug-heft-reporter]
                  [--max-workers COUNT_OR_PERCENTAGE]
                  
 
@@ -124,6 +125,9 @@ Optional arguments:
                         list of source files that were passed in as arguments.
                          This corresponds to the \\"--findRelatedTests\\" 
                         parameter in Jest's documentation.
+  --pass-with-no-tests  Allow the test suite to pass when no test files are 
+                        found. This corresponds to the \\"--passWithNoTests\\" 
+                        parameter in Jest's documentation.
   --silent              Prevent tests from printing messages through the 
                         console. This corresponds to the \\"--silent\\" parameter 
                         in Jest's documentation.
@@ -146,6 +150,13 @@ Optional arguments:
                         If unspecified, the default is normally 5000 ms. This 
                         corresponds to the \\"--testTimeout\\" parameter in 
                         Jest's documentation.
+  --detect-open-handles
+                        Attempt to collect and print open handles preventing 
+                        Jest from exiting cleanly. This option has a 
+                        significant performance penalty and should only be 
+                        used for debugging. This corresponds to the 
+                        \\"--detectOpenHandles\\" parameter in Jest's 
+                        documentation.
   --debug-heft-reporter
                         Normally Heft installs a custom Jest reporter so that 
                         test results are presented consistently with other 

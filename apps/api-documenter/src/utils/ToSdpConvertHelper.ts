@@ -15,11 +15,7 @@ import {
   CommonYamlModel
 } from '../yaml/ISDPYamlFile';
 import path from 'path';
-import {
-  FileSystem,
-  Encoding,
-  NewlineKind
-} from '@rushstack/node-core-library';
+import { FileSystem, Encoding, NewlineKind } from '@rushstack/node-core-library';
 import yaml = require('js-yaml');
 
 export function convertUDPYamlToSDP(folderPath: string): void {
@@ -48,7 +44,7 @@ function convert(inputPath: string, outputPath: string): void {
         return;
       }
 
-      console.log(`convert file ${fpath} from sdp to udp`);
+      console.log(`convert file ${fpath} from udp to sdp`);
 
       const file: IYamlApiFile = yaml.safeLoad(yamlContent) as IYamlApiFile;
       const result: { model: CommonYamlModel; type: string } | undefined = convertToSDP(file);
@@ -56,19 +52,16 @@ function convert(inputPath: string, outputPath: string): void {
         const stringified: string = `### YamlMime:TS${result.type}\n${yaml.safeDump(result.model, {
           lineWidth: 120
         })}`;
-        FileSystem.writeFile(
-          `${outputPath}/${name}`, stringified,
-          {
-            convertLineEndings: NewlineKind.CrLf,
-            ensureFolderExists: true
-          }
-        );
+        FileSystem.writeFile(`${outputPath}/${name}`, stringified, {
+          convertLineEndings: NewlineKind.CrLf,
+          ensureFolderExists: true
+        });
       } else {
         console.log('not target file ', fpath);
       }
     } else {
       // read contents
-      convert(fpath,  path.join(outputPath, name));
+      convert(fpath, path.join(outputPath, name));
     }
   });
 }
@@ -210,6 +203,7 @@ function convertToTypeSDP(transfomredClass: IYamlApiFile, isClass: boolean): Typ
   const constructors: CommonYamlModel[] = [];
   const properties: CommonYamlModel[] = [];
   const methods: CommonYamlModel[] = [];
+  const events: CommonYamlModel[] = [];
   for (let i: number = 1; i < transfomredClass.items.length; i++) {
     const ele: IYamlItem = transfomredClass.items[i];
     const item: CommonYamlModel = convertCommonYamlModel(ele, element.package!, transfomredClass);
@@ -218,10 +212,12 @@ function convertToTypeSDP(transfomredClass: IYamlApiFile, isClass: boolean): Typ
       if (isClass) {
         constructors.push(item);
       }
-    } else if (ele.type === 'property' || ele.type === 'event') {
+    } else if (ele.type === 'property') {
       properties.push(item);
     } else if (ele.type === 'method') {
       methods.push(item);
+    } else if (ele.type === 'event') {
+      events.push(item);
     } else {
       console.log(`[warning] ${ele.uid}#${ele.name} is not applied sub type ${ele.type} for type yaml`);
     }
@@ -242,6 +238,10 @@ function convertToTypeSDP(transfomredClass: IYamlApiFile, isClass: boolean): Typ
 
   if (methods.length > 0) {
     result.methods = methods;
+  }
+
+  if (events.length > 0) {
+    result.events = events;
   }
 
   if (element.extends && element.extends.length > 0) {

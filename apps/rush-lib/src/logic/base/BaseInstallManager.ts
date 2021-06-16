@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors';
+import colors from 'colors/safe';
 import * as fetch from 'node-fetch';
 import * as fs from 'fs';
-import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
 import * as semver from 'semver';
@@ -13,8 +12,7 @@ import {
   JsonFile,
   PosixModeBits,
   NewlineKind,
-  AlreadyReportedError,
-  Import
+  AlreadyReportedError
 } from '@rushstack/node-core-library';
 
 import { ApprovedPackagesChecker } from '../ApprovedPackagesChecker';
@@ -34,9 +32,9 @@ import { ShrinkwrapFileFactory } from '../ShrinkwrapFileFactory';
 import { Utilities } from '../../utilities/Utilities';
 import { InstallHelpers } from '../installManager/InstallHelpers';
 import { PolicyValidator } from '../policy/PolicyValidator';
-import { RushConfigurationProject } from '../../api/RushConfigurationProject';
-
-const HttpsProxyAgent: typeof import('https-proxy-agent') = Import.lazy('https-proxy-agent', require);
+import { WebClient, WebClientResponse } from '../../utilities/WebClient';
+import { SetupPackageRegistry } from '../setup/SetupPackageRegistry';
+import { PnpmfileConfiguration } from '../pnpm/PnpmfileConfiguration';
 
 export interface IInstallManagerOptions {
   /**
@@ -99,9 +97,10 @@ export interface IInstallManagerOptions {
   maxInstallAttempts: number;
 
   /**
-   * The list of projects that should be installed, along with project dependencies.
+   * Filters to be passed to PNPM during installation, if applicable.
+   * These restrict the scope of a workspace installation.
    */
-  toProjects: ReadonlyArray<RushConfigurationProject>;
+  pnpmFilterArguments: string[];
 }
 
 /**
@@ -113,6 +112,8 @@ export abstract class BaseInstallManager {
   private _commonTempInstallFlag: LastInstallFlag;
   private _commonTempLinkFlag: LastLinkFlag;
   private _installRecycler: AsyncRecycler;
+  private _npmSetupValidated: boolean = false;
+  private _syncNpmrcAlreadyCalled: boolean = false;
 
   private _options: IInstallManagerOptions;
 
@@ -147,8 +148,8 @@ export abstract class BaseInstallManager {
     return this._options;
   }
 
-  public async doInstall(): Promise<void> {
-    const isFilteredInstall: boolean = this.options.toProjects.length > 0;
+  public async doInstallAsync(): Promise<void> {
+    const isFilteredInstall: boolean = this.options.pnpmFilterArguments.length > 0;
     const useWorkspaces: boolean =
       this.rushConfiguration.pnpmOptions && this.rushConfiguration.pnpmOptions.useWorkspaces;
 
@@ -178,6 +179,10 @@ export abstract class BaseInstallManager {
 
     const { shrinkwrapIsUpToDate, variantIsUpToDate } = await this.prepareAsync();
 
+    console.log(
+      os.EOL + colors.bold(`Checking installation in "${this.rushConfiguration.commonTempFolder}"`)
+    );
+
     // This marker file indicates that the last "rush install" completed successfully.
     // Always perform a clean install if filter flags were provided. Additionally, if
     // "--purge" was specified, or if the last install was interrupted, then we will
@@ -193,6 +198,9 @@ export abstract class BaseInstallManager {
     };
 
     if (cleanInstall || !shrinkwrapIsUpToDate || !variantIsUpToDate || !canSkipInstall()) {
+      console.log();
+      await this.validateNpmSetup();
+
       let publishedRelease: boolean | undefined;
       try {
         publishedRelease = await this._checkIfReleaseIsPublished();
@@ -217,12 +225,7 @@ export abstract class BaseInstallManager {
       // Perform the actual install
       await this.installAsync(cleanInstall);
 
-      const usePnpmFrozenLockfile: boolean =
-        this._rushConfiguration.packageManager === 'pnpm' &&
-        this._rushConfiguration.experimentsConfiguration.configuration.usePnpmFrozenLockfileForRushInstall ===
-          true;
-
-      if (this.options.allowShrinkwrapUpdates && (usePnpmFrozenLockfile || !shrinkwrapIsUpToDate)) {
+      if (this.options.allowShrinkwrapUpdates && !shrinkwrapIsUpToDate) {
         // Copy (or delete) common\temp\pnpm-lock.yaml --> common\config\rush\pnpm-lock.yaml
         Utilities.syncFile(
           this._rushConfiguration.tempShrinkwrapFilename,
@@ -247,6 +250,8 @@ export abstract class BaseInstallManager {
       if (!isFilteredInstall) {
         this._commonTempInstallFlag.create();
       }
+    } else {
+      console.log('Installation is already up-to-date.');
     }
 
     // Perform any post-install work the install manager requires
@@ -259,11 +264,38 @@ export abstract class BaseInstallManager {
     shrinkwrapFile: BaseShrinkwrapFile | undefined
   ): Promise<{ shrinkwrapIsUpToDate: boolean; shrinkwrapWarnings: string[] }>;
 
-  protected abstract canSkipInstall(lastInstallDate: Date): boolean;
-
   protected abstract installAsync(cleanInstall: boolean): Promise<void>;
 
   protected abstract postInstallAsync(): Promise<void>;
+
+  protected canSkipInstall(lastModifiedDate: Date): boolean {
+    // Based on timestamps, can we skip this install entirely?
+    const potentiallyChangedFiles: string[] = [];
+
+    // Consider the timestamp on the node_modules folder; if someone tampered with it
+    // or deleted it entirely, then we can't skip this install
+    potentiallyChangedFiles.push(
+      path.join(this.rushConfiguration.commonTempFolder, RushConstants.nodeModulesFolderName)
+    );
+
+    // Additionally, if they pulled an updated shrinkwrap file from Git,
+    // then we can't skip this install
+    potentiallyChangedFiles.push(this.rushConfiguration.getCommittedShrinkwrapFilename(this.options.variant));
+
+    // Add common-versions.json file to the potentially changed files list.
+    potentiallyChangedFiles.push(this.rushConfiguration.getCommonVersionsFilePath(this.options.variant));
+
+    if (this.rushConfiguration.packageManager === 'pnpm') {
+      // If the repo is using pnpmfile.js, consider that also
+      const pnpmFileFilename: string = this.rushConfiguration.getPnpmfilePath(this.options.variant);
+
+      if (FileSystem.exists(pnpmFileFilename)) {
+        potentiallyChangedFiles.push(pnpmFileFilename);
+      }
+    }
+
+    return Utilities.isFileTimestampCurrent(lastModifiedDate, potentiallyChangedFiles);
+  }
 
   protected async prepareAsync(): Promise<{ variantIsUpToDate: boolean; shrinkwrapIsUpToDate: boolean }> {
     // Check the policies
@@ -381,23 +413,20 @@ export abstract class BaseInstallManager {
       this._rushConfiguration.commonRushConfigFolder,
       this._rushConfiguration.commonTempFolder
     );
+    this._syncNpmrcAlreadyCalled = true;
 
-    // also, copy the pnpmfile.js if it exists
-    if (this._rushConfiguration.packageManager === 'pnpm') {
-      const committedPnpmFilePath: string = this._rushConfiguration.getPnpmfilePath(this._options.variant);
-      const tempPnpmFilePath: string = path.join(
-        this._rushConfiguration.commonTempFolder,
-        RushConstants.pnpmfileFilename
-      );
-
-      // ensure that we remove any old one that may be hanging around
-      Utilities.syncFile(committedPnpmFilePath, tempPnpmFilePath);
+    // Shim support for pnpmfile in. This shim will call back into the variant-specific pnpmfile.
+    // Additionally when in workspaces, the shim implements support for common versions.
+    if (this.rushConfiguration.packageManager === 'pnpm') {
+      await PnpmfileConfiguration.writeCommonTempPnpmfileShimAsync(this.rushConfiguration, this.options);
     }
 
     // Allow for package managers to do their own preparation and check that the shrinkwrap is up to date
     // eslint-disable-next-line prefer-const
     let { shrinkwrapIsUpToDate, shrinkwrapWarnings } = await this.prepareCommonTempAsync(shrinkwrapFile);
     shrinkwrapIsUpToDate = shrinkwrapIsUpToDate && !this.options.recheckShrinkwrap;
+
+    this._syncTempShrinkwrap(shrinkwrapFile);
 
     // Write out the reported warnings
     if (shrinkwrapWarnings.length > 0) {
@@ -415,8 +444,6 @@ export abstract class BaseInstallManager {
       }
       console.log();
     }
-
-    this._syncTempShrinkwrap(shrinkwrapFile);
 
     // Force update if the shrinkwrap is out of date
     if (!shrinkwrapIsUpToDate) {
@@ -478,34 +505,17 @@ export abstract class BaseInstallManager {
         args.push('--store', this._rushConfiguration.pnpmOptions.pnpmStorePath);
       }
 
-      // we are using the --no-lock flag for now, which unfortunately prints a warning, but should be OK
-      // since rush already has its own install lock file which will invalidate the cache for us.
-      // we theoretically could use the lock file, but we would need to clean the store if the
-      // lockfile existed, otherwise PNPM would hang indefinitely. it is simpler to rely on Rush's
-      // last install flag, which encapsulates the entire installation
+      const { configuration: experiments } = this._rushConfiguration.experimentsConfiguration;
 
-      // This setting was removed in 5.0.0. See https://github.com/pnpm/pnpm/releases/tag/v5.0.0
-      if (semver.lt(this._rushConfiguration.packageManagerToolVersion, '5.0.0')) {
-        args.push('--no-lock');
-      }
-
-      if (
-        this._rushConfiguration.experimentsConfiguration.configuration.usePnpmFrozenLockfileForRushInstall &&
-        !this._options.allowShrinkwrapUpdates
-      ) {
-        if (semver.gte(this._rushConfiguration.packageManagerToolVersion, '3.0.0')) {
-          args.push('--frozen-lockfile');
-        } else {
-          args.push('--frozen-shrinkwrap');
-        }
+      if (experiments.usePnpmFrozenLockfileForRushInstall && !this._options.allowShrinkwrapUpdates) {
+        args.push('--frozen-lockfile');
+      } else if (experiments.usePnpmPreferFrozenLockfileForRushUpdate) {
+        // In workspaces, we want to avoid unnecessary lockfile churn
+        args.push('--prefer-frozen-lockfile');
       } else {
         // Ensure that Rush's tarball dependencies get synchronized properly with the pnpm-lock.yaml file.
         // See this GitHub issue: https://github.com/pnpm/pnpm/issues/1342
-        if (semver.gte(this._rushConfiguration.packageManagerToolVersion, '3.0.0')) {
-          args.push('--no-prefer-frozen-lockfile');
-        } else {
-          args.push('--no-prefer-frozen-shrinkwrap');
-        }
+        args.push('--no-prefer-frozen-lockfile');
       }
 
       if (options.collectLogFile) {
@@ -518,10 +528,6 @@ export abstract class BaseInstallManager {
 
       if (this._rushConfiguration.pnpmOptions.strictPeerDependencies) {
         args.push('--strict-peer-dependencies');
-      }
-
-      if ((this._rushConfiguration.packageManagerWrapper as PnpmPackageManager).supportsResolutionStrategy) {
-        args.push(`--resolution-strategy=${this._rushConfiguration.pnpmOptions.resolutionStrategy}`);
       }
     } else if (this._rushConfiguration.packageManager === 'yarn') {
       args.push('--link-folder', 'yarn-link');
@@ -600,21 +606,11 @@ export abstract class BaseInstallManager {
     // Note that the "@" symbol does not normally get URL-encoded
     queryUrl += RushConstants.rushPackageName.replace('/', '%2F');
 
-    const userAgent: string = `pnpm/? npm/? node/${process.version} ${os.platform()} ${os.arch()}`;
+    const webClient: WebClient = new WebClient();
+    webClient.userAgent = `pnpm/? npm/? node/${process.version} ${os.platform()} ${os.arch()}`;
+    webClient.accept = 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*';
 
-    const headers: fetch.Headers = new fetch.Headers();
-    headers.append('user-agent', userAgent);
-    headers.append('accept', 'application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*');
-
-    let agent: http.Agent | undefined = undefined;
-    if (process.env.HTTP_PROXY) {
-      agent = new HttpsProxyAgent(process.env.HTTP_PROXY);
-    }
-
-    const response: fetch.Response = await fetch.default(queryUrl, {
-      headers: headers,
-      agent: agent
-    });
+    const response: WebClientResponse = await webClient.fetchAsync(queryUrl);
     if (!response.ok) {
       throw new Error('Failed to query');
     }
@@ -636,11 +632,9 @@ export abstract class BaseInstallManager {
     }
 
     // Make sure the tarball wasn't deleted from the CDN
-    headers.set('accept', '*/*');
-    const response2: fetch.Response = await fetch.default(url, {
-      headers: headers,
-      agent: agent
-    });
+    webClient.accept = '*/*';
+
+    const response2: fetch.Response = await webClient.fetchAsync(url);
 
     if (!response2.ok) {
       if (response2.status === 404) {
@@ -655,9 +649,14 @@ export abstract class BaseInstallManager {
 
   private _syncTempShrinkwrap(shrinkwrapFile: BaseShrinkwrapFile | undefined): void {
     if (shrinkwrapFile) {
-      // If we have a (possibly incomplete) shrinkwrap file, save it as the temporary file.
-      shrinkwrapFile.save(this.rushConfiguration.tempShrinkwrapFilename);
-      shrinkwrapFile.save(this.rushConfiguration.tempShrinkwrapPreinstallFilename);
+      Utilities.syncFile(
+        this._rushConfiguration.getCommittedShrinkwrapFilename(this.options.variant),
+        this.rushConfiguration.tempShrinkwrapFilename
+      );
+      Utilities.syncFile(
+        this._rushConfiguration.getCommittedShrinkwrapFilename(this.options.variant),
+        this.rushConfiguration.tempShrinkwrapPreinstallFilename
+      );
     } else {
       // Otherwise delete the temporary file
       FileSystem.deleteFile(this.rushConfiguration.tempShrinkwrapFilename);
@@ -682,5 +681,33 @@ export abstract class BaseInstallManager {
         );
       }
     }
+  }
+
+  protected async validateNpmSetup(): Promise<void> {
+    if (this._npmSetupValidated) {
+      return;
+    }
+
+    if (!this.options.bypassPolicy) {
+      const setupPackageRegistry: SetupPackageRegistry = new SetupPackageRegistry({
+        rushConfiguration: this.rushConfiguration,
+        isDebug: this.options.debug,
+        syncNpmrcAlreadyCalled: this._syncNpmrcAlreadyCalled
+      });
+      const valid: boolean = await setupPackageRegistry.checkOnly();
+      if (!valid) {
+        console.error();
+        console.error(colors.red('ERROR: NPM credentials are missing or expired'));
+        console.error();
+        console.error(
+          colors.bold(
+            '==> Please run "rush setup" to update your NPM token.  (Or append "--bypass-policy" to proceed anyway.)'
+          )
+        );
+        throw new AlreadyReportedError();
+      }
+    }
+
+    this._npmSetupValidated = true;
   }
 }
