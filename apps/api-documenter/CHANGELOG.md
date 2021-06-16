@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.13.20-new.1
+
+- 合并主分支
+
 ## 7.12.3-new.0
 
 - 翻译为中文
