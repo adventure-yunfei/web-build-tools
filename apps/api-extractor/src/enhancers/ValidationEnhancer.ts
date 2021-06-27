@@ -12,6 +12,7 @@ import { SymbolMetadata } from '../collector/SymbolMetadata';
 import { CollectorEntity } from '../collector/CollectorEntity';
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 import { ReleaseTag } from '@microsoft/api-extractor-model';
+import { AstImportInternal } from '../analyzer/AstImportInternal';
 
 export class ValidationEnhancer {
   public static analyze(collector: Collector): void {
@@ -28,6 +29,8 @@ export class ValidationEnhancer {
           ValidationEnhancer._checkForInternalUnderscore(collector, entity, entity.astEntity, symbolMetadata);
           ValidationEnhancer._checkForInconsistentReleaseTags(collector, entity.astEntity, symbolMetadata);
         }
+      } else if (entity.astEntity instanceof AstImportInternal) {
+        // TODO: validation for local module import
       }
     }
   }
@@ -172,6 +175,7 @@ export class ValidationEnhancer {
         const rootSymbol: AstSymbol = referencedEntity.rootAstSymbol;
 
         if (!rootSymbol.isExternal) {
+          // TODO: consider exported by local module import
           const collectorEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(rootSymbol);
 
           if (collectorEntity && collectorEntity.exported) {
@@ -209,6 +213,8 @@ export class ValidationEnhancer {
             }
           }
         }
+      } else if (referencedEntity instanceof AstImportInternal) {
+        // TODO: validation for local module import
       }
     }
   }

@@ -14,9 +14,10 @@ import { AstImport } from './AstImport';
 import { MessageRouter } from '../collector/MessageRouter';
 import { TypeScriptInternals, IGlobalVariableAnalyzer } from './TypeScriptInternals';
 import { StringChecks } from './StringChecks';
+import { AstImportInternal } from './AstImportInternal';
 import { SourceFileLocationFormatter } from './SourceFileLocationFormatter';
 
-export type AstEntity = AstSymbol | AstImport;
+export type AstEntity = AstSymbol | AstImport | AstImportInternal;
 
 /**
  * Options for `AstSymbolTable._fetchAstSymbol()`
@@ -135,6 +136,14 @@ export class AstSymbolTable {
     return this._exportAnalyzer.tryGetExportOfAstModule(exportName, astModule);
   }
 
+  public analyze(astEntity: AstSymbol | AstImportInternal): void {
+    if (astEntity instanceof AstSymbol) {
+      this.analyzeAstSymbol(astEntity);
+    } else {
+      this._analyzeAstImportInternal(astEntity);
+    }
+  }
+
   /**
    * Ensures that AstSymbol.analyzed is true for the provided symbol.  The operation
    * starts from the root symbol and then fills out all children of all declarations, and
@@ -148,7 +157,7 @@ export class AstSymbolTable {
    * or members.  (We do always construct its parents however, since AstDefinition.parent
    * is immutable, and needed e.g. to calculate release tag inheritance.)
    */
-  public analyze(astSymbol: AstSymbol): void {
+  public analyzeAstSymbol(astSymbol: AstSymbol): void {
     if (astSymbol.analyzed) {
       return;
     }
@@ -178,12 +187,33 @@ export class AstSymbolTable {
           // Walk up to the root of the tree, looking for any imports along the way
           if (referencedAstEntity instanceof AstSymbol) {
             if (!referencedAstEntity.isExternal) {
-              this.analyze(referencedAstEntity);
+              this.analyzeAstSymbol(referencedAstEntity);
+            }
+          } else if (referencedAstEntity instanceof AstImportInternal) {
+            if (!referencedAstEntity.astModule.isExternal) {
+              this._analyzeAstImportInternal(referencedAstEntity);
             }
           }
         }
       });
     }
+  }
+
+  private _analyzeAstImportInternal(astImportInternal: AstImportInternal): void {
+    if (astImportInternal.analyzed) {
+      return;
+    }
+
+    // mark before actual analyzing, to handle module cyclic reexport
+    astImportInternal.analyzed = true;
+
+    this.fetchAstModuleExportInfo(astImportInternal.astModule).exportedLocalEntities.forEach(exportedEntity => {
+      if (exportedEntity instanceof AstImportInternal) {
+        this._analyzeAstImportInternal(exportedEntity);
+      } else if (exportedEntity instanceof AstSymbol) {
+        this.analyzeAstSymbol(exportedEntity);
+      }
+    });
   }
 
   /**
