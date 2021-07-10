@@ -108,7 +108,7 @@ export class DtsRollupGenerator {
           : ReleaseTag.None;
 
         if (this._shouldIncludeReleaseTag(maxEffectiveReleaseTag, dtsKind)) {
-          DtsEmitHelpers.emitImport(writer, entity, astImport);
+          DtsEmitHelpers.emitImport(writer, collector, entity, astImport);
         }
       }
     }
@@ -262,6 +262,11 @@ export class DtsRollupGenerator {
       case ts.SyntaxKind.DefaultKeyword:
       case ts.SyntaxKind.DeclareKeyword:
         // Delete any explicit "export" or "declare" keywords -- we will re-add them below
+        span.modification.skipAll();
+        break;
+
+      case ts.SyntaxKind.ImportEqualsDeclaration:
+        // Delete "import Foo = Bar.Baz;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
         span.modification.skipAll();
         break;
 
