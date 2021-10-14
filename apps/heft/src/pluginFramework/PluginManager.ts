@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { Terminal, InternalError, Import } from '@rushstack/node-core-library';
+import { ITerminal, InternalError, Import } from '@rushstack/node-core-library';
 
 import { HeftConfiguration } from '../configuration/HeftConfiguration';
 import { IHeftPlugin } from './IHeftPlugin';
@@ -20,19 +20,18 @@ import { DeleteGlobsPlugin } from '../plugins/DeleteGlobsPlugin';
 import { CopyStaticAssetsPlugin } from '../plugins/CopyStaticAssetsPlugin';
 import { RunScriptPlugin } from '../plugins/RunScriptPlugin';
 import { ApiExtractorPlugin } from '../plugins/ApiExtractorPlugin/ApiExtractorPlugin';
-import { SassTypingsPlugin } from '../plugins/SassTypingsPlugin/SassTypingsPlugin';
 import { ProjectValidatorPlugin } from '../plugins/ProjectValidatorPlugin';
 import { ToolPackageResolver } from '../utilities/ToolPackageResolver';
 import { NodeServicePlugin } from '../plugins/NodeServicePlugin';
 
 export interface IPluginManagerOptions {
-  terminal: Terminal;
+  terminal: ITerminal;
   heftConfiguration: HeftConfiguration;
   internalHeftSession: InternalHeftSession;
 }
 
 export class PluginManager {
-  private _terminal: Terminal;
+  private _terminal: ITerminal;
   private _heftConfiguration: HeftConfiguration;
   private _internalHeftSession: InternalHeftSession;
   private _appliedPlugins: IHeftPlugin[] = [];
@@ -53,7 +52,6 @@ export class PluginManager {
     this._applyPlugin(new DeleteGlobsPlugin());
     this._applyPlugin(new RunScriptPlugin());
     this._applyPlugin(new ApiExtractorPlugin(taskPackageResolver));
-    this._applyPlugin(new SassTypingsPlugin());
     this._applyPlugin(new ProjectValidatorPlugin());
     this._applyPlugin(new NodeServicePlugin());
   }

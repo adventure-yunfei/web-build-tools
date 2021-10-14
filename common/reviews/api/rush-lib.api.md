@@ -5,9 +5,9 @@
 ```ts
 
 import { IPackageJson } from '@rushstack/node-core-library';
+import { ITerminal } from '@rushstack/node-core-library';
 import { JsonObject } from '@rushstack/node-core-library';
 import { PackageNameParser } from '@rushstack/node-core-library';
-import { Terminal } from '@rushstack/node-core-library';
 
 // @public
 export class ApprovedPackagesConfiguration {
@@ -108,6 +108,7 @@ export const enum EnvironmentVariableNames {
     RUSH_PARALLELISM = "RUSH_PARALLELISM",
     RUSH_PNPM_STORE_PATH = "RUSH_PNPM_STORE_PATH",
     RUSH_PREVIEW_VERSION = "RUSH_PREVIEW_VERSION",
+    RUSH_TAR_BINARY_PATH = "RUSH_TAR_BINARY_PATH",
     RUSH_TEMP_FOLDER = "RUSH_TEMP_FOLDER",
     RUSH_VARIANT = "RUSH_VARIANT"
 }
@@ -149,6 +150,7 @@ export interface IConfigurationEnvironmentVariable {
 
 // @beta
 export interface IExperimentsJson {
+    buildCacheWithAllowWarningsInSuccessfulBuild?: boolean;
     noChmodFieldInTarHeaderNormalization?: boolean;
     omitImportersFromPreventManualShrinkwrapChanges?: boolean;
     usePnpmFrozenLockfileForRushInstall?: boolean;
@@ -162,7 +164,7 @@ export interface IGetChangedProjectsOptions {
     // (undocumented)
     targetBranchName: string;
     // (undocumented)
-    terminal: Terminal;
+    terminal: ITerminal;
 }
 
 // @public
@@ -326,9 +328,9 @@ export class ProjectChangeAnalyzer {
     constructor(rushConfiguration: RushConfiguration);
     getChangedProjectsAsync(options: IGetChangedProjectsOptions): AsyncIterable<RushConfigurationProject>;
     // @internal
-    _tryGetProjectDependenciesAsync(projectName: string, terminal: Terminal): Promise<Map<string, string> | undefined>;
+    _tryGetProjectDependenciesAsync(projectName: string, terminal: ITerminal): Promise<Map<string, string> | undefined>;
     // @internal
-    _tryGetProjectStateHashAsync(projectName: string, terminal: Terminal): Promise<string | undefined>;
+    _tryGetProjectStateHashAsync(projectName: string, terminal: ITerminal): Promise<string | undefined>;
 }
 
 // @public
@@ -383,6 +385,7 @@ export class RushConfiguration {
     get gitAllowedEmailRegExps(): string[];
     get gitChangeLogUpdateCommitMessage(): string | undefined;
     get gitSampleEmail(): string;
+    get gitTagSeparator(): string | undefined;
     get gitVersionBumpCommitMessage(): string | undefined;
     get hotfixChangeEnabled(): boolean;
     static loadFromConfigurationFile(rushJsonFilename: string): RushConfiguration;

@@ -1,6 +1,158 @@
 # Change Log - @microsoft/loader-load-themed-styles
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+
+## 1.9.106
+Wed, 13 Oct 2021 15:09:54 GMT
+
+_Version update only_
+
+## 1.9.105
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 1.9.104
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 1.9.103
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 1.9.102
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 1.9.101
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 1.9.100
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 1.9.99
+Tue, 05 Oct 2021 15:08:38 GMT
+
+_Version update only_
+
+## 1.9.98
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 1.9.97
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 1.9.96
+Thu, 23 Sep 2021 00:10:40 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 1.9.95
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 1.9.94
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 1.9.93
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 1.9.92
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 1.9.91
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 1.9.90
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 1.9.89
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 1.9.88
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 1.9.87
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 1.9.86
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 1.9.85
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 1.9.84
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 1.9.83
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 1.9.82
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 1.9.81
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 1.9.80
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 1.9.79
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 1.9.78
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
+
+## 1.9.77
+Tue, 27 Jul 2021 22:31:02 GMT
+
+_Version update only_
 
 ## 1.9.76
 Wed, 14 Jul 2021 15:06:29 GMT

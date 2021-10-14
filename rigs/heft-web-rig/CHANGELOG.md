@@ -1,6 +1,164 @@
 # Change Log - @rushstack/heft-web-rig
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+
+## 0.4.26
+Wed, 13 Oct 2021 15:09:54 GMT
+
+_Version update only_
+
+## 0.4.25
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 0.4.24
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 0.4.23
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 0.4.22
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 0.4.21
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 0.4.20
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 0.4.19
+Tue, 05 Oct 2021 15:08:38 GMT
+
+_Version update only_
+
+## 0.4.18
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 0.4.17
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 0.4.16
+Thu, 23 Sep 2021 00:10:40 GMT
+
+_Version update only_
+
+## 0.4.15
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 0.4.14
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 0.4.13
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 0.4.12
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 0.4.11
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 0.4.10
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 0.4.9
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 0.4.8
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 0.4.7
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 0.4.6
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 0.4.5
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 0.4.4
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 0.4.3
+Fri, 13 Aug 2021 00:09:14 GMT
+
+### Patches
+
+- Remove default use of incremental: true in tsconfig-base.json
+
+## 0.4.2
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 0.4.1
+Thu, 12 Aug 2021 01:28:38 GMT
+
+### Patches
+
+- Restore automatic generation of tsBuildInfo.json file path to work around odd path resolution behavior.
+
+## 0.4.0
+Wed, 11 Aug 2021 23:14:17 GMT
+
+### Minor changes
+
+- Enable "incremental: true" by default in tsconfig-base.json
+
+## 0.3.16
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 0.3.15
+Sat, 31 Jul 2021 00:52:11 GMT
+
+### Patches
+
+- Use newly extracted Sass plugin (@rushstack/heft-sass-plugin)
+
+## 0.3.14
+Tue, 27 Jul 2021 22:31:02 GMT
+
+_Version update only_
 
 ## 0.3.13
 Wed, 14 Jul 2021 15:06:29 GMT

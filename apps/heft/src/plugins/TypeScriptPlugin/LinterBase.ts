@@ -2,27 +2,36 @@
 // See LICENSE in the project root for license information.
 
 import * as path from 'path';
-import { Terminal, FileSystem, JsonFile } from '@rushstack/node-core-library';
+import { ITerminal, FileSystem, JsonFile, Path } from '@rushstack/node-core-library';
 
 import {
   IExtendedSourceFile,
   IExtendedProgram,
   IExtendedTypeScript
 } from './internalTypings/TypeScriptInternals';
-import { PerformanceMeasurer } from '../../utilities/Performance';
+import { PerformanceMeasurer, PerformanceMeasurerAsync } from '../../utilities/Performance';
 import { IScopedLogger } from '../../pluginFramework/logging/ScopedLogger';
+import { createHash, Hash } from 'crypto';
 
 export interface ILinterBaseOptions {
   ts: IExtendedTypeScript;
   scopedLogger: IScopedLogger;
   buildFolderPath: string;
-  buildCacheFolderPath: string;
+  /**
+   * The path where the linter state will be written to.
+   */
+  buildMetadataFolderPath: string;
   linterConfigFilePath: string;
 
   /**
    * A performance measurer for the lint run.
    */
   measurePerformance: PerformanceMeasurer;
+
+  /**
+   * An asynchronous performance measurer for the lint run.
+   */
+  measurePerformanceAsync: PerformanceMeasurerAsync;
 }
 
 export interface IRunLinterOptions {
@@ -60,11 +69,12 @@ interface ITsLintCacheData {
 
 export abstract class LinterBase<TLintResult> {
   protected readonly _scopedLogger: IScopedLogger;
-  protected readonly _terminal: Terminal;
+  protected readonly _terminal: ITerminal;
   protected readonly _buildFolderPath: string;
-  protected readonly _buildCacheFolderPath: string;
+  protected readonly _buildMetadataFolderPath: string;
   protected readonly _linterConfigFilePath: string;
   protected readonly _measurePerformance: PerformanceMeasurer;
+  protected readonly _measurePerformanceAsync: PerformanceMeasurerAsync;
 
   private readonly _ts: IExtendedTypeScript;
   private readonly _linterName: string;
@@ -74,10 +84,11 @@ export abstract class LinterBase<TLintResult> {
     this._terminal = this._scopedLogger.terminal;
     this._ts = options.ts;
     this._buildFolderPath = options.buildFolderPath;
-    this._buildCacheFolderPath = options.buildCacheFolderPath;
+    this._buildMetadataFolderPath = options.buildMetadataFolderPath;
     this._linterConfigFilePath = options.linterConfigFilePath;
     this._linterName = linterName;
     this._measurePerformance = options.measurePerformance;
+    this._measurePerformanceAsync = options.measurePerformanceAsync;
   }
 
   protected abstract get cacheVersion(): string;
@@ -87,14 +98,30 @@ export abstract class LinterBase<TLintResult> {
   public async performLintingAsync(options: IRunLinterOptions): Promise<void> {
     await this.initializeAsync(options.tsProgram);
 
+    const commonDirectory: string = options.tsProgram.getCommonSourceDirectory();
+
+    const relativePaths: Map<string, string> = new Map();
+
+    const fileHash: Hash = createHash('md5');
+    for (const file of options.typeScriptFilenames) {
+      // Need to use relative paths to ensure portability.
+      const relative: string = Path.convertToSlashes(path.relative(commonDirectory, file));
+      relativePaths.set(file, relative);
+      fileHash.update(relative);
+    }
+    const hashSuffix: string = fileHash.digest('base64').replace(/\+/g, '-').replace(/\//g, '_').slice(0, 8);
+
     const tslintConfigVersion: string = this.cacheVersion;
-    const cacheFilePath: string = path.join(this._buildCacheFolderPath, `${this._linterName}.json`);
+    const cacheFilePath: string = path.resolve(
+      this._buildMetadataFolderPath,
+      `_${this._linterName}-${hashSuffix}.json`
+    );
 
     let tslintCacheData: ITsLintCacheData | undefined;
     try {
       tslintCacheData = await JsonFile.loadAsync(cacheFilePath);
     } catch (e) {
-      if (FileSystem.isNotExistError(e)) {
+      if (FileSystem.isNotExistError(e as Error)) {
         tslintCacheData = undefined;
       } else {
         throw e;
@@ -112,33 +139,33 @@ export abstract class LinterBase<TLintResult> {
     // https://github.com/palantir/tslint/blob/24d29e421828348f616bf761adb3892bcdf51662/src/linter.ts#L161-L179
     // Modified to only lint files that have changed and that we care about
     const lintFailures: TLintResult[] = [];
-
     for (const sourceFile of options.tsProgram.getSourceFiles()) {
       const filePath: string = sourceFile.fileName;
+      const relative: string | undefined = relativePaths.get(filePath);
 
-      if (!options.typeScriptFilenames.has(filePath) || (await this.isFileExcludedAsync(filePath))) {
+      if (relative === undefined || (await this.isFileExcludedAsync(filePath))) {
         continue;
       }
 
       // Older compilers don't compute the ts.SourceFile.version.  If it is missing, then we can't skip processing
       const version: string = sourceFile.version || '';
-      const cachedVersion: string = cachedNoFailureFileVersions.get(filePath) || '';
+      const cachedVersion: string = cachedNoFailureFileVersions.get(relative) || '';
       if (
         cachedVersion === '' ||
         version === '' ||
         cachedVersion !== version ||
         options.changedFiles.has(sourceFile)
       ) {
-        this._measurePerformance(this._linterName, () => {
-          const failures: TLintResult[] = this.lintFile(sourceFile);
+        await this._measurePerformanceAsync(this._linterName, async () => {
+          const failures: TLintResult[] = await this.lintFileAsync(sourceFile);
           if (failures.length === 0) {
-            newNoFailureFileVersions.set(filePath, version);
+            newNoFailureFileVersions.set(relative, version);
           } else {
             lintFailures.push(...failures);
           }
         });
       } else {
-        newNoFailureFileVersions.set(filePath, version);
+        newNoFailureFileVersions.set(relative, version);
       }
     }
     //#endregion
@@ -166,7 +193,7 @@ export abstract class LinterBase<TLintResult> {
 
   protected abstract initializeAsync(tsProgram: IExtendedProgram): void;
 
-  protected abstract lintFile(sourceFile: IExtendedSourceFile): TLintResult[];
+  protected abstract lintFileAsync(sourceFile: IExtendedSourceFile): Promise<TLintResult[]>;
 
   protected abstract lintingFinished(lintFailures: TLintResult[]): void;
 

@@ -1,6 +1,6 @@
 /**
  * This configuration file specifies NPM dependency version selections that affect all projects
- * in a Rush repo.  For full documentation, please see https://rushjs.io
+ * in a Rush repo.  More documentation is available on the Rush website: https://rushjs.io
  */
 {
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/common-versions.schema.json",
@@ -28,7 +28,7 @@
     // From the allowedAlternativeVersions list below, this should be the TypeScript version that's used to
     // build most of the projects in the repo.  Preferring it avoids errors for indirect dependencies
     // that request it as a peer dependency.
-    "typescript": "~3.9.7",
+    "typescript": "~4.4.2",
 
     // Workaround for https://github.com/microsoft/rushstack/issues/1466
     "eslint": "~7.30.0"
@@ -64,15 +64,14 @@
      * (in addition to whatever "usual" version is being used by other projects in the repo):
      */
     "typescript": [
-      // "~3.9.7" is the (inferred, not alternative) range used by most projects in this repo
+      // "~4.4.2" is the (inferred, not alternative) range used by most projects in this repo
 
-      // The oldest supported compiler, used by build-tests/heft-oldest-compiler-test
-      // and also build-tests/api-extractor-lib1-test
+      // The oldest supported compiler, used by build-tests/api-extractor-lib1-test
       "~2.9.2",
 
-      // The newest supported compiler, used by build-tests/heft-newest-compiler-test
-      // and used as the bundled compiler engine for API Extractor.
-      "~4.3.5"
+      // The newest supported compiler, used by most build tests and used as the bundled compiler
+      // engine for API Extractor.
+      "~4.4.2"
     ],
 
     "source-map": [
@@ -83,6 +82,10 @@
 
     // Use two different versions of @types/webpack-dev-server to allow pnpmfile.js to bring in
     // two different versions of the webpack typings
-    "@types/webpack-dev-server": ["3.11.2"]
+    "@types/webpack-dev-server": ["3.11.2"],
+
+    "webpack-dev-server": [
+      "~3.11.0" // heft-plugins/heft-webpack4-plugin is using an older version of webpack-dev-server for compatibility
+    ]
   }
 }

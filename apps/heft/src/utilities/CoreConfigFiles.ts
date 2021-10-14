@@ -8,12 +8,11 @@ import {
   InheritanceType,
   PathResolutionMethod
 } from '@rushstack/heft-config-file';
+import { ITerminal } from '@rushstack/node-core-library';
 
 import { IApiExtractorPluginConfiguration } from '../plugins/ApiExtractorPlugin/ApiExtractorPlugin';
 import { ITypeScriptConfigurationJson } from '../plugins/TypeScriptPlugin/TypeScriptPlugin';
 import { HeftConfiguration } from '../configuration/HeftConfiguration';
-import { Terminal } from '@rushstack/node-core-library';
-import { ISassConfigurationJson } from '../plugins/SassTypingsPlugin/SassTypingsPlugin';
 import { INodeServicePluginConfiguration } from '../plugins/NodeServicePlugin';
 
 export enum HeftEvent {
@@ -125,7 +124,6 @@ export class CoreConfigFiles {
   private static _nodeServiceConfigurationLoader:
     | ConfigurationFile<INodeServicePluginConfiguration>
     | undefined;
-  private static _sassConfigurationFileLoader: ConfigurationFile<ISassConfigurationJson> | undefined;
 
   /**
    * Returns the loader for the `config/heft.json` config file.
@@ -159,7 +157,7 @@ export class CoreConfigFiles {
    * Gets the eventActions from config/heft.json
    */
   public static async getConfigConfigFileEventActionsAsync(
-    terminal: Terminal,
+    terminal: ITerminal,
     heftConfiguration: HeftConfiguration
   ): Promise<IHeftEventActions> {
     let result: IHeftEventActions | undefined =
@@ -281,27 +279,6 @@ export class CoreConfigFiles {
     }
 
     return CoreConfigFiles._nodeServiceConfigurationLoader;
-  }
-
-  public static get sassConfigurationFileLoader(): ConfigurationFile<ISassConfigurationJson> {
-    const schemaPath: string = path.resolve(__dirname, '..', 'schemas', 'sass.schema.json');
-    CoreConfigFiles._sassConfigurationFileLoader = new ConfigurationFile<ISassConfigurationJson>({
-      projectRelativeFilePath: 'config/sass.json',
-      jsonSchemaPath: schemaPath,
-      jsonPathMetadata: {
-        '$.importIncludePaths.*': {
-          pathResolutionMethod: PathResolutionMethod.resolvePathRelativeToProjectRoot
-        },
-        '$.generatedTsFolder.*': {
-          pathResolutionMethod: PathResolutionMethod.resolvePathRelativeToProjectRoot
-        },
-        '$.srcFolder.*': {
-          pathResolutionMethod: PathResolutionMethod.resolvePathRelativeToProjectRoot
-        }
-      }
-    });
-
-    return CoreConfigFiles._sassConfigurationFileLoader;
   }
 
   private static _addEventActionToMap<TEventAction extends IHeftConfigurationJsonEventActionBase>(

@@ -1,6 +1,174 @@
 # Change Log - @rushstack/module-minifier-plugin
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:55 GMT and should not be manually modified.
+
+## 0.4.31
+Wed, 13 Oct 2021 15:09:55 GMT
+
+_Version update only_
+
+## 0.4.30
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 0.4.29
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 0.4.28
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 0.4.27
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 0.4.26
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 0.4.25
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 0.4.24
+Tue, 05 Oct 2021 15:08:38 GMT
+
+_Version update only_
+
+## 0.4.23
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 0.4.22
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 0.4.21
+Thu, 23 Sep 2021 00:10:41 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 0.4.20
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 0.4.19
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 0.4.18
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 0.4.17
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 0.4.16
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 0.4.15
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 0.4.14
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 0.4.13
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 0.4.12
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 0.4.11
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 0.4.10
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 0.4.9
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 0.4.8
+Wed, 18 Aug 2021 00:06:54 GMT
+
+### Patches
+
+- Fix compatibility issue with mini-css-extract-plugin and other plugins that introduce non-JavaScript modules and asset types.
+
+## 0.4.7
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 0.4.6
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 0.4.5
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 0.4.4
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 0.4.3
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 0.4.2
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
+
+## 0.4.1
+Thu, 22 Jul 2021 22:31:41 GMT
+
+### Patches
+
+- Fix comment file generation logic. Fix WorkerPoolMinifier hanging the process.
+
+## 0.4.0
+Thu, 22 Jul 2021 15:07:19 GMT
+
+### Minor changes
+
+- Separate comment extraction from minification.
 
 ## 0.3.75
 Wed, 14 Jul 2021 15:06:29 GMT

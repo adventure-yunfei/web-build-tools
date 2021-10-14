@@ -1,6 +1,30 @@
 # Change Log - @rushstack/rig-package
 
-This log was last generated on Mon, 12 Jul 2021 23:08:26 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+
+## 0.3.3
+Wed, 13 Oct 2021 15:09:54 GMT
+
+_Version update only_
+
+## 0.3.2
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 0.3.1
+Thu, 23 Sep 2021 00:10:41 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 0.3.0
+Fri, 27 Aug 2021 00:07:25 GMT
+
+### Minor changes
+
+- Cache rig.json reads
 
 ## 0.2.13
 Mon, 12 Jul 2021 23:08:26 GMT

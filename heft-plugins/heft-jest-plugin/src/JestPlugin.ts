@@ -33,7 +33,7 @@ import {
   JsonFile,
   JsonSchema,
   PackageName,
-  Terminal
+  ITerminal
 } from '@rushstack/node-core-library';
 
 import { IHeftJestReporterOptions } from './HeftJestReporter';
@@ -124,7 +124,7 @@ export class JestPlugin implements IHeftPlugin<IJestPluginOptions> {
     testStageProperties: ITestStageProperties,
     options?: IJestPluginOptions
   ): Promise<void> {
-    const terminal: Terminal = scopedLogger.terminal;
+    const terminal: ITerminal = scopedLogger.terminal;
     terminal.writeLine(`Using Jest version ${getVersion()}`);
 
     const buildFolder: string = heftConfiguration.buildFolder;
@@ -158,6 +158,13 @@ export class JestPlugin implements IHeftPlugin<IJestPluginOptions> {
             'plugin in heft.json'
         );
       }
+    }
+
+    // If no displayName is provided, use the package name. This field is used by Jest to
+    // differentiate in multi-project repositories, and since we have the context, we may
+    // as well provide it.
+    if (!jestConfig.displayName) {
+      jestConfig.displayName = heftConfiguration.projectPackageJson.name;
     }
 
     const jestArgv: Config.Argv = {

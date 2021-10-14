@@ -3,13 +3,16 @@
 
 import * as semver from 'semver';
 import * as path from 'path';
-import { Terminal, Path } from '@rushstack/node-core-library';
+import { ITerminal, Path } from '@rushstack/node-core-library';
 import type * as TApiExtractor from '@microsoft/api-extractor';
 
-import { SubprocessRunnerBase } from '../../utilities/subprocess/SubprocessRunnerBase';
+import {
+  ISubprocessRunnerBaseConfiguration,
+  SubprocessRunnerBase
+} from '../../utilities/subprocess/SubprocessRunnerBase';
 import { IScopedLogger } from '../../pluginFramework/logging/ScopedLogger';
 
-export interface IApiExtractorRunnerConfiguration {
+export interface IApiExtractorRunnerConfiguration extends ISubprocessRunnerBaseConfiguration {
   /**
    * The path to the Extractor's config file ("api-extractor.json")
    *
@@ -32,13 +35,6 @@ export interface IApiExtractorRunnerConfiguration {
   typescriptPackagePath: string | undefined;
 
   /**
-   * The folder of the project being built
-   *
-   * For example, /home/username/code/repo/project
-   */
-  buildFolder: string;
-
-  /**
    * If set to true, run API Extractor in production mode
    */
   production: boolean;
@@ -46,7 +42,7 @@ export interface IApiExtractorRunnerConfiguration {
 
 export class ApiExtractorRunner extends SubprocessRunnerBase<IApiExtractorRunnerConfiguration> {
   private _scopedLogger!: IScopedLogger;
-  private _terminal!: Terminal;
+  private _terminal!: ITerminal;
 
   public get filename(): string {
     return __filename;

@@ -46,7 +46,7 @@ export abstract class CommandLineParameterProvider {
 
   private _parameters: CommandLineParameter[];
   private _parametersByLongName: Map<string, CommandLineParameter>;
-
+  private _parametersProcessed: boolean;
   private _remainder: CommandLineRemainder | undefined;
 
   /** @internal */
@@ -54,6 +54,7 @@ export abstract class CommandLineParameterProvider {
   public constructor() {
     this._parameters = [];
     this._parametersByLongName = new Map<string, CommandLineParameter>();
+    this._parametersProcessed = false;
   }
 
   /**
@@ -61,6 +62,13 @@ export abstract class CommandLineParameterProvider {
    */
   public get parameters(): ReadonlyArray<CommandLineParameter> {
     return this._parameters;
+  }
+
+  /**
+   * Informs the caller if the argparse data has been processed into parameters.
+   */
+  public get parametersProcessed(): boolean {
+    return this._parametersProcessed;
   }
 
   /**
@@ -290,6 +298,45 @@ export abstract class CommandLineParameterProvider {
   }
 
   /**
+   * Returns a object which maps the long name of each parameter in this.parameters
+   * to the stringified form of its value. This is useful for logging telemetry, but
+   * it is not the proper way of accessing parameters or their values.
+   */
+  public getParameterStringMap(): Record<string, string> {
+    const parameterMap: Record<string, string> = {};
+    for (const parameter of this.parameters) {
+      switch (parameter.kind) {
+        case CommandLineParameterKind.Flag:
+        case CommandLineParameterKind.Choice:
+        case CommandLineParameterKind.String:
+        case CommandLineParameterKind.Integer:
+          parameterMap[parameter.longName] = JSON.stringify(
+            (
+              parameter as
+                | CommandLineFlagParameter
+                | CommandLineIntegerParameter
+                | CommandLineChoiceParameter
+                | CommandLineStringParameter
+            ).value
+          );
+          break;
+        case CommandLineParameterKind.StringList:
+        case CommandLineParameterKind.IntegerList:
+        case CommandLineParameterKind.ChoiceList:
+          const arrayValue: ReadonlyArray<string | number> | undefined = (
+            parameter as
+              | CommandLineIntegerListParameter
+              | CommandLineStringListParameter
+              | CommandLineChoiceListParameter
+          ).values;
+          parameterMap[parameter.longName] = arrayValue ? arrayValue.join(',') : '';
+          break;
+      }
+    }
+    return parameterMap;
+  }
+
+  /**
    * The child class should implement this hook to define its command-line parameters,
    * e.g. by calling defineFlagParameter().
    */
@@ -303,6 +350,10 @@ export abstract class CommandLineParameterProvider {
 
   /** @internal */
   protected _processParsedData(data: ICommandLineParserData): void {
+    if (this._parametersProcessed) {
+      throw new Error('Command Line Parser Data was already processed');
+    }
+
     // Fill in the values for the parameters
     for (const parameter of this._parameters) {
       const value: any = data[parameter._parserKey!]; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -312,6 +363,8 @@ export abstract class CommandLineParameterProvider {
     if (this.remainder) {
       this.remainder._setValue(data[argparse.Const.REMAINDER]);
     }
+
+    this._parametersProcessed = true;
   }
 
   private _generateKey(): string {

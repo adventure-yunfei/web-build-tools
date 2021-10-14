@@ -1,6 +1,155 @@
 # Change Log - @rushstack/localization-plugin
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:55 GMT and should not be manually modified.
+
+## 0.7.7
+Wed, 13 Oct 2021 15:09:55 GMT
+
+_Version update only_
+
+## 0.7.6
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 0.7.5
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 0.7.4
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 0.7.3
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 0.7.2
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 0.7.1
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 0.7.0
+Tue, 05 Oct 2021 15:08:38 GMT
+
+### Minor changes
+
+- Use ITerminal instead of Terminal to allow for compatibility with other versions of @rushstack/node-core-library.
+
+## 0.6.58
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 0.6.57
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 0.6.56
+Thu, 23 Sep 2021 00:10:41 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 0.6.55
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 0.6.54
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 0.6.53
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 0.6.52
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 0.6.51
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 0.6.50
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 0.6.49
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 0.6.48
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 0.6.47
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 0.6.46
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 0.6.45
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 0.6.44
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 0.6.43
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 0.6.42
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 0.6.41
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 0.6.40
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 0.6.39
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 0.6.38
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
 
 ## 0.6.37
 Wed, 14 Jul 2021 15:06:29 GMT

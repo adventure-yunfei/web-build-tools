@@ -1,6 +1,160 @@
 # Change Log - @rushstack/debug-certificate-manager
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+
+## 1.1.7
+Wed, 13 Oct 2021 15:09:54 GMT
+
+_Version update only_
+
+## 1.1.6
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 1.1.5
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 1.1.4
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 1.1.3
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 1.1.2
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 1.1.1
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 1.1.0
+Tue, 05 Oct 2021 15:08:37 GMT
+
+### Minor changes
+
+- Use ITerminal instead of Terminal to allow for compatibility with other versions of @rushstack/node-core-library.
+
+## 1.0.71
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 1.0.70
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 1.0.69
+Thu, 23 Sep 2021 00:10:40 GMT
+
+_Version update only_
+
+## 1.0.68
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 1.0.67
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 1.0.66
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 1.0.65
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 1.0.64
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 1.0.63
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 1.0.62
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 1.0.61
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 1.0.60
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 1.0.59
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 1.0.58
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 1.0.57
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 1.0.56
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 1.0.55
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 1.0.54
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 1.0.53
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 1.0.52
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 1.0.51
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
+
+## 1.0.50
+Tue, 27 Jul 2021 22:31:02 GMT
+
+### Patches
+
+- Update node-forge to version ~0.10.0.
 
 ## 1.0.49
 Wed, 14 Jul 2021 15:06:29 GMT

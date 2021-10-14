@@ -1,6 +1,153 @@
 # Change Log - @rushstack/set-webpack-public-path-plugin
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:55 GMT and should not be manually modified.
+
+## 3.2.86
+Wed, 13 Oct 2021 15:09:55 GMT
+
+_Version update only_
+
+## 3.2.85
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 3.2.84
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 3.2.83
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 3.2.82
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 3.2.81
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 3.2.80
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 3.2.79
+Tue, 05 Oct 2021 15:08:38 GMT
+
+_Version update only_
+
+## 3.2.78
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 3.2.77
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 3.2.76
+Thu, 23 Sep 2021 00:10:41 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 3.2.75
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 3.2.74
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 3.2.73
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 3.2.72
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 3.2.71
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 3.2.70
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 3.2.69
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 3.2.68
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 3.2.67
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 3.2.66
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 3.2.65
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 3.2.64
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 3.2.63
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 3.2.62
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 3.2.61
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 3.2.60
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 3.2.59
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 3.2.58
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
 
 ## 3.2.57
 Wed, 14 Jul 2021 15:06:29 GMT

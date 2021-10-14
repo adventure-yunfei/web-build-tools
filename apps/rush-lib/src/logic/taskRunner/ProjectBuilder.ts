@@ -10,6 +10,7 @@ import {
   JsonObject,
   NewlineKind,
   InternalError,
+  ITerminal,
   Terminal,
   ColorValue
 } from '@rushstack/node-core-library';
@@ -52,6 +53,7 @@ export interface IProjectBuilderOptions {
   isIncrementalBuildAllowed: boolean;
   projectChangeAnalyzer: ProjectChangeAnalyzer;
   packageDepsFilename: string;
+  allowWarningsInSuccessfulBuild?: boolean;
 }
 
 function _areShallowEqual(object1: JsonObject, object2: JsonObject): boolean {
@@ -77,7 +79,10 @@ export class ProjectBuilder extends BaseBuilder {
     return ProjectBuilder.getTaskName(this._rushProject);
   }
 
-  public readonly isIncrementalBuildAllowed: boolean;
+  /**
+   * This property is mutated by TaskRunner, so is not readonly
+   */
+  public isSkipAllowed: boolean;
   public hadEmptyScript: boolean = false;
 
   private readonly _rushProject: RushConfigurationProject;
@@ -85,8 +90,10 @@ export class ProjectBuilder extends BaseBuilder {
   private readonly _buildCacheConfiguration: BuildCacheConfiguration | undefined;
   private readonly _commandName: string;
   private readonly _commandToRun: string;
+  private readonly _isCacheReadAllowed: boolean;
   private readonly _projectChangeAnalyzer: ProjectChangeAnalyzer;
   private readonly _packageDepsFilename: string;
+  private readonly _allowWarningsInSuccessfulBuild: boolean;
 
   /**
    * UNINITIALIZED === we haven't tried to initialize yet
@@ -101,9 +108,11 @@ export class ProjectBuilder extends BaseBuilder {
     this._buildCacheConfiguration = options.buildCacheConfiguration;
     this._commandName = options.commandName;
     this._commandToRun = options.commandToRun;
-    this.isIncrementalBuildAllowed = options.isIncrementalBuildAllowed;
+    this._isCacheReadAllowed = options.isIncrementalBuildAllowed;
+    this.isSkipAllowed = options.isIncrementalBuildAllowed;
     this._projectChangeAnalyzer = options.projectChangeAnalyzer;
     this._packageDepsFilename = options.packageDepsFilename;
+    this._allowWarningsInSuccessfulBuild = options.allowWarningsInSuccessfulBuild || false;
   }
 
   /**
@@ -121,12 +130,12 @@ export class ProjectBuilder extends BaseBuilder {
       }
       return await this._executeTaskAsync(context);
     } catch (error) {
-      throw new TaskError('executing', error.message);
+      throw new TaskError('executing', (error as Error).message);
     }
   }
 
   public async tryWriteCacheEntryAsync(
-    terminal: Terminal,
+    terminal: ITerminal,
     trackedFilePaths: string[] | undefined,
     repoCommandLineConfiguration: CommandLineConfiguration | undefined
   ): Promise<boolean | undefined> {
@@ -167,12 +176,12 @@ export class ProjectBuilder extends BaseBuilder {
         newlineKind: NewlineKind.Lf // for StdioSummarizer
       });
 
-      const quietModeTransform: DiscardStdoutTransform = new DiscardStdoutTransform({
+      const discardTransform: DiscardStdoutTransform = new DiscardStdoutTransform({
         destination: context.collatedWriter
       });
 
       const splitterTransform1: SplitterTransform = new SplitterTransform({
-        destinations: [context.quietMode ? quietModeTransform : context.collatedWriter, stderrLineTransform]
+        destinations: [context.quietMode ? discardTransform : context.collatedWriter, stderrLineTransform]
       });
 
       const normalizeNewlineTransform: TextRewriterTransform = new TextRewriterTransform({
@@ -182,7 +191,9 @@ export class ProjectBuilder extends BaseBuilder {
       });
 
       const collatedTerminal: CollatedTerminal = new CollatedTerminal(normalizeNewlineTransform);
-      const terminalProvider: CollatedTerminalProvider = new CollatedTerminalProvider(collatedTerminal);
+      const terminalProvider: CollatedTerminalProvider = new CollatedTerminalProvider(collatedTerminal, {
+        debugEnabled: context.debugMode
+      });
       const terminal: Terminal = new Terminal(terminalProvider);
 
       let hasWarningOrError: boolean = false;
@@ -227,7 +238,7 @@ export class ProjectBuilder extends BaseBuilder {
             files,
             arguments: this._commandToRun
           };
-        } else if (this.isIncrementalBuildAllowed) {
+        } else if (this.isSkipAllowed) {
           // To test this code path:
           // Remove the `.git` folder then run "rush build --verbose"
           terminal.writeLine({
@@ -241,28 +252,46 @@ export class ProjectBuilder extends BaseBuilder {
       } catch (error) {
         // To test this code path:
         // Delete a project's ".rush/temp/shrinkwrap-deps.json" then run "rush build --verbose"
-        terminal.writeLine('Unable to calculate incremental build state: ' + error.toString());
+        terminal.writeLine('Unable to calculate incremental build state: ' + (error as Error).toString());
         terminal.writeLine({
           text: 'Rush will proceed without incremental build, caching, and change detection.',
           foregroundColor: ColorValue.Cyan
         });
       }
 
-      // If the current command is allowed to do incremental builds, attempt to retrieve
-      // the project from the build cache or skip building, if appropriate.
-      if (this.isIncrementalBuildAllowed) {
+      // If possible, we want to skip this build -- either by restoring it from the
+      // build cache, if build caching is enabled, or determining that the project
+      // is unchanged (using the older incremental build logic). These two approaches,
+      // "caching" and "skipping", are incompatible, so only one applies.
+      //
+      // Note that "build caching" and "build skipping" take two different approaches
+      // to tracking dependents:
+      //
+      //   - For build caching, "isCacheReadAllowed" is set if a project supports
+      //     incremental builds, and determining whether this project or a dependent
+      //     has changed happens inside the hashing logic.
+      //
+      //   - For build skipping, "isSkipAllowed" is set to true initially, and during
+      //     the process of building dependents, it will be changed by TaskRunner to
+      //     false if a dependency wasn't able to be skipped.
+      //
+      let buildCacheReadAttempted: boolean = false;
+      if (this._isCacheReadAllowed) {
         const projectBuildCache: ProjectBuildCache | undefined = await this._getProjectBuildCacheAsync(
           terminal,
           trackedFiles,
           context.repoCommandLineConfiguration
         );
+
+        buildCacheReadAttempted = !!projectBuildCache;
         const restoreFromCacheSuccess: boolean | undefined =
           await projectBuildCache?.tryRestoreFromCacheAsync(terminal);
 
         if (restoreFromCacheSuccess) {
           return TaskStatus.FromCache;
         }
-
+      }
+      if (this.isSkipAllowed && !buildCacheReadAttempted) {
         const isPackageUnchanged: boolean = !!(
           lastProjectBuildDeps &&
           projectBuildDeps &&
@@ -334,13 +363,20 @@ export class ProjectBuilder extends BaseBuilder {
                 resolve(TaskStatus.Success);
               }
             } catch (error) {
-              reject(error);
+              reject(error as TaskError);
             }
           });
         }
       );
 
-      if (status === TaskStatus.Success && projectBuildDeps) {
+      const taskIsSuccessful: boolean =
+        status === TaskStatus.Success ||
+        (status === TaskStatus.SuccessWithWarning &&
+          this._allowWarningsInSuccessfulBuild &&
+          !!this._rushConfiguration.experimentsConfiguration.configuration
+            .buildCacheWithAllowWarningsInSuccessfulBuild);
+
+      if (taskIsSuccessful && projectBuildDeps) {
         // Write deps on success.
         const writeProjectStatePromise: Promise<boolean> = JsonFile.saveAsync(
           projectBuildDeps,
@@ -382,7 +418,7 @@ export class ProjectBuilder extends BaseBuilder {
   }
 
   private async _getProjectBuildCacheAsync(
-    terminal: Terminal,
+    terminal: ITerminal,
     trackedProjectFiles: string[] | undefined,
     commandLineConfiguration: CommandLineConfiguration | undefined
   ): Promise<ProjectBuildCache | undefined> {

@@ -1,6 +1,37 @@
 # Change Log - @rushstack/ts-command-line
 
-This log was last generated on Mon, 12 Jul 2021 23:08:26 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+
+## 4.10.2
+Wed, 13 Oct 2021 15:09:54 GMT
+
+_Version update only_
+
+## 4.10.1
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 4.10.0
+Mon, 04 Oct 2021 15:10:18 GMT
+
+### Minor changes
+
+- Add safety check parametersProcessed to CommandLineParameterProvider
+
+## 4.9.1
+Thu, 23 Sep 2021 00:10:41 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 4.9.0
+Fri, 20 Aug 2021 15:08:10 GMT
+
+### Minor changes
+
+- Add getParameterStringMap to CommandLineParameterProvider, to easily query parameter usage for telemetry
 
 ## 4.8.1
 Mon, 12 Jul 2021 23:08:26 GMT

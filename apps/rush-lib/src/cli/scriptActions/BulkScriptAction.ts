@@ -5,15 +5,11 @@ import * as os from 'os';
 import colors from 'colors/safe';
 
 import { AlreadyReportedError, ConsoleTerminalProvider, Terminal } from '@rushstack/node-core-library';
-import {
-  CommandLineFlagParameter,
-  CommandLineStringParameter,
-  CommandLineParameterKind
-} from '@rushstack/ts-command-line';
+import { CommandLineFlagParameter, CommandLineStringParameter } from '@rushstack/ts-command-line';
 
 import { Event } from '../../index';
 import { SetupChecks } from '../../logic/SetupChecks';
-import { ITaskSelectorConstructor, TaskSelector } from '../../logic/TaskSelector';
+import { ITaskSelectorOptions, TaskSelector } from '../../logic/TaskSelector';
 import { Stopwatch, StopwatchState } from '../../utilities/Stopwatch';
 import { BaseScriptAction, IBaseScriptActionOptions } from './BaseScriptAction';
 import { ITaskRunnerOptions, TaskRunner } from '../../logic/taskRunner/TaskRunner';
@@ -46,7 +42,7 @@ export interface IBulkScriptActionOptions extends IBaseScriptActionOptions {
 }
 
 interface IExecuteInternalOptions {
-  taskSelectorOptions: ITaskSelectorConstructor;
+  taskSelectorOptions: ITaskSelectorOptions;
   taskRunnerOptions: ITaskRunnerOptions;
   stopwatch: Stopwatch;
   ignoreHooks?: boolean;
@@ -110,6 +106,7 @@ export class BulkScriptAction extends BaseScriptAction {
     const stopwatch: Stopwatch = Stopwatch.start();
 
     const isQuietMode: boolean = !this._verboseParameter.value;
+    const isDebugMode: boolean = !!this.parser.isDebug;
 
     // if this is parallelizable, then use the value from the flag (undefined or a number),
     // if parallelism is not enabled, then restrict to 1 core
@@ -136,7 +133,7 @@ export class BulkScriptAction extends BaseScriptAction {
       return;
     }
 
-    const taskSelectorOptions: ITaskSelectorConstructor = {
+    const taskSelectorOptions: ITaskSelectorOptions = {
       rushConfiguration: this.rushConfiguration,
       buildCacheConfiguration,
       selection,
@@ -144,14 +141,17 @@ export class BulkScriptAction extends BaseScriptAction {
       commandToRun: this._commandToRun,
       customParameterValues,
       isQuietMode: isQuietMode,
+      isDebugMode: isDebugMode,
       isIncrementalBuildAllowed: this._isIncrementalBuildAllowed,
       ignoreMissingScript: this._ignoreMissingScript,
       ignoreDependencyOrder: this._ignoreDependencyOrder,
+      allowWarningsInSuccessfulBuild: this._allowWarningsInSuccessfulBuild,
       packageDepsFilename: Utilities.getPackageDepsFilenameForCommand(this._commandToRun)
     };
 
     const taskRunnerOptions: ITaskRunnerOptions = {
       quietMode: isQuietMode,
+      debugMode: this.parser.isDebug,
       parallelism: parallelism,
       changedProjectsOnly: changedProjectsOnly,
       allowWarningsInSuccessfulBuild: this._allowWarningsInSuccessfulBuild,
@@ -332,11 +332,11 @@ export class BulkScriptAction extends BaseScriptAction {
       if (error instanceof AlreadyReportedError) {
         console.log(`rush ${this.actionName} (${stopwatch.toString()})`);
       } else {
-        if (error && error.message) {
+        if (error && (error as Error).message) {
           if (this.parser.isDebug) {
-            console.log('Error: ' + error.stack);
+            console.log('Error: ' + (error as Error).stack);
           } else {
-            console.log('Error: ' + error.message);
+            console.log('Error: ' + (error as Error).message);
           }
         }
 
@@ -378,21 +378,10 @@ export class BulkScriptAction extends BaseScriptAction {
   }
 
   private _collectTelemetry(stopwatch: Stopwatch, success: boolean): void {
-    const extraData: { [key: string]: string } = this._selectionParameters.getTelemetry();
-
-    for (const customParameter of this.customParameters) {
-      switch (customParameter.kind) {
-        case CommandLineParameterKind.Flag:
-        case CommandLineParameterKind.Choice:
-        case CommandLineParameterKind.String:
-        case CommandLineParameterKind.Integer:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          extraData[customParameter.longName] = JSON.stringify((customParameter as any).value);
-          break;
-        default:
-          extraData[customParameter.longName] = '?';
-      }
-    }
+    const extraData: Record<string, string> = {
+      ...this._selectionParameters.getTelemetry(),
+      ...this.getParameterStringMap()
+    };
 
     if (this.parser.telemetry) {
       this.parser.telemetry.log({

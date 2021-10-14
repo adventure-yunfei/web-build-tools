@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
-import * as webpack from 'webpack';
+import type { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server';
+import type * as webpack from 'webpack';
 import type { IBuildStageProperties, IBundleSubstageProperties } from '@rushstack/heft';
-import { Import, IPackageJson, PackageJsonLookup } from '@rushstack/node-core-library';
 
 /**
  * @public
@@ -30,8 +29,14 @@ export interface IWebpackBundleSubstageProperties extends IBundleSubstagePropert
    * for Webpack to run. If webpackConfigFilePath is specified,
    * this will be populated automatically with the exports of the
    * config file referenced in that property.
+   *
+   * @remarks
+   * Tapable event handlers can return `null` instead of `undefined` to suppress
+   * other handlers from creating a configuration object.
    */
-  webpackConfiguration?: webpack.Configuration | webpack.Configuration[];
+  // We are inheriting this problem from Tapable's API
+  // eslint-disable-next-line @rushstack/no-new-null
+  webpackConfiguration?: webpack.Configuration | webpack.Configuration[] | null;
 }
 
 /**
@@ -39,28 +44,4 @@ export interface IWebpackBundleSubstageProperties extends IBundleSubstagePropert
  */
 export interface IWebpackBuildStageProperties extends IBuildStageProperties {
   webpackStats?: webpack.Stats | webpack.compilation.MultiStats;
-}
-
-export interface IWebpackVersions {
-  webpackVersion: string;
-  webpackDevServerVersion: string;
-}
-
-let _webpackVersions: IWebpackVersions | undefined;
-export function getWebpackVersions(): IWebpackVersions {
-  if (!_webpackVersions) {
-    const webpackDevServerPackageJsonPath: string = Import.resolveModule({
-      modulePath: 'webpack-dev-server/package.json',
-      baseFolderPath: __dirname
-    });
-    const webpackDevServerPackageJson: IPackageJson = PackageJsonLookup.instance.loadPackageJson(
-      webpackDevServerPackageJsonPath
-    );
-    _webpackVersions = {
-      webpackVersion: webpack.version!,
-      webpackDevServerVersion: webpackDevServerPackageJson.version
-    };
-  }
-
-  return _webpackVersions;
 }

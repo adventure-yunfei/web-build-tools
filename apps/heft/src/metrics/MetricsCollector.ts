@@ -16,6 +16,11 @@ export interface IMetricsData {
   command: string;
 
   /**
+   * Whether or not the command ran into errors
+   */
+  encounteredError?: boolean;
+
+  /**
    * The amount of time the command took to execute, in milliseconds.
    */
   taskTotalExecutionMs: number;
@@ -44,6 +49,11 @@ export interface IMetricsData {
    * The total amount of memory the machine has, in megabytes.
    */
   machineTotalMemoryMB: number;
+
+  /**
+   * A map of commandline parameter names to their effective values
+   */
+  commandParameters: Record<string, string>;
 }
 
 /**
@@ -76,6 +86,7 @@ export class MetricsCollectorHooks {
  */
 export interface IPerformanceData {
   taskTotalExecutionMs: number;
+  encounteredError?: boolean;
 }
 
 /**
@@ -98,9 +109,14 @@ export class MetricsCollector {
    * Record metrics to the installed plugin(s).
    *
    * @param command - Describe the user command, e.g. `start` or `build`
-   * @param params - Optional parameters
+   * @param parameterMap - Optional map of parameters to their values
+   * @param performanceData - Optional performance data
    */
-  public record(command: string, performanceData?: Partial<IPerformanceData>): void {
+  public record(
+    command: string,
+    performanceData?: Partial<IPerformanceData>,
+    parameters?: Record<string, string>
+  ): void {
     if (this._startTimeMs === undefined) {
       throw new InternalError('MetricsCollector has not been initialized with setStartTime() yet');
     }
@@ -120,12 +136,14 @@ export class MetricsCollector {
 
     const metricsData: IMetricsData = {
       command: command,
+      encounteredError: filledPerformanceData.encounteredError,
       taskTotalExecutionMs: filledPerformanceData.taskTotalExecutionMs,
       machineOs: process.platform,
       machineArch: process.arch,
       machineCores: os.cpus().length,
       machineProcessor: os.cpus()[0].model,
-      machineTotalMemoryMB: os.totalmem()
+      machineTotalMemoryMB: os.totalmem(),
+      commandParameters: parameters || {}
     };
 
     this.hooks.recordMetric.call('inner_loop_heft', metricsData);

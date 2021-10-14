@@ -8,7 +8,7 @@ import { ProjectBuilder, convertSlashesForWindows } from '../logic/taskRunner/Pr
 import { ProjectChangeAnalyzer } from './ProjectChangeAnalyzer';
 import { TaskCollection } from './taskRunner/TaskCollection';
 
-export interface ITaskSelectorConstructor {
+export interface ITaskSelectorOptions {
   rushConfiguration: RushConfiguration;
   buildCacheConfiguration: BuildCacheConfiguration | undefined;
   selection: ReadonlySet<RushConfigurationProject>;
@@ -16,11 +16,13 @@ export interface ITaskSelectorConstructor {
   commandToRun: string;
   customParameterValues: string[];
   isQuietMode: boolean;
+  isDebugMode: boolean;
   isIncrementalBuildAllowed: boolean;
   ignoreMissingScript: boolean;
   ignoreDependencyOrder: boolean;
   packageDepsFilename: string;
   projectChangeAnalyzer?: ProjectChangeAnalyzer;
+  allowWarningsInSuccessfulBuild?: boolean;
 }
 
 /**
@@ -30,10 +32,10 @@ export interface ITaskSelectorConstructor {
  *  - registering the necessary ProjectBuilders with the TaskRunner, which actually orchestrates execution
  */
 export class TaskSelector {
-  private _options: ITaskSelectorConstructor;
+  private _options: ITaskSelectorOptions;
   private _projectChangeAnalyzer: ProjectChangeAnalyzer;
 
-  public constructor(options: ITaskSelectorConstructor) {
+  public constructor(options: ITaskSelectorOptions) {
     this._options = options;
 
     const { projectChangeAnalyzer = new ProjectChangeAnalyzer(options.rushConfiguration) } = options;
@@ -131,7 +133,8 @@ export class TaskSelector {
         commandName: this._options.commandName,
         isIncrementalBuildAllowed: this._options.isIncrementalBuildAllowed,
         projectChangeAnalyzer: this._projectChangeAnalyzer,
-        packageDepsFilename: this._options.packageDepsFilename
+        packageDepsFilename: this._options.packageDepsFilename,
+        allowWarningsInSuccessfulBuild: this._options.allowWarningsInSuccessfulBuild
       })
     );
   }

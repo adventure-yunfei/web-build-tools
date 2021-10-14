@@ -1,6 +1,153 @@
 # Change Log - @rushstack/loader-raw-script
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:55 GMT and should not be manually modified.
+
+## 1.3.192
+Wed, 13 Oct 2021 15:09:55 GMT
+
+_Version update only_
+
+## 1.3.191
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 1.3.190
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 1.3.189
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 1.3.188
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 1.3.187
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 1.3.186
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 1.3.185
+Tue, 05 Oct 2021 15:08:38 GMT
+
+_Version update only_
+
+## 1.3.184
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 1.3.183
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 1.3.182
+Thu, 23 Sep 2021 00:10:40 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 1.3.181
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 1.3.180
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 1.3.179
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 1.3.178
+Tue, 14 Sep 2021 01:17:04 GMT
+
+_Version update only_
+
+## 1.3.177
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 1.3.176
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 1.3.175
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 1.3.174
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 1.3.173
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 1.3.172
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 1.3.171
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 1.3.170
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 1.3.169
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 1.3.168
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 1.3.167
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 1.3.166
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 1.3.165
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 1.3.164
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
 
 ## 1.3.163
 Wed, 14 Jul 2021 15:06:29 GMT

@@ -1,6 +1,162 @@
 # Change Log - @rushstack/heft-webpack4-plugin
 
-This log was last generated on Wed, 14 Jul 2021 15:06:29 GMT and should not be manually modified.
+This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+
+## 0.3.14
+Wed, 13 Oct 2021 15:09:54 GMT
+
+_Version update only_
+
+## 0.3.13
+Fri, 08 Oct 2021 09:35:07 GMT
+
+_Version update only_
+
+## 0.3.12
+Fri, 08 Oct 2021 08:08:34 GMT
+
+_Version update only_
+
+## 0.3.11
+Thu, 07 Oct 2021 23:43:12 GMT
+
+_Version update only_
+
+## 0.3.10
+Thu, 07 Oct 2021 07:13:35 GMT
+
+_Version update only_
+
+## 0.3.9
+Wed, 06 Oct 2021 15:08:26 GMT
+
+_Version update only_
+
+## 0.3.8
+Wed, 06 Oct 2021 02:41:48 GMT
+
+_Version update only_
+
+## 0.3.7
+Tue, 05 Oct 2021 15:08:38 GMT
+
+_Version update only_
+
+## 0.3.6
+Mon, 04 Oct 2021 15:10:18 GMT
+
+_Version update only_
+
+## 0.3.5
+Fri, 24 Sep 2021 00:09:29 GMT
+
+_Version update only_
+
+## 0.3.4
+Thu, 23 Sep 2021 00:10:40 GMT
+
+### Patches
+
+- Upgrade the `@types/node` dependency to version to version 12.
+
+## 0.3.3
+Wed, 22 Sep 2021 03:27:12 GMT
+
+_Version update only_
+
+## 0.3.2
+Wed, 22 Sep 2021 00:09:32 GMT
+
+_Version update only_
+
+## 0.3.1
+Sat, 18 Sep 2021 03:05:57 GMT
+
+_Version update only_
+
+## 0.3.0
+Tue, 14 Sep 2021 01:17:04 GMT
+
+### Minor changes
+
+- Improve the type declaration for IWebpackBundleSubstageProperties.webpackConfiguration
+
+## 0.2.14
+Mon, 13 Sep 2021 15:07:05 GMT
+
+_Version update only_
+
+## 0.2.13
+Fri, 10 Sep 2021 15:08:28 GMT
+
+_Version update only_
+
+## 0.2.12
+Wed, 08 Sep 2021 19:06:22 GMT
+
+_Version update only_
+
+## 0.2.11
+Wed, 08 Sep 2021 00:08:03 GMT
+
+_Version update only_
+
+## 0.2.10
+Fri, 03 Sep 2021 00:09:10 GMT
+
+_Version update only_
+
+## 0.2.9
+Tue, 31 Aug 2021 00:07:11 GMT
+
+_Version update only_
+
+## 0.2.8
+Fri, 27 Aug 2021 00:07:25 GMT
+
+_Version update only_
+
+## 0.2.7
+Fri, 20 Aug 2021 15:08:10 GMT
+
+_Version update only_
+
+## 0.2.6
+Fri, 13 Aug 2021 00:09:14 GMT
+
+_Version update only_
+
+## 0.2.5
+Thu, 12 Aug 2021 18:11:18 GMT
+
+_Version update only_
+
+## 0.2.4
+Thu, 12 Aug 2021 01:28:38 GMT
+
+_Version update only_
+
+## 0.2.3
+Wed, 11 Aug 2021 23:14:17 GMT
+
+_Version update only_
+
+## 0.2.2
+Wed, 11 Aug 2021 00:07:21 GMT
+
+_Version update only_
+
+## 0.2.1
+Sat, 31 Jul 2021 00:52:11 GMT
+
+_Version update only_
+
+## 0.2.0
+Tue, 27 Jul 2021 22:31:02 GMT
+
+### Minor changes
+
+- Update webpack to be lazy-loaded.
 
 ## 0.1.38
 Wed, 14 Jul 2021 15:06:29 GMT
