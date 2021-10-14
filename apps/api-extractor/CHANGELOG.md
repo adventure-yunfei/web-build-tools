@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.18.16-rc.1
+
+- 合并主分支代码
+
 ## 7.16.1-rc.1
 
 - 合并主分支代码

@@ -53,9 +53,33 @@ export class ApiModelGenerator {
   private readonly _referenceGenerator: DeclarationReferenceGenerator;
   /** Record the generated api items by corresponding symbol */
   private readonly _apiItemsBySymbol: Map<ts.Symbol, ApiItem> = new Map();
+  private readonly _apiModelTrimming: ReleaseTag;
 
   public constructor(collector: Collector) {
     this._collector = collector;
+
+    let apiModelTrimming: ReleaseTag;
+    switch (process.env.API_MODEL_TRIMMING) {
+      case 'internal':
+        apiModelTrimming = ReleaseTag.Internal;
+        break;
+      case 'alpha':
+        apiModelTrimming = ReleaseTag.Alpha;
+        break;
+      case 'beta':
+        apiModelTrimming = ReleaseTag.Beta;
+        break;
+      case 'public':
+        apiModelTrimming = ReleaseTag.Public;
+        break;
+      case undefined:
+        apiModelTrimming = ReleaseTag.Beta;
+        break;
+      default:
+        throw new Error(`invalid API_MODEL_TRIMMING: ${process.env.API_MODEL_TRIMMING}`);
+    }
+    this._apiModelTrimming = apiModelTrimming;
+
     this._apiModel = new ApiModel();
     this._referenceGenerator = new DeclarationReferenceGenerator(
       collector.packageJsonLookup,
@@ -200,12 +224,11 @@ export class ApiModelGenerator {
           excerptToken.canonicalReference !== undefined &&
           DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)
         ) {
-          const actualReference:
-            | DeclarationReference
-            | undefined = this._referenceGenerator.getDeclarationReferenceForPlaceholder(
-            excerptToken.canonicalReference,
-            this._getApiItemBySymbol
-          );
+          const actualReference: DeclarationReference | undefined =
+            this._referenceGenerator.getDeclarationReferenceForPlaceholder(
+              excerptToken.canonicalReference,
+              this._getApiItemBySymbol
+            );
           // @ts-ignore
           excerptToken._canonicalReference = actualReference;
         }
@@ -235,8 +258,8 @@ export class ApiModelGenerator {
 
     const apiItemMetadata: ApiItemMetadata = this._collector.fetchApiItemMetadata(astDeclaration);
     const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
-    if (releaseTag === ReleaseTag.Internal || releaseTag === ReleaseTag.Alpha) {
-      return; // trim out items marked as "@internal" or "@alpha"
+    if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, this._apiModelTrimming) < 0) {
+      return; // trim out items under specified release tag
     }
 
     switch (astDeclaration.declaration.kind) {
@@ -623,8 +646,8 @@ export class ApiModelGenerator {
       const apiItemMetadata: ApiItemMetadata = this._collector.fetchApiItemMetadata(astDeclaration);
       const docComment: tsdoc.DocComment | undefined = apiItemMetadata.tsdocComment;
       const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
-      if (releaseTag === ReleaseTag.Internal || releaseTag === ReleaseTag.Alpha) {
-        return; // trim out items marked as "@internal" or "@alpha"
+      if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, this._apiModelTrimming) < 0) {
+        return; // trim out items under specified release tag
       }
 
       apiFunction = new ApiFunction({
@@ -779,8 +802,8 @@ export class ApiModelGenerator {
       const apiItemMetadata: ApiItemMetadata = this._collector.fetchApiItemMetadata(astDeclaration);
       const docComment: tsdoc.DocComment | undefined = apiItemMetadata.tsdocComment;
       const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
-      if (releaseTag === ReleaseTag.Internal || releaseTag === ReleaseTag.Alpha) {
-        return; // trim out items marked as "@internal" or "@alpha"
+      if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, this._apiModelTrimming) < 0) {
+        return; // trim out items under specified release tag
       }
       const isOptional: boolean =
         (astDeclaration.astSymbol.followedSymbol.flags & ts.SymbolFlags.Optional) !== 0;
