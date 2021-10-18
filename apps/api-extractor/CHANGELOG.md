@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.18.16-rc.3
+
+- 修正 Entity 变量和 namespace 内的变量的命名冲突
 ## 7.18.16-rc.1
 
 - 合并主分支代码
