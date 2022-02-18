@@ -438,9 +438,10 @@ export class ExportAnalyzer {
         //   import('api-extractor-lib1-test')
         //
         // Extracted qualifier:
-        //   apiExtractorLib1Test
+        //   ''
 
-        exportName = SyntaxHelpers.makeCamelCaseIdentifier(externalModulePath);
+        // exportName = SyntaxHelpers.makeCamelCaseIdentifier(externalModulePath);
+        exportName = '';
       }
 
       return this._fetchAstImport(undefined, {

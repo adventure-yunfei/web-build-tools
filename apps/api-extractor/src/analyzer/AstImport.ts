@@ -4,6 +4,7 @@
 import { AstSymbol } from './AstSymbol';
 import { InternalError } from '@rushstack/node-core-library';
 import { AstSyntheticEntity } from './AstEntity';
+import { SyntaxHelpers } from './SyntaxHelpers';
 
 /**
  * Indicates the import kind for an `AstImport`.
@@ -171,6 +172,9 @@ export class AstImport extends AstSyntheticEntity {
   /** {@inheritdoc} */
   public get localName(): string {
     // abstract
+    if (this.importKind === AstImportKind.ImportType) {
+      return this.exportName || SyntaxHelpers.makeCamelCaseIdentifier(this.modulePath);
+    }
     return this.exportName;
   }
 
