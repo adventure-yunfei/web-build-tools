@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.19.4-rc.1
+- 修正 import type `import('abc')` 语法支持
+
 ## 7.18.16-rc.3
 
 - 修正 Entity 变量和 namespace 内的变量的命名冲突
