@@ -1,6 +1,134 @@
 # Change Log - @rushstack/localization-plugin
 
-This log was last generated on Wed, 13 Oct 2021 15:09:55 GMT and should not be manually modified.
+This log was last generated on Wed, 16 Feb 2022 07:15:28 GMT and should not be manually modified.
+
+## 0.10.0
+Wed, 16 Feb 2022 07:15:28 GMT
+
+### Minor changes
+
+- Add an option to ignore missing RESX comments.
+
+## 0.9.15
+Fri, 11 Feb 2022 10:30:25 GMT
+
+_Version update only_
+
+## 0.9.14
+Tue, 25 Jan 2022 01:11:07 GMT
+
+_Version update only_
+
+## 0.9.13
+Fri, 21 Jan 2022 01:10:41 GMT
+
+_Version update only_
+
+## 0.9.12
+Thu, 20 Jan 2022 02:43:46 GMT
+
+_Version update only_
+
+## 0.9.11
+Wed, 05 Jan 2022 16:07:47 GMT
+
+_Version update only_
+
+## 0.9.10
+Mon, 27 Dec 2021 16:10:40 GMT
+
+_Version update only_
+
+## 0.9.9
+Tue, 14 Dec 2021 19:27:51 GMT
+
+_Version update only_
+
+## 0.9.8
+Fri, 10 Dec 2021 01:09:33 GMT
+
+_Version update only_
+
+## 0.9.7
+Thu, 09 Dec 2021 20:34:41 GMT
+
+_Version update only_
+
+## 0.9.6
+Thu, 09 Dec 2021 00:21:54 GMT
+
+_Version update only_
+
+## 0.9.5
+Wed, 08 Dec 2021 19:05:08 GMT
+
+_Version update only_
+
+## 0.9.4
+Wed, 08 Dec 2021 16:14:05 GMT
+
+_Version update only_
+
+## 0.9.3
+Mon, 06 Dec 2021 16:08:33 GMT
+
+_Version update only_
+
+## 0.9.2
+Fri, 03 Dec 2021 03:05:22 GMT
+
+_Version update only_
+
+## 0.9.1
+Tue, 30 Nov 2021 20:18:41 GMT
+
+_Version update only_
+
+## 0.9.0
+Mon, 29 Nov 2021 07:26:16 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Remove "filesToIgnore" option in favor of "globsToIgnore."
+
+## 0.8.0
+Tue, 16 Nov 2021 16:08:01 GMT
+
+### Minor changes
+
+- Accept .resx.json as an alternative strings file extension.
+
+## 0.7.13
+Thu, 11 Nov 2021 01:17:03 GMT
+
+_Version update only_
+
+## 0.7.12
+Wed, 10 Nov 2021 16:09:47 GMT
+
+_Version update only_
+
+## 0.7.11
+Sat, 06 Nov 2021 00:09:13 GMT
+
+_Version update only_
+
+## 0.7.10
+Fri, 05 Nov 2021 15:09:18 GMT
+
+_Version update only_
+
+## 0.7.9
+Thu, 28 Oct 2021 00:08:22 GMT
+
+_Version update only_
+
+## 0.7.8
+Wed, 27 Oct 2021 00:08:15 GMT
+
+### Patches
+
+- Update the package.json repository field to include the directory property.
 
 ## 0.7.7
 Wed, 13 Oct 2021 15:09:55 GMT

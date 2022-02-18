@@ -19,6 +19,7 @@ import {
   ITerminal,
   ConsoleTerminalProvider
 } from '@rushstack/node-core-library';
+import { getRepoRoot } from '@rushstack/package-deps-hash';
 
 import { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import { IChangeFile, IChangeInfo, ChangeType } from '../../api/ChangeManagement';
@@ -72,6 +73,9 @@ export class ChangeAction extends BaseRushAction {
       'PATCH - these are changes that are backwards and forwards compatible. ' +
         'Examples are: Modifying a private API or fixing a bug in the logic ' +
         'of how an existing API works.',
+      '',
+      "NONE - these are changes that are backwards and forwards compatible and don't require an immediate release. " +
+        'Examples are: Modifying dev tooling configuration like eslint.',
       '',
       'HOTFIX (EXPERIMENTAL) - these are changes that are hotfixes targeting a ' +
         'specific older version of the package. When a hotfix change is added, ' +
@@ -150,7 +154,7 @@ export class ChangeAction extends BaseRushAction {
 
     this._bulkChangeBumpTypeParameter = this.defineChoiceParameter({
       parameterLongName: BULK_BUMP_TYPE_LONG_NAME,
-      alternatives: [...Object.keys(this._getBumpOptions()), ChangeType[ChangeType.none]],
+      alternatives: [...Object.keys(this._getBumpOptions())],
       description: `The bump type to apply to all changed projects if the ${BULK_LONG_NAME} flag is provided.`
     });
   }
@@ -295,17 +299,17 @@ export class ChangeAction extends BaseRushAction {
     }
   }
 
-  private _generateHostMap(): Map<string, string> {
-    const hostMap: Map<string, string> = new Map<string, string>();
-    this.rushConfiguration.projects.forEach((project) => {
+  private _generateHostMap(): Map<RushConfigurationProject, string> {
+    const hostMap: Map<RushConfigurationProject, string> = new Map();
+    for (const project of this.rushConfiguration.projects) {
       let hostProjectName: string = project.packageName;
-      if (project.versionPolicy && project.versionPolicy.isLockstepped) {
+      if (project.versionPolicy?.isLockstepped) {
         const lockstepPolicy: LockStepVersionPolicy = project.versionPolicy as LockStepVersionPolicy;
         hostProjectName = lockstepPolicy.mainProject || project.packageName;
       }
 
-      hostMap.set(project.packageName, hostProjectName);
-    });
+      hostMap.set(project, hostProjectName);
+    }
 
     return hostMap;
   }
@@ -329,18 +333,23 @@ export class ChangeAction extends BaseRushAction {
 
   private async _getChangedProjectNamesAsync(): Promise<string[]> {
     const projectChangeAnalyzer: ProjectChangeAnalyzer = new ProjectChangeAnalyzer(this.rushConfiguration);
-    const changedProjects: AsyncIterable<RushConfigurationProject> =
-      projectChangeAnalyzer.getChangedProjectsAsync({
+    const changedProjects: Set<RushConfigurationProject> =
+      await projectChangeAnalyzer.getChangedProjectsAsync({
         targetBranchName: this._targetBranch,
         terminal: this._terminal,
-        shouldFetch: !this._noFetchParameter.value
+        shouldFetch: !this._noFetchParameter.value,
+        // Lockfile evaluation will expand the set of projects that request change files
+        // Not enabling, since this would be a breaking change
+        includeExternalDependencies: false,
+        // Since install may not have happened, cannot read rush-project.json
+        enableFiltering: false
       });
-    const projectHostMap: Map<string, string> = this._generateHostMap();
+    const projectHostMap: Map<RushConfigurationProject, string> = this._generateHostMap();
 
     const changedProjectNames: Set<string> = new Set<string>();
-    for await (const changedProject of changedProjects) {
+    for (const changedProject of changedProjects) {
       if (changedProject.shouldPublish && !changedProject.versionPolicy?.exemptFromRushChange) {
-        const hostName: string | undefined = projectHostMap.get(changedProject.packageName);
+        const hostName: string | undefined = projectHostMap.get(changedProject);
         if (hostName) {
           changedProjectNames.add(hostName);
         }
@@ -356,8 +365,10 @@ export class ChangeAction extends BaseRushAction {
   }
 
   private _getChangeFiles(): string[] {
+    const repoRoot: string = getRepoRoot(this.rushConfiguration.rushJsonFolder);
+    const relativeChangesFolder: string = path.relative(repoRoot, this.rushConfiguration.changesFolder);
     return this._git
-      .getChangedFiles(this._targetBranch, this._terminal, true, `common/changes/`)
+      .getChangedFiles(this._targetBranch, this._terminal, true, relativeChangesFolder)
       .map((relativePath) => {
         return path.join(this.rushConfiguration.rushJsonFolder, relativePath);
       });
@@ -491,7 +502,9 @@ export class ChangeAction extends BaseRushAction {
               'major - for changes that break compatibility, e.g. removing an API',
             [ChangeType[ChangeType.minor]]: 'minor - for backwards compatible changes, e.g. adding a new API',
             [ChangeType[ChangeType.patch]]:
-              'patch - for changes that do not affect compatibility, e.g. fixing a bug'
+              'patch - for changes that do not affect compatibility, e.g. fixing a bug',
+            [ChangeType[ChangeType.none]]:
+              'none - for changes that do not need an immediate release, e.g. eslint config change'
           };
 
     if (packageName) {
@@ -501,8 +514,11 @@ export class ChangeAction extends BaseRushAction {
 
       if (versionPolicy) {
         if (versionPolicy.definitionName === VersionPolicyDefinitionName.lockStepVersion) {
-          // No need to ask for bump types if project is lockstep versioned.
-          bumpOptions = {};
+          const lockStepPolicy: LockStepVersionPolicy = versionPolicy as LockStepVersionPolicy;
+          // No need to ask for bump types if project is lockstep versioned with an explicit nextBump
+          if (lockStepPolicy.nextBump !== undefined) {
+            bumpOptions = {};
+          }
         } else if (versionPolicy.definitionName === VersionPolicyDefinitionName.individualVersion) {
           const individualPolicy: IndividualVersionPolicy = versionPolicy as IndividualVersionPolicy;
           if (individualPolicy.lockedMajor !== undefined) {

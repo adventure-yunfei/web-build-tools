@@ -1,6 +1,87 @@
 # Change Log - @rushstack/heft-jest-plugin
 
-This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Feb 2022 10:30:25 GMT and should not be manually modified.
+
+## 0.2.3
+Fri, 11 Feb 2022 10:30:25 GMT
+
+### Patches
+
+- Update JSON schema documentation
+
+## 0.2.2
+Wed, 05 Jan 2022 16:07:47 GMT
+
+_Version update only_
+
+## 0.2.1
+Mon, 27 Dec 2021 16:10:40 GMT
+
+_Version update only_
+
+## 0.2.0
+Tue, 14 Dec 2021 19:27:51 GMT
+
+### Minor changes
+
+- Upgrade Jest to v27
+
+## 0.1.53
+Thu, 09 Dec 2021 20:34:41 GMT
+
+_Version update only_
+
+## 0.1.52
+Thu, 09 Dec 2021 00:21:54 GMT
+
+_Version update only_
+
+## 0.1.51
+Wed, 08 Dec 2021 19:05:08 GMT
+
+_Version update only_
+
+## 0.1.50
+Wed, 08 Dec 2021 16:14:05 GMT
+
+_Version update only_
+
+## 0.1.49
+Mon, 06 Dec 2021 16:08:32 GMT
+
+_Version update only_
+
+## 0.1.48
+Fri, 03 Dec 2021 03:05:22 GMT
+
+_Version update only_
+
+## 0.1.47
+Mon, 29 Nov 2021 07:26:16 GMT
+
+_Version update only_
+
+## 0.1.46
+Sat, 06 Nov 2021 00:09:13 GMT
+
+_Version update only_
+
+## 0.1.45
+Fri, 05 Nov 2021 15:09:18 GMT
+
+_Version update only_
+
+## 0.1.44
+Thu, 28 Oct 2021 00:08:22 GMT
+
+_Version update only_
+
+## 0.1.43
+Wed, 27 Oct 2021 00:08:15 GMT
+
+### Patches
+
+- Update the package.json repository field to include the directory property.
 
 ## 0.1.42
 Wed, 13 Oct 2021 15:09:54 GMT

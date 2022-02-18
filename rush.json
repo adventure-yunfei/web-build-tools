@@ -16,7 +16,7 @@
    * path segment in the "$schema" field for all your Rush config files.  This will ensure
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
-  "rushVersion": "5.55.0",
+  "rushVersion": "5.62.2",
 
   /**
    * The next field selects which package manager should be installed and determines its version.
@@ -26,9 +26,9 @@
    * Specify one of: "pnpmVersion", "npmVersion", or "yarnVersion".  See the Rush documentation
    * for details about these alternatives.
    */
-  "pnpmVersion": "6.7.1",
+  "pnpmVersion": "6.29.1",
 
-  // "npmVersion": "4.5.0",
+  // "npmVersion": "6.14.15",
   // "yarnVersion": "1.9.4",
 
   /**
@@ -62,7 +62,7 @@
      * The default value is false to avoid legacy compatibility issues.
      * It is strongly recommended to set strictPeerDependencies=true.
      */
-    // "strictPeerDependencies": true,
+    "strictPeerDependencies": true,
 
     /**
      * Configures the strategy used to select versions during installation.
@@ -124,7 +124,7 @@
    * LTS schedule: https://nodejs.org/en/about/releases/
    * LTS versions: https://nodejs.org/en/download/releases/
    */
-  "nodeSupportedVersionRange": ">=12.13.0 <13.0.0 || >=14.15.0 <15.0.0",
+  "nodeSupportedVersionRange": ">=12.13.0 <13.0.0 || >=14.15.0 <15.0.0 || >=16.13.0 <17.0.0",
 
   /**
    * Odd-numbered major versions of Node.js are experimental.  Even-numbered releases
@@ -257,7 +257,7 @@
      * you might configure your system's trigger to look for a special string such as "[skip-ci]"
      * in the commit message, and then customize Rush's message to contain that string.
      */
-    // "versionBumpCommitMessage": "Applying package updates. [skip-ci]",
+    // "versionBumpCommitMessage": "Bump versions [skip ci]",
 
     /**
      * The commit message to use when committing changes during 'rush version'.
@@ -266,7 +266,7 @@
      * you might configure your system's trigger to look for a special string such as "[skip-ci]"
      * in the commit message, and then customize Rush's message to contain that string.
      */
-    // "changeLogUpdateCommitMessage": "Deleting change files and updating change logs for package updates. [skip-ci]"
+    // "changeLogUpdateCommitMessage": "Update changelogs [skip ci]"
   },
 
   "repository": {
@@ -285,7 +285,7 @@
      * your PR branch, and in this situation "rush change" will also automatically invoke "git fetch"
      * to retrieve the latest activity for the remote master branch.
      */
-    "url": "https://github.com/microsoft/rushstack.git"
+    "urls": ["https://github.com/microsoft/rushstack.git"]
 
     /**
      * The default branch name. This tells "rush change" which remote branch to compare against.
@@ -440,7 +440,6 @@
     //    */
     //   // "versionPolicyName": ""
     // },
-    //
 
     // "apps" folder (alphabetical order)
     {
@@ -485,6 +484,12 @@
     {
       "packageName": "@microsoft/rush-lib",
       "projectFolder": "apps/rush-lib",
+      "reviewCategory": "libraries",
+      "versionPolicyName": "rush"
+    },
+    {
+      "packageName": "@rushstack/rush-sdk",
+      "projectFolder": "libraries/rush-sdk",
       "reviewCategory": "libraries",
       "versionPolicyName": "rush"
     },
@@ -544,6 +549,12 @@
       "reviewCategory": "tests",
       "shouldPublish": false
     },
+    {
+      "packageName": "eslint-7-test",
+      "projectFolder": "build-tests/eslint-7-test",
+      "reviewCategory": "tests",
+      "shouldPublish": false
+    },
 
     // "build-tests-samples" folder (alphabetical order)
     {
@@ -583,10 +594,58 @@
       "shouldPublish": false
     },
     {
+      "packageName": "heft-web-rig-app-tutorial",
+      "projectFolder": "build-tests-samples/heft-web-rig-app-tutorial",
+      "reviewCategory": "tests",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "heft-web-rig-library-tutorial",
+      "projectFolder": "build-tests-samples/heft-web-rig-library-tutorial",
+      "reviewCategory": "tests",
+      "shouldPublish": false
+    },
+    {
       "packageName": "packlets-tutorial",
       "projectFolder": "build-tests-samples/packlets-tutorial",
       "reviewCategory": "tests",
       "shouldPublish": false
+    },
+
+    // "eslint" folder (alphabetical order)
+    {
+      "packageName": "@rushstack/eslint-config",
+      "projectFolder": "eslint/eslint-config",
+      "reviewCategory": "libraries",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@rushstack/eslint-patch",
+      "projectFolder": "eslint/eslint-patch",
+      "reviewCategory": "libraries",
+      "shouldPublish": true,
+      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+    },
+    {
+      "packageName": "@rushstack/eslint-plugin",
+      "projectFolder": "eslint/eslint-plugin",
+      "reviewCategory": "libraries",
+      "shouldPublish": true,
+      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+    },
+    {
+      "packageName": "@rushstack/eslint-plugin-packlets",
+      "projectFolder": "eslint/eslint-plugin-packlets",
+      "reviewCategory": "libraries",
+      "shouldPublish": true,
+      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+    },
+    {
+      "packageName": "@rushstack/eslint-plugin-security",
+      "projectFolder": "eslint/eslint-plugin-security",
+      "reviewCategory": "libraries",
+      "shouldPublish": true,
+      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
     },
 
     // heft-* projects
@@ -724,8 +783,20 @@
       "shouldPublish": false
     },
     {
+      "packageName": "rush-amazon-s3-build-cache-plugin-integration-test",
+      "projectFolder": "build-tests/rush-amazon-s3-build-cache-plugin-integration-test",
+      "reviewCategory": "tests",
+      "shouldPublish": false
+    },
+    {
       "packageName": "rush-project-change-analyzer-test",
       "projectFolder": "build-tests/rush-project-change-analyzer-test",
+      "reviewCategory": "tests",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "set-webpack-public-path-plugin-webpack4-test",
+      "projectFolder": "build-tests/set-webpack-public-path-plugin-webpack4-test",
       "reviewCategory": "tests",
       "shouldPublish": false
     },
@@ -737,6 +808,12 @@
     },
 
     // "heft-plugins" folder (alphabetical order)
+    {
+      "packageName": "@rushstack/heft-dev-cert-plugin",
+      "projectFolder": "heft-plugins/heft-dev-cert-plugin",
+      "reviewCategory": "libraries",
+      "shouldPublish": true
+    },
     {
       "packageName": "@rushstack/heft-jest-plugin",
       "projectFolder": "heft-plugins/heft-jest-plugin",
@@ -844,8 +921,7 @@
       "packageName": "@rushstack/typings-generator",
       "projectFolder": "libraries/typings-generator",
       "reviewCategory": "libraries",
-      "shouldPublish": true,
-      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+      "shouldPublish": true
     },
 
     // "repo-scripts" folder (alphabetical order)
@@ -882,40 +958,30 @@
       "shouldPublish": true
     },
 
-    // "stack" folder (alphabetical order)
+    // "rush-plugins" folder (alphabetical order)
     {
-      "packageName": "@rushstack/eslint-config",
-      "projectFolder": "stack/eslint-config",
+      "packageName": "@rushstack/rush-amazon-s3-build-cache-plugin",
+      "projectFolder": "rush-plugins/rush-amazon-s3-build-cache-plugin",
       "reviewCategory": "libraries",
-      "shouldPublish": true
+      "versionPolicyName": "rush"
     },
     {
-      "packageName": "@rushstack/eslint-patch",
-      "projectFolder": "stack/eslint-patch",
+      "packageName": "@rushstack/rush-azure-storage-build-cache-plugin",
+      "projectFolder": "rush-plugins/rush-azure-storage-build-cache-plugin",
       "reviewCategory": "libraries",
-      "shouldPublish": true,
-      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+      "versionPolicyName": "rush"
     },
     {
-      "packageName": "@rushstack/eslint-plugin",
-      "projectFolder": "stack/eslint-plugin",
+      "packageName": "@rushstack/rush-litewatch-plugin",
+      "projectFolder": "rush-plugins/rush-litewatch-plugin",
       "reviewCategory": "libraries",
-      "shouldPublish": true,
-      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+      "shouldPublish": false
     },
     {
-      "packageName": "@rushstack/eslint-plugin-packlets",
-      "projectFolder": "stack/eslint-plugin-packlets",
+      "packageName": "@rushstack/rush-serve-plugin",
+      "projectFolder": "rush-plugins/rush-serve-plugin",
       "reviewCategory": "libraries",
-      "shouldPublish": true,
-      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
-    },
-    {
-      "packageName": "@rushstack/eslint-plugin-security",
-      "projectFolder": "stack/eslint-plugin-security",
-      "reviewCategory": "libraries",
-      "shouldPublish": true,
-      "cyclicDependencyProjects": ["@rushstack/heft-node-rig", "@rushstack/heft"]
+      "shouldPublish": false
     },
 
     // "webpack" folder (alphabetical order)

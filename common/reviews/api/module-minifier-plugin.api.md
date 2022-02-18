@@ -4,14 +4,14 @@
 
 ```ts
 
-import { AsyncSeriesWaterfallHook } from 'tapable';
+import type { AsyncSeriesWaterfallHook } from 'tapable';
 import { Compiler } from 'webpack';
-import { MinifyOptions } from 'terser';
+import type { MinifyOptions } from 'terser';
 import { Plugin } from 'webpack';
-import { RawSourceMap } from 'source-map';
-import { ReplaceSource } from 'webpack-sources';
+import type { RawSourceMap } from 'source-map';
+import type { ReplaceSource } from 'webpack-sources';
 import { Source } from 'webpack-sources';
-import { SyncWaterfallHook } from 'tapable';
+import type { SyncWaterfallHook } from 'tapable';
 import * as webpack from 'webpack';
 
 // @public
@@ -19,6 +19,9 @@ export const CHUNK_MODULES_TOKEN: '__WEBPACK_CHUNK_MODULES__';
 
 // @public
 export function generateLicenseFileForAsset(compilation: webpack.compilation.Compilation, asset: IAssetInfo, minifiedModules: IModuleMap): string;
+
+// @public
+export function getIdentifier(ordinal: number): string;
 
 // @internal
 export interface _IAcornComment {
@@ -59,11 +62,24 @@ export const IDENTIFIER_TRAILING_DIGITS: string;
 // @public
 export interface IExtendedModule extends webpack.compilation.Module {
     external?: boolean;
+    hasDependencies(callback: (dep: webpack.compilation.Dependency) => boolean | void): boolean;
     id: string | number | null;
     identifier(): string;
     modules?: IExtendedModule[];
     readableIdentifier(requestShortener: unknown): string;
     resource?: string;
+}
+
+// @public
+export interface ILocalMinifierOptions {
+    // (undocumented)
+    terserOptions?: MinifyOptions;
+}
+
+// @public
+export interface IMinifierConnection {
+    configHash: string;
+    disconnect(): Promise<void>;
 }
 
 // @public
@@ -110,9 +126,8 @@ export interface IModuleMinificationSuccessResult {
 
 // @public
 export interface IModuleMinifier {
-    // (undocumented)
+    connect(): Promise<IMinifierConnection>;
     minify: IModuleMinifierFunction;
-    ref?(): () => Promise<void>;
 }
 
 // @public
@@ -123,13 +138,14 @@ export interface IModuleMinifierFunction {
 
 // @public
 export interface IModuleMinifierPluginHooks {
-    finalModuleId: SyncWaterfallHook<string | number | undefined>;
-    postProcessCodeFragment: SyncWaterfallHook<ReplaceSource, string>;
+    finalModuleId: SyncWaterfallHook<string | number | undefined, webpack.compilation.Compilation>;
+    postProcessCodeFragment: SyncWaterfallHook<ReplaceSource, IPostProcessFragmentContext>;
     rehydrateAssets: AsyncSeriesWaterfallHook<IDehydratedAssets, webpack.compilation.Compilation>;
 }
 
 // @public
 export interface IModuleMinifierPluginOptions {
+    compressAsyncImports?: boolean;
     minifier: IModuleMinifier;
     sourceMap?: boolean;
     usePortableModules?: boolean;
@@ -149,9 +165,10 @@ export interface _INormalModuleFactoryModuleData {
 }
 
 // @public
-export interface ISynchronousMinifierOptions {
-    // (undocumented)
-    terserOptions?: MinifyOptions;
+export interface IPostProcessFragmentContext {
+    compilation: webpack.compilation.Compilation;
+    loggingName: string;
+    module: webpack.compilation.Module | undefined;
 }
 
 // @internal
@@ -165,6 +182,14 @@ export interface IWorkerPoolMinifierOptions {
     maxThreads?: number;
     terserOptions?: MinifyOptions;
     verbose?: boolean;
+}
+
+// @public
+export class LocalMinifier implements IModuleMinifier {
+    constructor(options: ILocalMinifierOptions);
+    // (undocumented)
+    connect(): Promise<IMinifierConnection>;
+    minify(request: IModuleMinificationRequest, callback: IModuleMinificationCallback): void;
 }
 
 // @public
@@ -186,6 +211,8 @@ export class ModuleMinifierPlugin implements webpack.Plugin {
 
 // @public
 export class NoopMinifier implements IModuleMinifier {
+    // (undocumented)
+    connect(): Promise<IMinifierConnection>;
     minify(request: IModuleMinificationRequest, callback: IModuleMinificationCallback): void;
 }
 
@@ -206,22 +233,14 @@ export const STAGE_AFTER: 100;
 export const STAGE_BEFORE: -100;
 
 // @public
-export class SynchronousMinifier implements IModuleMinifier {
-    constructor(options: ISynchronousMinifierOptions);
-    minify(request: IModuleMinificationRequest, callback: IModuleMinificationCallback): void;
-    // (undocumented)
-    readonly terserOptions: MinifyOptions;
-}
-
-// @public
 export class WorkerPoolMinifier implements IModuleMinifier {
     constructor(options: IWorkerPoolMinifierOptions);
+    // (undocumented)
+    connect(): Promise<IMinifierConnection>;
     // (undocumented)
     get maxThreads(): number;
     set maxThreads(threads: number);
     minify(request: IModuleMinificationRequest, callback: IModuleMinificationCallback): void;
-    // (undocumented)
-    ref(): () => Promise<void>;
 }
 
 // (No @packageDocumentation comment for this package)

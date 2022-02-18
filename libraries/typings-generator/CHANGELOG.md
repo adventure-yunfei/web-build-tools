@@ -1,6 +1,107 @@
 # Change Log - @rushstack/typings-generator
 
-This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Feb 2022 10:30:26 GMT and should not be manually modified.
+
+## 0.6.7
+Fri, 11 Feb 2022 10:30:26 GMT
+
+_Version update only_
+
+## 0.6.6
+Tue, 25 Jan 2022 01:11:07 GMT
+
+_Version update only_
+
+## 0.6.5
+Fri, 21 Jan 2022 01:10:41 GMT
+
+_Version update only_
+
+## 0.6.4
+Thu, 20 Jan 2022 02:43:46 GMT
+
+_Version update only_
+
+## 0.6.3
+Wed, 05 Jan 2022 16:07:47 GMT
+
+_Version update only_
+
+## 0.6.2
+Mon, 27 Dec 2021 16:10:40 GMT
+
+_Version update only_
+
+## 0.6.1
+Tue, 14 Dec 2021 19:27:52 GMT
+
+_Version update only_
+
+## 0.6.0
+Fri, 10 Dec 2021 01:09:33 GMT
+
+### Minor changes
+
+- Support additional output files beyond the typings files.
+
+## 0.5.7
+Thu, 09 Dec 2021 20:34:41 GMT
+
+_Version update only_
+
+## 0.5.6
+Thu, 09 Dec 2021 00:21:54 GMT
+
+_Version update only_
+
+## 0.5.5
+Wed, 08 Dec 2021 19:05:08 GMT
+
+_Version update only_
+
+## 0.5.4
+Wed, 08 Dec 2021 16:14:05 GMT
+
+_Version update only_
+
+## 0.5.3
+Mon, 06 Dec 2021 16:08:33 GMT
+
+_Version update only_
+
+## 0.5.2
+Fri, 03 Dec 2021 03:05:23 GMT
+
+_Version update only_
+
+## 0.5.1
+Tue, 30 Nov 2021 20:18:41 GMT
+
+_Version update only_
+
+## 0.5.0
+Mon, 29 Nov 2021 07:26:16 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Remove "filesToIgnore" option in favor of "globsToIgnore."
+
+## 0.4.6
+Sat, 06 Nov 2021 00:09:13 GMT
+
+_Version update only_
+
+## 0.4.5
+Fri, 05 Nov 2021 15:09:18 GMT
+
+_Version update only_
+
+## 0.4.4
+Wed, 27 Oct 2021 00:08:15 GMT
+
+### Patches
+
+- Update the package.json repository field to include the directory property.
 
 ## 0.4.3
 Wed, 13 Oct 2021 15:09:54 GMT

@@ -120,6 +120,11 @@ export interface ILocalizedData {
    * Normalize newlines in RESX files to either CRLF (Windows-style) or LF ('nix style)
    */
   normalizeResxNewlines?: 'lf' | 'crlf';
+
+  /**
+   * If set to true, do not warn on missing RESX <data> element comments.
+   */
+  ignoreMissingResxComments?: boolean;
 }
 
 /**
@@ -153,9 +158,10 @@ export interface ILocalizationPluginOptions {
   localizedData: ILocalizedData;
 
   /**
-   * This option is used to specify `.resx` and `.loc.json` files that should not be processed by this plugin.
+   * This option is used to specify `.resx`, `.resx.json` and `.loc.json` files that should not be processed by
+   * this plugin.
    */
-  filesToIgnore?: string[];
+  globsToIgnore?: string[];
 
   /**
    * The value to replace the [locale] token with for chunks without localized strings. Defaults to "none"
@@ -171,17 +177,24 @@ export interface ILocalizationPluginOptions {
    * This option is used to specify how and if TypeScript typings should be generated for loc files.
    */
   typingsOptions?: ITypingsGenerationOptions;
+
+  /**
+   * @deprecated
+   *
+   * TODO: Remove when version 1.0.0 is released.
+   */
+  filesToIgnore?: string[];
 }
 
 /**
- * @internal
+ * @public
  */
 export interface ILocalizationFile {
   [stringName: string]: ILocalizedString;
 }
 
 /**
- * @internal
+ * @public
  */
 export interface ILocalizedString {
   value: string;

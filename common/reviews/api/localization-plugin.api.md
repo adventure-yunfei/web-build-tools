@@ -33,15 +33,17 @@ export interface ILocaleFileData {
     [stringName: string]: string;
 }
 
-// @internal (undocumented)
-export interface _ILocalizationFile {
+// @public (undocumented)
+export interface ILocalizationFile {
     // (undocumented)
-    [stringName: string]: _ILocalizedString;
+    [stringName: string]: ILocalizedString;
 }
 
 // @public
 export interface ILocalizationPluginOptions {
+    // @deprecated (undocumented)
     filesToIgnore?: string[];
+    globsToIgnore?: string[];
     localizationStats?: ILocalizationStatsOptions;
     localizedData: ILocalizedData;
     noStringsLocaleName?: string;
@@ -81,6 +83,7 @@ export interface ILocalizationStatsOptions {
 // @public (undocumented)
 export interface ILocalizedData {
     defaultLocale: IDefaultLocaleOptions;
+    ignoreMissingResxComments?: boolean;
     normalizeResxNewlines?: 'lf' | 'crlf';
     passthroughLocale?: IPassthroughLocaleOptions;
     pseudolocales?: IPseudolocalesOptions;
@@ -88,8 +91,8 @@ export interface ILocalizedData {
     translatedStrings: ILocalizedStrings;
 }
 
-// @internal (undocumented)
-export interface _ILocalizedString {
+// @public (undocumented)
+export interface ILocalizedString {
     // (undocumented)
     comment?: string;
     // (undocumented)
@@ -116,6 +119,8 @@ export interface _IParseLocFileOptions {
     content: string;
     // (undocumented)
     filePath: string;
+    // (undocumented)
+    ignoreMissingResxComments: boolean | undefined;
     // (undocumented)
     resxNewlineNormalization: NewlineKind | undefined;
     // (undocumented)
@@ -158,6 +163,18 @@ export interface IResolvedMissingTranslations {
     [localeName: string]: string | ILocaleFileData;
 }
 
+// @public (undocumented)
+export interface IResxReaderOptions {
+    // (undocumented)
+    newlineNormalization: NewlineKind | undefined;
+    // (undocumented)
+    resxFilePath: string;
+    // (undocumented)
+    terminal: ITerminal;
+    // (undocumented)
+    warnOnMissingComment: boolean;
+}
+
 // @internal (undocumented)
 export interface _IStringPlaceholder {
     // (undocumented)
@@ -178,9 +195,11 @@ export interface ITypingsGeneratorOptions {
     // (undocumented)
     exportAsDefault?: boolean;
     // (undocumented)
-    filesToIgnore?: string[];
-    // (undocumented)
     generatedTsFolder: string;
+    // (undocumented)
+    globsToIgnore?: string[];
+    // (undocumented)
+    ignoreMissingResxComments?: boolean | undefined;
     // (undocumented)
     resxNewlineNormalization?: NewlineKind | undefined;
     // (undocumented)
@@ -195,7 +214,7 @@ export class LocalizationPlugin implements Webpack.Plugin {
     // Warning: (ae-forgotten-export) The symbol "IAddDefaultLocFileResult" needs to be exported by the entry point index.d.ts
     //
     // @internal (undocumented)
-    addDefaultLocFile(terminal: ITerminal, localizedResourcePath: string, localizedResourceData: _ILocalizationFile): IAddDefaultLocFileResult;
+    addDefaultLocFile(terminal: ITerminal, localizedResourcePath: string, localizedResourceData: ILocalizationFile): IAddDefaultLocFileResult;
     // (undocumented)
     apply(compiler: Webpack.Compiler): void;
     // Warning: (ae-forgotten-export) The symbol "IStringSerialNumberData" needs to be exported by the entry point index.d.ts
@@ -209,7 +228,15 @@ export class LocalizationPlugin implements Webpack.Plugin {
 // @internal (undocumented)
 export class _LocFileParser {
     // (undocumented)
-    static parseLocFile(options: _IParseLocFileOptions): _ILocalizationFile;
+    static parseLocFile(options: _IParseLocFileOptions): ILocalizationFile;
+}
+
+// @public (undocumented)
+export class ResxReader {
+    // (undocumented)
+    static readResxAsLocFile(resxContents: string, options: IResxReaderOptions): ILocalizationFile;
+    // (undocumented)
+    static readResxFileAsLocFile(options: IResxReaderOptions): ILocalizationFile;
 }
 
 // @public

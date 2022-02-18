@@ -26,7 +26,8 @@ export {
   INodePackageJson,
   IPackageJson,
   IPackageJsonDependencyTable,
-  IPackageJsonScriptTable
+  IPackageJsonScriptTable,
+  IPackageJsonRepository
 } from './IPackageJson';
 export {
   Import,
@@ -62,6 +63,7 @@ export {
   FileSystem,
   FileSystemCopyFilesAsyncFilter,
   FileSystemCopyFilesFilter,
+  FolderItem,
   FileSystemStats,
   IFileSystemCopyFileBaseOptions,
   IFileSystemCopyFileOptions,

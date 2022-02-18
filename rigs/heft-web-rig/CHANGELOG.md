@@ -1,6 +1,128 @@
 # Change Log - @rushstack/heft-web-rig
 
-This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Feb 2022 10:30:25 GMT and should not be manually modified.
+
+## 0.9.0
+Fri, 11 Feb 2022 10:30:25 GMT
+
+### Minor changes
+
+- A major overhaul of heft-web-rig; for details refer to https://github.com/microsoft/rushstack/pull/3204
+- Set useUnknownInCatchVariables=false in tsconfig.json, to work around https://github.com/microsoft/TypeScript/issues/42596
+
+## 0.8.2
+Tue, 25 Jan 2022 01:11:07 GMT
+
+### Patches
+
+- Upgrade ESLint to ~8.7.0
+
+## 0.8.1
+Fri, 21 Jan 2022 01:10:41 GMT
+
+_Version update only_
+
+## 0.8.0
+Thu, 20 Jan 2022 02:43:46 GMT
+
+### Minor changes
+
+- Update the `rush-project.json` file to follow the new schema and configure the "build" command output folders for the "_phase:build" phase.
+
+## 0.7.2
+Wed, 05 Jan 2022 16:07:47 GMT
+
+_Version update only_
+
+## 0.7.1
+Mon, 27 Dec 2021 16:10:40 GMT
+
+_Version update only_
+
+## 0.7.0
+Tue, 14 Dec 2021 19:27:51 GMT
+
+### Minor changes
+
+- Upgrade Jest to v27
+
+## 0.6.4
+Fri, 10 Dec 2021 01:09:33 GMT
+
+_Version update only_
+
+## 0.6.3
+Thu, 09 Dec 2021 20:34:41 GMT
+
+_Version update only_
+
+## 0.6.2
+Thu, 09 Dec 2021 00:21:54 GMT
+
+_Version update only_
+
+## 0.6.1
+Wed, 08 Dec 2021 19:05:08 GMT
+
+_Version update only_
+
+## 0.6.0
+Wed, 08 Dec 2021 16:14:05 GMT
+
+### Minor changes
+
+- Update to TypeScript 4.5
+
+## 0.5.0
+Mon, 06 Dec 2021 16:08:32 GMT
+
+### Minor changes
+
+- Bump ESLint to v8
+
+## 0.4.34
+Fri, 03 Dec 2021 03:05:22 GMT
+
+_Version update only_
+
+## 0.4.33
+Tue, 30 Nov 2021 20:18:41 GMT
+
+### Patches
+
+- Set default Jest environment in Jest configuration to "jest-environment-jsdom"
+
+## 0.4.32
+Mon, 29 Nov 2021 07:26:16 GMT
+
+_Version update only_
+
+## 0.4.31
+Sat, 06 Nov 2021 00:09:13 GMT
+
+_Version update only_
+
+## 0.4.30
+Fri, 05 Nov 2021 15:09:18 GMT
+
+_Version update only_
+
+## 0.4.29
+Thu, 28 Oct 2021 23:48:23 GMT
+
+_Version update only_
+
+## 0.4.28
+Thu, 28 Oct 2021 00:08:22 GMT
+
+_Version update only_
+
+## 0.4.27
+Wed, 27 Oct 2021 00:08:15 GMT
+
+### Patches
+
+- Update the package.json repository field to include the directory property.
 
 ## 0.4.26
 Wed, 13 Oct 2021 15:09:54 GMT

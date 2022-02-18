@@ -1,6 +1,117 @@
 # Change Log - @rushstack/debug-certificate-manager
 
-This log was last generated on Wed, 13 Oct 2021 15:09:54 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Feb 2022 10:30:25 GMT and should not be manually modified.
+
+## 1.1.28
+Fri, 11 Feb 2022 10:30:25 GMT
+
+_Version update only_
+
+## 1.1.27
+Tue, 25 Jan 2022 01:11:07 GMT
+
+_Version update only_
+
+## 1.1.26
+Fri, 21 Jan 2022 01:10:41 GMT
+
+_Version update only_
+
+## 1.1.25
+Thu, 20 Jan 2022 02:43:46 GMT
+
+_Version update only_
+
+## 1.1.24
+Thu, 06 Jan 2022 08:49:34 GMT
+
+### Patches
+
+- Fix an incorrect argument passed to the command to repair the certificate store on Windows.
+
+## 1.1.23
+Wed, 05 Jan 2022 16:07:47 GMT
+
+_Version update only_
+
+## 1.1.22
+Mon, 27 Dec 2021 16:10:40 GMT
+
+_Version update only_
+
+## 1.1.21
+Tue, 14 Dec 2021 19:27:51 GMT
+
+_Version update only_
+
+## 1.1.20
+Thu, 09 Dec 2021 20:34:41 GMT
+
+_Version update only_
+
+## 1.1.19
+Thu, 09 Dec 2021 00:21:54 GMT
+
+_Version update only_
+
+## 1.1.18
+Wed, 08 Dec 2021 19:05:08 GMT
+
+_Version update only_
+
+## 1.1.17
+Wed, 08 Dec 2021 16:14:05 GMT
+
+_Version update only_
+
+## 1.1.16
+Mon, 06 Dec 2021 16:08:33 GMT
+
+_Version update only_
+
+## 1.1.15
+Fri, 03 Dec 2021 03:05:22 GMT
+
+_Version update only_
+
+## 1.1.14
+Tue, 30 Nov 2021 20:18:41 GMT
+
+_Version update only_
+
+## 1.1.13
+Mon, 29 Nov 2021 07:26:16 GMT
+
+_Version update only_
+
+## 1.1.12
+Tue, 09 Nov 2021 16:08:07 GMT
+
+### Patches
+
+- Fix a bug where ensureCertificateAsync would assume a previously generated certificate was trusted.
+
+## 1.1.11
+Sat, 06 Nov 2021 00:09:13 GMT
+
+_Version update only_
+
+## 1.1.10
+Fri, 05 Nov 2021 15:09:18 GMT
+
+_Version update only_
+
+## 1.1.9
+Thu, 28 Oct 2021 00:08:22 GMT
+
+_Version update only_
+
+## 1.1.8
+Wed, 27 Oct 2021 00:08:15 GMT
+
+### Patches
+
+- Update the package.json repository field to include the directory property.
 
 ## 1.1.7
 Wed, 13 Oct 2021 15:09:54 GMT

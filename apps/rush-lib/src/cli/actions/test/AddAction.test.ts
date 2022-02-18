@@ -3,13 +3,12 @@
 
 import '../../test/mockRushCommandLineParser';
 
-import * as path from 'path';
-
 import { PackageJsonUpdater } from '../../../logic/PackageJsonUpdater';
 import { RushCommandLineParser } from '../../RushCommandLineParser';
+import { AddAction } from '../AddAction';
 
-describe('AddAction', () => {
-  describe(`basic "rush add" tests`, () => {
+describe(AddAction.name, () => {
+  describe('basic "rush add" tests', () => {
     let doRushAddMock: jest.SpyInstance;
     let oldExitCode: number | undefined;
     let oldArgs: string[];
@@ -29,10 +28,10 @@ describe('AddAction', () => {
       process.argv = oldArgs;
     });
 
-    describe(`'add' action`, () => {
+    describe("'add' action", () => {
       it(`adds a dependency to just one repo in the workspace`, async () => {
-        const startPath: string = path.resolve(__dirname, 'addRepo');
-        const aPath: string = path.resolve(__dirname, 'addRepo', 'a');
+        const startPath: string = `${__dirname}/addRepo`;
+        const aPath: string = `${__dirname}/addRepo/a`;
 
         // Create a Rush CLI instance. This instance is heavy-weight and relies on setting process.exit
         // to exit and clear the Rush file lock. So running multiple `it` or `describe` test blocks over the same test
@@ -50,14 +49,14 @@ describe('AddAction', () => {
         expect(doRushAddMock).toHaveBeenCalledTimes(1);
         expect(doRushAddMock.mock.calls[0][0].projects).toHaveLength(1);
         expect(doRushAddMock.mock.calls[0][0].projects[0].packageName).toEqual('a');
-        expect(doRushAddMock.mock.calls[0][0].packageName).toEqual('assert');
+        expect(doRushAddMock.mock.calls[0][0].packageNames).toContain('assert');
       });
     });
 
-    describe(`'add' action with --all`, () => {
+    describe("'add' action with --all", () => {
       it(`adds a dependency to all repos in the workspace`, async () => {
-        const startPath: string = path.resolve(__dirname, 'addRepo');
-        const aPath: string = path.resolve(__dirname, 'addRepo', 'a');
+        const startPath: string = `${__dirname}/addRepo`;
+        const aPath: string = `${__dirname}/addRepo/a`;
 
         // Create a Rush CLI instance. This instance is heavy-weight and relies on setting process.exit
         // to exit and clear the Rush file lock. So running multiple `it` or `describe` test blocks over the same test
@@ -76,7 +75,7 @@ describe('AddAction', () => {
         expect(doRushAddMock.mock.calls[0][0].projects).toHaveLength(2);
         expect(doRushAddMock.mock.calls[0][0].projects[0].packageName).toEqual('a');
         expect(doRushAddMock.mock.calls[0][0].projects[1].packageName).toEqual('b');
-        expect(doRushAddMock.mock.calls[0][0].packageName).toEqual('assert');
+        expect(doRushAddMock.mock.calls[0][0].packageNames).toContain('assert');
       });
     });
   });

@@ -1,6 +1,103 @@
 # Change Log - @rushstack/terminal
 
-This log was last generated on Wed, 13 Oct 2021 15:09:55 GMT and should not be manually modified.
+This log was last generated on Fri, 11 Feb 2022 10:30:26 GMT and should not be manually modified.
+
+## 0.3.26
+Fri, 11 Feb 2022 10:30:26 GMT
+
+_Version update only_
+
+## 0.3.25
+Tue, 25 Jan 2022 01:11:07 GMT
+
+_Version update only_
+
+## 0.3.24
+Fri, 21 Jan 2022 01:10:41 GMT
+
+_Version update only_
+
+## 0.3.23
+Thu, 20 Jan 2022 02:43:46 GMT
+
+_Version update only_
+
+## 0.3.22
+Wed, 05 Jan 2022 16:07:47 GMT
+
+_Version update only_
+
+## 0.3.21
+Mon, 27 Dec 2021 16:10:40 GMT
+
+_Version update only_
+
+## 0.3.20
+Tue, 14 Dec 2021 19:27:52 GMT
+
+_Version update only_
+
+## 0.3.19
+Thu, 09 Dec 2021 20:34:41 GMT
+
+_Version update only_
+
+## 0.3.18
+Thu, 09 Dec 2021 00:21:54 GMT
+
+_Version update only_
+
+## 0.3.17
+Wed, 08 Dec 2021 19:05:08 GMT
+
+_Version update only_
+
+## 0.3.16
+Wed, 08 Dec 2021 16:14:05 GMT
+
+_Version update only_
+
+## 0.3.15
+Mon, 06 Dec 2021 16:08:33 GMT
+
+_Version update only_
+
+## 0.3.14
+Fri, 03 Dec 2021 03:05:23 GMT
+
+_Version update only_
+
+## 0.3.13
+Tue, 30 Nov 2021 20:18:41 GMT
+
+_Version update only_
+
+## 0.3.12
+Mon, 29 Nov 2021 07:26:16 GMT
+
+_Version update only_
+
+## 0.3.11
+Sat, 06 Nov 2021 00:09:13 GMT
+
+_Version update only_
+
+## 0.3.10
+Fri, 05 Nov 2021 15:09:18 GMT
+
+_Version update only_
+
+## 0.3.9
+Thu, 28 Oct 2021 00:08:22 GMT
+
+_Version update only_
+
+## 0.3.8
+Wed, 27 Oct 2021 00:08:15 GMT
+
+### Patches
+
+- Update the package.json repository field to include the directory property.
 
 ## 0.3.7
 Wed, 13 Oct 2021 15:09:55 GMT
