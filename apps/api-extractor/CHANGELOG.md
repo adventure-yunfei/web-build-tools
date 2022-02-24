@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.19.4-rc.6
+- 优化 `AstNamespaceImport` 输出结果
+
 ## 7.19.4-rc.1
 - 修正 import type `import('abc')` 语法支持
 
