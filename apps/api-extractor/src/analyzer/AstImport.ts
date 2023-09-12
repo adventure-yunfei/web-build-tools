@@ -4,6 +4,7 @@
 import { AstSymbol } from './AstSymbol';
 import { InternalError } from '@rushstack/node-core-library';
 import { AstSyntheticEntity } from './AstEntity';
+import { SyntaxHelpers } from './SyntaxHelpers';
 
 /**
  * Indicates the import kind for an `AstImport`.
@@ -48,6 +49,7 @@ export interface IAstImportOptions {
   readonly importKind: AstImportKind;
   readonly modulePath: string;
   readonly exportName: string;
+  readonly exportPath?: string[];
   readonly isTypeOnly: boolean;
 }
 
@@ -86,11 +88,46 @@ export class AstImport extends AstSyntheticEntity {
    * // For AstImportKind.EqualsImport style, exportName would be "x" in this example:
    * import x = require("y");
    *
+   * import { x } from "y";
+   * import x2 = x;          // <---
+   *
+   * import * as y from "y";
+   * import x2 = y.x;        // <---
+   *
    * // For AstImportKind.ImportType style, exportName would be "a.b.c" in this example:
    * interface foo { foo: import('bar').a.b.c };
    * ```
    */
   public readonly exportName: string;
+
+  /**
+   * The path of the symbol being imported, instead of a single exportName.
+   * Normally it represents importing a deep path of an external package.
+   *
+   * @remarks
+   *
+   * ```ts
+   * // in normal cases without EqualsImport, "exportPath" contains exactly one "exportName" item
+   *
+   * // in this example, symbol "y2" will be represented as:
+   * //   - importKind: DefaultImport
+   * //   - modulePath: "m"
+   * //   - exportPath: "x.y"
+   * //   - exportName: "y"
+   * import x from "m";
+   * import y2 = x.y;
+   *
+   * // in this example with nested EqualsImport, symbol "y2" will be represented as:
+   * //   - importKind: NamedImport
+   * //   - modulePath: "m/n"
+   * //   - exportPath: "a.x.y"
+   * //   - exportName: "y"
+   * import { a } from "m/n";
+   * import b2 = a.x;
+   * import y2 = b2.y;
+   * ```
+   */
+  public readonly exportPath: string[];
 
   /**
    * Whether it is a type-only import, for example:
@@ -124,6 +161,7 @@ export class AstImport extends AstSyntheticEntity {
     this.importKind = options.importKind;
     this.modulePath = options.modulePath;
     this.exportName = options.exportName;
+    this.exportPath = options.exportPath ? options.exportPath : [options.exportName];
 
     // We start with this assumption, but it may get changed later if non-type-only import is encountered.
     this.isTypeOnlyEverywhere = options.isTypeOnly;
@@ -134,6 +172,9 @@ export class AstImport extends AstSyntheticEntity {
   /** {@inheritdoc} */
   public get localName(): string {
     // abstract
+    if (this.importKind === AstImportKind.ImportType) {
+      return this.exportName || SyntaxHelpers.makeCamelCaseIdentifier(this.modulePath);
+    }
     return this.exportName;
   }
 
@@ -143,13 +184,17 @@ export class AstImport extends AstSyntheticEntity {
   public static getKey(options: IAstImportOptions): string {
     switch (options.importKind) {
       case AstImportKind.DefaultImport:
-        return `${options.modulePath}:${options.exportName}`;
+        return `${options.modulePath}:${
+          options.exportPath ? options.exportPath.join('.') : options.exportName
+        }`;
       case AstImportKind.NamedImport:
-        return `${options.modulePath}:${options.exportName}`;
+        return `${options.modulePath}:${
+          options.exportPath ? options.exportPath.join('.') : options.exportName
+        }`;
       case AstImportKind.StarImport:
-        return `${options.modulePath}:*`;
+        return `${options.modulePath}:*${options.exportPath ? options.exportPath.slice(1).join('.') : ''}`;
       case AstImportKind.EqualsImport:
-        return `${options.modulePath}:=`;
+        return `${options.modulePath}:=${options.exportPath ? options.exportPath.slice(1).join('.') : ''}`;
       case AstImportKind.ImportType: {
         const subKey: string = !options.exportName
           ? '*' // Equivalent to StarImport

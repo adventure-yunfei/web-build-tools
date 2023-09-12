@@ -8,6 +8,8 @@
 
 import * as child_process from 'child_process';
 import * as fs from 'fs';
+import { Writable } from 'stream';
+import { WritableOptions } from 'stream';
 
 // @public
 export enum AlreadyExistsBehavior {
@@ -33,7 +35,16 @@ export class AnsiEscape {
 export class Async {
     static forEachAsync<TEntry>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<void>, options?: IAsyncParallelismOptions | undefined): Promise<void>;
     static mapAsync<TEntry, TRetVal>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<TRetVal>, options?: IAsyncParallelismOptions | undefined): Promise<TRetVal[]>;
+    static runWithRetriesAsync<TResult>({ action, maxRetries, retryDelayMs }: IRunWithRetriesOptions<TResult>): Promise<TResult>;
     static sleep(ms: number): Promise<void>;
+}
+
+// @public
+export class AsyncQueue<T> implements AsyncIterable<[T, () => void]> {
+    // (undocumented)
+    [Symbol.asyncIterator](): AsyncIterableIterator<[T, () => void]>;
+    constructor(iterable?: Iterable<T>);
+    push(item: T): void;
 }
 
 // @public
@@ -185,6 +196,27 @@ export enum FileConstants {
 }
 
 // @public
+export class FileError extends Error {
+    // (undocumented)
+    static [Symbol.hasInstance](instance: object): boolean;
+    constructor(message: string, options: IFileErrorOptions);
+    readonly absolutePath: string;
+    readonly column: number | undefined;
+    // @internal (undocumented)
+    static _environmentVariableIsAbsolutePath: boolean;
+    getFormattedErrorMessage(options?: IFileErrorFormattingOptions): string;
+    readonly line: number | undefined;
+    readonly projectFolder: string;
+    // @internal (undocumented)
+    static _sanitizedEnvironmentVariable: string | undefined;
+    // @override
+    toString(): string;
+}
+
+// @public
+export type FileLocationStyle = 'Unix' | 'VisualStudio';
+
+// @public
 export class FileSystem {
     static appendToFile(filePath: string, contents: string | Buffer, options?: IFileSystemWriteFileOptions): void;
     static appendToFileAsync(filePath: string, contents: string | Buffer, options?: IFileSystemWriteFileOptions): Promise<void>;
@@ -193,7 +225,7 @@ export class FileSystem {
     static copyFile(options: IFileSystemCopyFileOptions): void;
     static copyFileAsync(options: IFileSystemCopyFileOptions): Promise<void>;
     static copyFiles(options: IFileSystemCopyFilesOptions): void;
-    static copyFilesAsync(options: IFileSystemCopyFilesOptions): Promise<void>;
+    static copyFilesAsync(options: IFileSystemCopyFilesAsyncOptions): Promise<void>;
     static createHardLink(options: IFileSystemCreateLinkOptions): void;
     static createHardLinkAsync(options: IFileSystemCreateLinkOptions): Promise<void>;
     static createSymbolicLinkFile(options: IFileSystemCreateLinkOptions): void;
@@ -221,10 +253,12 @@ export class FileSystem {
     static getRealPathAsync(linkPath: string): Promise<string>;
     static getStatistics(path: string): FileSystemStats;
     static getStatisticsAsync(path: string): Promise<FileSystemStats>;
+    static isDirectoryError(error: Error): boolean;
     static isErrnoException(error: Error): error is NodeJS.ErrnoException;
     static isExistError(error: Error): boolean;
     static isFileDoesNotExistError(error: Error): boolean;
     static isFolderDoesNotExistError(error: Error): boolean;
+    static isNotDirectoryError(error: Error): boolean;
     static isNotExistError(error: Error): boolean;
     static isUnlinkNotPermittedError(error: Error): boolean;
     static move(options: IFileSystemMoveOptions): void;
@@ -305,6 +339,11 @@ export interface IConsoleTerminalProviderOptions {
     verboseEnabled: boolean;
 }
 
+// @beta
+export interface IDynamicPrefixProxyTerminalProviderOptions extends IPrefixProxyTerminalProviderOptionsBase {
+    getPrefix: () => string;
+}
+
 // @public
 export interface IEnvironmentEntry {
     name: string;
@@ -329,6 +368,19 @@ export interface IExecutableSpawnSyncOptions extends IExecutableResolveOptions {
     maxBuffer?: number;
     stdio?: ExecutableStdioMapping;
     timeoutMs?: number;
+}
+
+// @public
+export interface IFileErrorFormattingOptions {
+    format?: FileLocationStyle;
+}
+
+// @public
+export interface IFileErrorOptions {
+    absolutePath: string;
+    column?: number;
+    line?: number;
+    projectFolder: string;
 }
 
 // @public (undocumented)
@@ -408,6 +460,16 @@ export interface IFileWriterFlags {
 }
 
 // @public
+export interface IImportResolveAsyncOptions extends IImportResolveOptions {
+    getRealPathAsync?: (filePath: string) => Promise<string>;
+}
+
+// @public
+export interface IImportResolveModuleAsyncOptions extends IImportResolveAsyncOptions {
+    modulePath: string;
+}
+
+// @public
 export interface IImportResolveModuleOptions extends IImportResolveOptions {
     modulePath: string;
 }
@@ -416,12 +478,27 @@ export interface IImportResolveModuleOptions extends IImportResolveOptions {
 export interface IImportResolveOptions {
     allowSelfReference?: boolean;
     baseFolderPath: string;
+    getRealPath?: (filePath: string) => string;
     includeSystemModules?: boolean;
+}
+
+// @public
+export interface IImportResolvePackageAsyncOptions extends IImportResolveAsyncOptions {
+    packageName: string;
 }
 
 // @public
 export interface IImportResolvePackageOptions extends IImportResolveOptions {
     packageName: string;
+}
+
+// @public
+export interface IJsonFileLoadAndValidateOptions extends IJsonFileParseOptions, IJsonSchemaValidateOptions {
+}
+
+// @public
+export interface IJsonFileParseOptions {
+    jsonSyntax?: JsonSyntax;
 }
 
 // @public
@@ -458,7 +535,9 @@ export interface IJsonSchemaValidateOptions {
 export class Import {
     static lazy(moduleName: string, require: (id: string) => unknown): any;
     static resolveModule(options: IImportResolveModuleOptions): string;
+    static resolveModuleAsync(options: IImportResolveModuleAsyncOptions): Promise<string>;
     static resolvePackage(options: IImportResolvePackageOptions): string;
+    static resolvePackageAsync(options: IImportResolvePackageAsyncOptions): Promise<string>;
 }
 
 // @public
@@ -473,6 +552,7 @@ export interface INodePackageJson {
     name: string;
     optionalDependencies?: IPackageJsonDependencyTable;
     peerDependencies?: IPackageJsonDependencyTable;
+    peerDependenciesMeta?: IPeerDependenciesMetaTable;
     private?: boolean;
     repository?: string | IPackageJsonRepository;
     resolutions?: Record<string, string>;
@@ -540,6 +620,33 @@ export interface IParsedPackageNameOrError extends IParsedPackageName {
 export interface IPathFormatConciselyOptions {
     baseFolder: string;
     pathToConvert: string;
+    trimLeadingDotSlash?: boolean;
+}
+
+// @public
+export interface IPathFormatFileLocationOptions {
+    baseFolder?: string;
+    column?: number;
+    format: FileLocationStyle;
+    line?: number;
+    message: string;
+    pathToFormat: string;
+}
+
+// @public
+export interface IPeerDependenciesMetaTable {
+    // (undocumented)
+    [dependencyName: string]: {
+        optional?: boolean;
+    };
+}
+
+// @beta (undocumented)
+export type IPrefixProxyTerminalProviderOptions = IStaticPrefixProxyTerminalProviderOptions | IDynamicPrefixProxyTerminalProviderOptions;
+
+// @beta (undocumented)
+export interface IPrefixProxyTerminalProviderOptionsBase {
+    terminalProvider: ITerminalProvider;
 }
 
 // @public
@@ -547,6 +654,21 @@ export interface IProtectableMapParameters<K, V> {
     onClear?: (source: ProtectableMap<K, V>) => void;
     onDelete?: (source: ProtectableMap<K, V>, key: K) => void;
     onSet?: (source: ProtectableMap<K, V>, key: K, value: V) => V;
+}
+
+// @beta (undocumented)
+export interface IRunWithRetriesOptions<TResult> {
+    // (undocumented)
+    action: () => Promise<TResult> | TResult;
+    // (undocumented)
+    maxRetries: number;
+    // (undocumented)
+    retryDelayMs?: number;
+}
+
+// @beta
+export interface IStaticPrefixProxyTerminalProviderOptions extends IPrefixProxyTerminalProviderOptionsBase {
+    prefix: string;
 }
 
 // @beta (undocumented)
@@ -558,6 +680,11 @@ export interface IStringBufferOutputOptions {
 export interface IStringBuilder {
     append(text: string): void;
     toString(): string;
+}
+
+// @beta
+export interface ISubprocessOptions {
+    detached: boolean;
 }
 
 // @beta (undocumented)
@@ -583,17 +710,24 @@ export interface ITerminalProvider {
     write(data: string, severity: TerminalProviderSeverity): void;
 }
 
+// @beta
+export interface ITerminalWritableOptions {
+    severity: TerminalProviderSeverity;
+    terminal: ITerminal;
+    writableOptions?: WritableOptions;
+}
+
 // @public
 export class JsonFile {
     // @internal (undocumented)
     static _formatPathForError: (path: string) => string;
-    static load(jsonFilename: string): JsonObject;
-    static loadAndValidate(jsonFilename: string, jsonSchema: JsonSchema, options?: IJsonSchemaValidateOptions): JsonObject;
-    static loadAndValidateAsync(jsonFilename: string, jsonSchema: JsonSchema, options?: IJsonSchemaValidateOptions): Promise<JsonObject>;
-    static loadAndValidateWithCallback(jsonFilename: string, jsonSchema: JsonSchema, errorCallback: (errorInfo: IJsonSchemaErrorInfo) => void): JsonObject;
-    static loadAndValidateWithCallbackAsync(jsonFilename: string, jsonSchema: JsonSchema, errorCallback: (errorInfo: IJsonSchemaErrorInfo) => void): Promise<JsonObject>;
-    static loadAsync(jsonFilename: string): Promise<JsonObject>;
-    static parseString(jsonContents: string): JsonObject;
+    static load(jsonFilename: string, options?: IJsonFileParseOptions): JsonObject;
+    static loadAndValidate(jsonFilename: string, jsonSchema: JsonSchema, options?: IJsonFileLoadAndValidateOptions): JsonObject;
+    static loadAndValidateAsync(jsonFilename: string, jsonSchema: JsonSchema, options?: IJsonFileLoadAndValidateOptions): Promise<JsonObject>;
+    static loadAndValidateWithCallback(jsonFilename: string, jsonSchema: JsonSchema, errorCallback: (errorInfo: IJsonSchemaErrorInfo) => void, options?: IJsonFileLoadAndValidateOptions): JsonObject;
+    static loadAndValidateWithCallbackAsync(jsonFilename: string, jsonSchema: JsonSchema, errorCallback: (errorInfo: IJsonSchemaErrorInfo) => void, options?: IJsonFileLoadAndValidateOptions): Promise<JsonObject>;
+    static loadAsync(jsonFilename: string, options?: IJsonFileParseOptions): Promise<JsonObject>;
+    static parseString(jsonContents: string, options?: IJsonFileParseOptions): JsonObject;
     static save(jsonObject: JsonObject, jsonFilename: string, options?: IJsonFileSaveOptions): boolean;
     static saveAsync(jsonObject: JsonObject, jsonFilename: string, options?: IJsonFileSaveOptions): Promise<boolean>;
     static stringify(jsonObject: JsonObject, options?: IJsonFileStringifyOptions): string;
@@ -618,6 +752,13 @@ export class JsonSchema {
 }
 
 // @public
+export enum JsonSyntax {
+    Json5 = "json5",
+    JsonWithComments = "jsonWithComments",
+    Strict = "strict"
+}
+
+// @public
 export class LegacyAdapters {
     static convertCallbackToPromise<TResult, TError>(fn: (cb: LegacyCallback<TResult, TError>) => void): Promise<TResult>;
     // (undocumented)
@@ -629,6 +770,7 @@ export class LegacyAdapters {
     // (undocumented)
     static convertCallbackToPromise<TResult, TError, TArg1, TArg2, TArg3, TArg4>(fn: (arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4, cb: LegacyCallback<TResult, TError>) => void, arg1: TArg1, arg2: TArg2, arg3: TArg3, arg4: TArg4): Promise<TResult>;
     static scrubError(error: Error | string | any): Error;
+    // @deprecated
     static sortStable<T>(array: T[], compare?: (a: T, b: T) => number): void;
 }
 
@@ -642,7 +784,7 @@ export class LockFile {
     get filePath(): string;
     static getLockFilePath(resourceFolder: string, resourceName: string, pid?: number): string;
     get isReleased(): boolean;
-    release(): void;
+    release(deleteFile?: boolean): void;
     static tryAcquire(resourceFolder: string, resourceName: string): LockFile | undefined;
 }
 
@@ -701,8 +843,10 @@ export class PackageNameParser {
 // @public
 export class Path {
     static convertToBackslashes(inputPath: string): string;
+    static convertToPlatformDefault(inputPath: string): string;
     static convertToSlashes(inputPath: string): string;
     static formatConcisely(options: IPathFormatConciselyOptions): string;
+    static formatFileLocation(options: IPathFormatFileLocationOptions): string;
     static isDownwardRelative(inputPath: string): boolean;
     static isEqual(path1: string, path2: string): boolean;
     static isUnder(childPath: string, parentFolderPath: string): boolean;
@@ -726,6 +870,17 @@ export enum PosixModeBits {
     UserWrite = 128
 }
 
+// @beta
+export class PrefixProxyTerminalProvider implements ITerminalProvider {
+    constructor(options: IPrefixProxyTerminalProviderOptions);
+    // @override (undocumented)
+    get eolCharacter(): string;
+    // @override (undocumented)
+    get supportsColor(): boolean;
+    // @override (undocumented)
+    write(data: string, severity: TerminalProviderSeverity): void;
+}
+
 // @public
 export class ProtectableMap<K, V> {
     constructor(parameters: IProtectableMapParameters<K, V>);
@@ -742,8 +897,8 @@ export class ProtectableMap<K, V> {
 // @public
 export class Sort {
     static compareByValue(x: any, y: any): number;
-    static isSorted<T>(array: T[], comparer?: (x: any, y: any) => number): boolean;
-    static isSortedBy<T>(array: T[], keySelector: (element: T) => any, comparer?: (x: any, y: any) => number): boolean;
+    static isSorted<T>(collection: Iterable<T>, comparer?: (x: any, y: any) => number): boolean;
+    static isSortedBy<T>(collection: Iterable<T>, keySelector: (element: T) => any, comparer?: (x: any, y: any) => number): boolean;
     static sortBy<T>(array: T[], keySelector: (element: T) => any, comparer?: (x: any, y: any) => number): void;
     static sortMapKeys<K, V>(map: Map<K, V>, keyComparer?: (x: K, y: K) => number): void;
     static sortSet<T>(set: Set<T>, comparer?: (x: T, y: T) => number): void;
@@ -768,6 +923,13 @@ export class StringBuilder implements IStringBuilder {
     constructor();
     append(text: string): void;
     toString(): string;
+}
+
+// @beta
+export class SubprocessTerminator {
+    static killProcessTree(subprocess: child_process.ChildProcess, subprocessOptions: ISubprocessOptions): void;
+    static killProcessTreeOnExit(subprocess: child_process.ChildProcess, subprocessOptions: ISubprocessOptions): void;
+    static readonly RECOMMENDED_OPTIONS: ISubprocessOptions;
 }
 
 // @beta
@@ -801,12 +963,20 @@ export enum TerminalProviderSeverity {
     warning = 1
 }
 
+// @beta
+export class TerminalWritable extends Writable {
+    constructor(options: ITerminalWritableOptions);
+    // (undocumented)
+    _write(chunk: string | Buffer | Uint8Array, encoding: string, callback: (error?: Error | null) => void): void;
+}
+
 // @public
 export class Text {
     static convertTo(input: string, newlineKind: NewlineKind): string;
     static convertToCrLf(input: string): string;
     static convertToLf(input: string): string;
     static ensureTrailingNewline(s: string, newlineKind?: NewlineKind): string;
+    static escapeRegExp(literal: string): string;
     static getNewline(newlineKind: NewlineKind): string;
     static padEnd(s: string, minimumLength: number, paddingCharacter?: string): string;
     static padStart(s: string, minimumLength: number, paddingCharacter?: string): string;

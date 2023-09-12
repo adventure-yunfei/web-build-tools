@@ -1,10 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { IHeftPlugin } from '../IHeftPlugin';
 import { ScopedLogger } from './ScopedLogger';
-import { ITerminalProvider } from '@rushstack/node-core-library';
-import { FileErrorFormat, FileError } from './FileError';
+import {
+  FileError,
+  FileLocationStyle,
+  ITerminalProvider,
+  IFileErrorFormattingOptions
+} from '@rushstack/node-core-library';
 
 export interface ILoggingManagerOptions {
   terminalProvider: ITerminalProvider;
@@ -28,16 +31,19 @@ export class LoggingManager {
     this._shouldPrintStacks = true;
   }
 
-  public requestScopedLogger(plugin: IHeftPlugin, loggerName: string): ScopedLogger {
+  public resetScopedLoggerErrorsAndWarnings(): void {
+    this._hasAnyErrors = false;
+    for (const scopedLogger of this._scopedLoggers.values()) {
+      scopedLogger.resetErrorsAndWarnings();
+    }
+  }
+
+  public requestScopedLogger(loggerName: string): ScopedLogger {
     const existingScopedLogger: ScopedLogger | undefined = this._scopedLoggers.get(loggerName);
     if (existingScopedLogger) {
-      throw new Error(
-        `A named logger with name "${loggerName}" has already been requested ` +
-          `by plugin "${existingScopedLogger._requestingPlugin.pluginName}".`
-      );
+      throw new Error(`A named logger with name ${JSON.stringify(loggerName)} has already been requested.`);
     } else {
       const scopedLogger: ScopedLogger = new ScopedLogger({
-        requestingPlugin: plugin,
         loggerName,
         terminalProvider: this._options.terminalProvider,
         getShouldPrintStacks: () => this._shouldPrintStacks,
@@ -48,13 +54,15 @@ export class LoggingManager {
     }
   }
 
-  public getErrorStrings(fileErrorFormat?: FileErrorFormat): string[] {
+  public getErrorStrings(fileLocationStyle?: FileLocationStyle): string[] {
     const result: string[] = [];
 
     for (const scopedLogger of this._scopedLoggers.values()) {
       result.push(
         ...scopedLogger.errors.map(
-          (error) => `[${scopedLogger.loggerName}] ${LoggingManager.getErrorMessage(error, fileErrorFormat)}`
+          (error) =>
+            `[${scopedLogger.loggerName}] ` +
+            LoggingManager.getErrorMessage(error, { format: fileLocationStyle })
         )
       );
     }
@@ -62,14 +70,15 @@ export class LoggingManager {
     return result;
   }
 
-  public getWarningStrings(fileErrorFormat?: FileErrorFormat): string[] {
+  public getWarningStrings(fileErrorFormat?: FileLocationStyle): string[] {
     const result: string[] = [];
 
     for (const scopedLogger of this._scopedLoggers.values()) {
       result.push(
         ...scopedLogger.warnings.map(
           (warning) =>
-            `[${scopedLogger.loggerName}] ${LoggingManager.getErrorMessage(warning, fileErrorFormat)}`
+            `[${scopedLogger.loggerName}] ` +
+            LoggingManager.getErrorMessage(warning, { format: fileErrorFormat })
         )
       );
     }
@@ -77,9 +86,9 @@ export class LoggingManager {
     return result;
   }
 
-  public static getErrorMessage(error: Error, fileErrorFormat?: FileErrorFormat): string {
+  public static getErrorMessage(error: Error, options?: IFileErrorFormattingOptions): string {
     if (error instanceof FileError) {
-      return error.toString(fileErrorFormat);
+      return error.getFormattedErrorMessage(options);
     } else {
       return error.message;
     }

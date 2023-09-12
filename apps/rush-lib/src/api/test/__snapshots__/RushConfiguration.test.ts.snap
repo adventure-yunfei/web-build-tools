@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`RushConfiguration fails to load repo/rush-repository-url-urls.json 1`] = `"The 'repository.url' field cannot be used when 'repository.urls' is present"`;

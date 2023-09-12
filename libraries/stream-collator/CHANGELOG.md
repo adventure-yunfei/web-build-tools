@@ -1,6 +1,538 @@
 # Change Log - @rushstack/stream-collator
 
-This log was last generated on Fri, 11 Feb 2022 10:30:26 GMT and should not be manually modified.
+This log was last generated on Thu, 24 Aug 2023 15:20:46 GMT and should not be manually modified.
+
+## 4.0.263
+Thu, 24 Aug 2023 15:20:46 GMT
+
+_Version update only_
+
+## 4.0.262
+Tue, 08 Aug 2023 07:10:40 GMT
+
+_Version update only_
+
+## 4.0.261
+Mon, 31 Jul 2023 15:19:06 GMT
+
+_Version update only_
+
+## 4.0.260
+Sat, 29 Jul 2023 00:22:51 GMT
+
+_Version update only_
+
+## 4.0.259
+Thu, 20 Jul 2023 20:47:29 GMT
+
+_Version update only_
+
+## 4.0.258
+Wed, 19 Jul 2023 00:20:32 GMT
+
+_Version update only_
+
+## 4.0.257
+Fri, 14 Jul 2023 15:20:46 GMT
+
+_Version update only_
+
+## 4.0.256
+Thu, 13 Jul 2023 00:22:37 GMT
+
+_Version update only_
+
+## 4.0.255
+Wed, 12 Jul 2023 15:20:40 GMT
+
+_Version update only_
+
+## 4.0.254
+Wed, 12 Jul 2023 00:23:30 GMT
+
+_Version update only_
+
+## 4.0.253
+Fri, 07 Jul 2023 00:19:33 GMT
+
+_Version update only_
+
+## 4.0.252
+Thu, 06 Jul 2023 00:16:20 GMT
+
+_Version update only_
+
+## 4.0.251
+Tue, 04 Jul 2023 00:18:47 GMT
+
+_Version update only_
+
+## 4.0.250
+Mon, 19 Jun 2023 22:40:21 GMT
+
+_Version update only_
+
+## 4.0.249
+Thu, 15 Jun 2023 00:21:02 GMT
+
+_Version update only_
+
+## 4.0.248
+Wed, 14 Jun 2023 00:19:42 GMT
+
+_Version update only_
+
+## 4.0.247
+Tue, 13 Jun 2023 15:17:21 GMT
+
+_Version update only_
+
+## 4.0.246
+Tue, 13 Jun 2023 01:49:02 GMT
+
+_Version update only_
+
+## 4.0.245
+Fri, 09 Jun 2023 18:05:35 GMT
+
+_Version update only_
+
+## 4.0.244
+Fri, 09 Jun 2023 15:23:15 GMT
+
+_Version update only_
+
+## 4.0.243
+Fri, 09 Jun 2023 00:19:49 GMT
+
+_Version update only_
+
+## 4.0.242
+Thu, 08 Jun 2023 15:21:17 GMT
+
+_Version update only_
+
+## 4.0.241
+Thu, 08 Jun 2023 00:20:03 GMT
+
+_Version update only_
+
+## 4.0.240
+Wed, 07 Jun 2023 22:45:17 GMT
+
+_Version update only_
+
+## 4.0.239
+Tue, 06 Jun 2023 02:52:51 GMT
+
+_Version update only_
+
+## 4.0.238
+Mon, 05 Jun 2023 21:45:21 GMT
+
+_Version update only_
+
+## 4.0.237
+Fri, 02 Jun 2023 02:01:13 GMT
+
+_Version update only_
+
+## 4.0.236
+Mon, 29 May 2023 15:21:15 GMT
+
+_Version update only_
+
+## 4.0.235
+Mon, 22 May 2023 06:34:33 GMT
+
+_Version update only_
+
+## 4.0.234
+Fri, 12 May 2023 00:23:05 GMT
+
+_Version update only_
+
+## 4.0.233
+Thu, 04 May 2023 00:20:29 GMT
+
+_Version update only_
+
+## 4.0.232
+Mon, 01 May 2023 15:23:20 GMT
+
+_Version update only_
+
+## 4.0.231
+Sat, 29 Apr 2023 00:23:03 GMT
+
+_Version update only_
+
+## 4.0.230
+Thu, 27 Apr 2023 17:18:43 GMT
+
+_Version update only_
+
+## 4.0.229
+Tue, 04 Apr 2023 22:36:28 GMT
+
+_Version update only_
+
+## 4.0.228
+Sat, 18 Mar 2023 00:20:56 GMT
+
+_Version update only_
+
+## 4.0.227
+Fri, 10 Feb 2023 01:18:51 GMT
+
+_Version update only_
+
+## 4.0.226
+Sun, 05 Feb 2023 03:02:02 GMT
+
+_Version update only_
+
+## 4.0.225
+Wed, 01 Feb 2023 02:16:34 GMT
+
+_Version update only_
+
+## 4.0.224
+Mon, 30 Jan 2023 16:22:31 GMT
+
+_Version update only_
+
+## 4.0.223
+Mon, 30 Jan 2023 00:55:44 GMT
+
+_Version update only_
+
+## 4.0.222
+Thu, 26 Jan 2023 02:55:10 GMT
+
+_Version update only_
+
+## 4.0.221
+Wed, 25 Jan 2023 07:26:55 GMT
+
+_Version update only_
+
+## 4.0.220
+Wed, 18 Jan 2023 22:44:12 GMT
+
+_Version update only_
+
+## 4.0.219
+Tue, 20 Dec 2022 01:18:22 GMT
+
+_Version update only_
+
+## 4.0.218
+Fri, 09 Dec 2022 16:18:28 GMT
+
+_Version update only_
+
+## 4.0.217
+Mon, 05 Dec 2022 16:16:09 GMT
+
+_Version update only_
+
+## 4.0.216
+Tue, 29 Nov 2022 01:16:50 GMT
+
+_Version update only_
+
+## 4.0.215
+Tue, 08 Nov 2022 01:20:56 GMT
+
+_Version update only_
+
+## 4.0.214
+Wed, 26 Oct 2022 00:16:16 GMT
+
+_Version update only_
+
+## 4.0.213
+Mon, 17 Oct 2022 22:14:21 GMT
+
+_Version update only_
+
+## 4.0.212
+Mon, 17 Oct 2022 15:16:00 GMT
+
+_Version update only_
+
+## 4.0.211
+Fri, 14 Oct 2022 15:26:32 GMT
+
+_Version update only_
+
+## 4.0.210
+Thu, 13 Oct 2022 00:20:15 GMT
+
+_Version update only_
+
+## 4.0.209
+Tue, 11 Oct 2022 23:49:12 GMT
+
+_Version update only_
+
+## 4.0.208
+Mon, 10 Oct 2022 15:23:44 GMT
+
+_Version update only_
+
+## 4.0.207
+Thu, 29 Sep 2022 07:13:06 GMT
+
+_Version update only_
+
+## 4.0.206
+Tue, 27 Sep 2022 22:17:20 GMT
+
+_Version update only_
+
+## 4.0.205
+Wed, 21 Sep 2022 20:21:10 GMT
+
+_Version update only_
+
+## 4.0.204
+Thu, 15 Sep 2022 00:18:52 GMT
+
+_Version update only_
+
+## 4.0.203
+Tue, 13 Sep 2022 00:16:55 GMT
+
+_Version update only_
+
+## 4.0.202
+Mon, 12 Sep 2022 22:27:48 GMT
+
+_Version update only_
+
+## 4.0.201
+Fri, 02 Sep 2022 17:48:43 GMT
+
+_Version update only_
+
+## 4.0.200
+Wed, 31 Aug 2022 01:45:06 GMT
+
+_Version update only_
+
+## 4.0.199
+Wed, 31 Aug 2022 00:42:46 GMT
+
+_Version update only_
+
+## 4.0.198
+Wed, 24 Aug 2022 03:01:22 GMT
+
+_Version update only_
+
+## 4.0.197
+Wed, 24 Aug 2022 00:14:38 GMT
+
+_Version update only_
+
+## 4.0.196
+Fri, 19 Aug 2022 00:17:20 GMT
+
+_Version update only_
+
+## 4.0.195
+Wed, 10 Aug 2022 09:52:12 GMT
+
+_Version update only_
+
+## 4.0.194
+Wed, 10 Aug 2022 08:12:16 GMT
+
+_Version update only_
+
+## 4.0.193
+Wed, 03 Aug 2022 18:40:35 GMT
+
+_Version update only_
+
+## 4.0.192
+Mon, 01 Aug 2022 02:45:32 GMT
+
+_Version update only_
+
+## 4.0.191
+Thu, 21 Jul 2022 23:30:28 GMT
+
+_Version update only_
+
+## 4.0.190
+Thu, 21 Jul 2022 00:16:14 GMT
+
+_Version update only_
+
+## 4.0.189
+Wed, 13 Jul 2022 21:31:13 GMT
+
+_Version update only_
+
+## 4.0.188
+Fri, 08 Jul 2022 15:17:47 GMT
+
+_Version update only_
+
+## 4.0.187
+Mon, 04 Jul 2022 15:15:13 GMT
+
+_Version update only_
+
+## 4.0.186
+Thu, 30 Jun 2022 04:48:54 GMT
+
+_Version update only_
+
+## 4.0.185
+Tue, 28 Jun 2022 22:47:14 GMT
+
+_Version update only_
+
+## 4.0.184
+Tue, 28 Jun 2022 00:23:32 GMT
+
+_Version update only_
+
+## 4.0.183
+Mon, 27 Jun 2022 18:43:09 GMT
+
+_Version update only_
+
+## 4.0.182
+Sat, 25 Jun 2022 21:00:40 GMT
+
+_Version update only_
+
+## 4.0.181
+Sat, 25 Jun 2022 01:54:29 GMT
+
+_Version update only_
+
+## 4.0.180
+Fri, 24 Jun 2022 07:16:47 GMT
+
+_Version update only_
+
+## 4.0.179
+Thu, 23 Jun 2022 22:14:25 GMT
+
+_Version update only_
+
+## 4.0.178
+Fri, 17 Jun 2022 09:17:54 GMT
+
+_Version update only_
+
+## 4.0.177
+Fri, 17 Jun 2022 00:16:18 GMT
+
+_Version update only_
+
+## 4.0.176
+Tue, 07 Jun 2022 09:37:05 GMT
+
+_Version update only_
+
+## 4.0.175
+Wed, 25 May 2022 22:25:08 GMT
+
+_Version update only_
+
+## 4.0.174
+Thu, 19 May 2022 15:13:21 GMT
+
+_Version update only_
+
+## 4.0.173
+Sat, 14 May 2022 03:01:27 GMT
+
+_Version update only_
+
+## 4.0.172
+Tue, 10 May 2022 01:20:43 GMT
+
+_Version update only_
+
+## 4.0.171
+Wed, 04 May 2022 23:29:13 GMT
+
+_Version update only_
+
+## 4.0.170
+Tue, 26 Apr 2022 00:10:15 GMT
+
+_Version update only_
+
+## 4.0.169
+Sat, 23 Apr 2022 02:13:07 GMT
+
+_Version update only_
+
+## 4.0.168
+Fri, 15 Apr 2022 00:12:36 GMT
+
+_Version update only_
+
+## 4.0.167
+Wed, 13 Apr 2022 15:12:41 GMT
+
+_Version update only_
+
+## 4.0.166
+Tue, 12 Apr 2022 23:29:34 GMT
+
+_Version update only_
+
+## 4.0.165
+Tue, 12 Apr 2022 02:58:32 GMT
+
+_Version update only_
+
+## 4.0.164
+Sat, 09 Apr 2022 19:07:48 GMT
+
+_Version update only_
+
+## 4.0.163
+Sat, 09 Apr 2022 02:24:27 GMT
+
+### Patches
+
+- Rename the "master" branch to "main".
+
+## 4.0.162
+Fri, 08 Apr 2022 20:05:59 GMT
+
+_Version update only_
+
+## 4.0.161
+Wed, 06 Apr 2022 22:35:23 GMT
+
+_Version update only_
+
+## 4.0.160
+Thu, 31 Mar 2022 02:06:05 GMT
+
+_Version update only_
+
+## 4.0.159
+Sat, 19 Mar 2022 08:05:38 GMT
+
+_Version update only_
+
+## 4.0.158
+Tue, 15 Mar 2022 19:15:53 GMT
+
+_Version update only_
 
 ## 4.0.157
 Fri, 11 Feb 2022 10:30:26 GMT

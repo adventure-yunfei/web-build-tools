@@ -4,15 +4,17 @@
 // This file is used during development to load the built-in plugins and to bypass
 // some other checks
 
-import * as rushLib from '@microsoft/rush-lib';
+import * as rushLib from '@microsoft/rush-lib/lib/index';
 import { PackageJsonLookup, Import } from '@rushstack/node-core-library';
 
 import { RushCommandSelector } from './RushCommandSelector';
 
 const builtInPluginConfigurations: rushLib._IBuiltInPluginConfiguration[] = [];
 
-function includePlugin(pluginName: string): void {
-  const pluginPackageName: string = `@rushstack/${pluginName}`;
+function includePlugin(pluginName: string, pluginPackageName?: string): void {
+  if (!pluginPackageName) {
+    pluginPackageName = `@rushstack/${pluginName}`;
+  }
   builtInPluginConfigurations.push({
     packageName: pluginPackageName,
     pluginName: pluginName,
@@ -25,6 +27,9 @@ function includePlugin(pluginName: string): void {
 
 includePlugin('rush-amazon-s3-build-cache-plugin');
 includePlugin('rush-azure-storage-build-cache-plugin');
+includePlugin('rush-http-build-cache-plugin');
+// Including this here so that developers can reuse it without installing the plugin a second time
+includePlugin('rush-azure-interactive-auth-plugin', '@rushstack/rush-azure-storage-build-cache-plugin');
 
 const currentPackageVersion: string = PackageJsonLookup.loadOwnPackageJson(__dirname).version;
 RushCommandSelector.execute(currentPackageVersion, rushLib, {

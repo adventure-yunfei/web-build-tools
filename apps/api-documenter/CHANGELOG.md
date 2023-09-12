@@ -1,6 +1,571 @@
+# Change Log - api-extractor custom version
+
+## 7.13.30-rc.0
+
+- 新增完整的引用类型链接支持
+
 # Change Log - @microsoft/api-documenter
 
-This log was last generated on Fri, 11 Feb 2022 10:30:25 GMT and should not be manually modified.
+This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+
+## 7.22.33
+Tue, 08 Aug 2023 07:10:39 GMT
+
+_Version update only_
+
+## 7.22.32
+Mon, 31 Jul 2023 15:19:05 GMT
+
+_Version update only_
+
+## 7.22.31
+Sat, 29 Jul 2023 00:22:50 GMT
+
+_Version update only_
+
+## 7.22.30
+Thu, 20 Jul 2023 20:47:28 GMT
+
+_Version update only_
+
+## 7.22.29
+Wed, 19 Jul 2023 00:20:31 GMT
+
+_Version update only_
+
+## 7.22.28
+Fri, 14 Jul 2023 15:20:45 GMT
+
+_Version update only_
+
+## 7.22.27
+Thu, 13 Jul 2023 00:22:37 GMT
+
+_Version update only_
+
+## 7.22.26
+Wed, 12 Jul 2023 15:20:39 GMT
+
+_Version update only_
+
+## 7.22.25
+Wed, 12 Jul 2023 00:23:29 GMT
+
+_Version update only_
+
+## 7.22.24
+Fri, 07 Jul 2023 00:19:32 GMT
+
+_Version update only_
+
+## 7.22.23
+Thu, 06 Jul 2023 00:16:19 GMT
+
+_Version update only_
+
+## 7.22.22
+Tue, 04 Jul 2023 00:18:47 GMT
+
+_Version update only_
+
+## 7.22.21
+Mon, 19 Jun 2023 22:40:21 GMT
+
+_Version update only_
+
+## 7.22.20
+Thu, 15 Jun 2023 00:21:01 GMT
+
+_Version update only_
+
+## 7.22.19
+Wed, 14 Jun 2023 00:19:42 GMT
+
+_Version update only_
+
+## 7.22.18
+Tue, 13 Jun 2023 15:17:20 GMT
+
+_Version update only_
+
+## 7.22.17
+Tue, 13 Jun 2023 01:49:01 GMT
+
+_Version update only_
+
+## 7.22.16
+Fri, 09 Jun 2023 18:05:34 GMT
+
+_Version update only_
+
+## 7.22.15
+Fri, 09 Jun 2023 15:23:15 GMT
+
+_Version update only_
+
+## 7.22.14
+Fri, 09 Jun 2023 00:19:49 GMT
+
+_Version update only_
+
+## 7.22.13
+Thu, 08 Jun 2023 15:21:17 GMT
+
+_Version update only_
+
+## 7.22.12
+Thu, 08 Jun 2023 00:20:02 GMT
+
+_Version update only_
+
+## 7.22.11
+Wed, 07 Jun 2023 22:45:16 GMT
+
+_Version update only_
+
+## 7.22.10
+Tue, 06 Jun 2023 02:52:51 GMT
+
+_Version update only_
+
+## 7.22.9
+Mon, 05 Jun 2023 21:45:21 GMT
+
+_Version update only_
+
+## 7.22.8
+Fri, 02 Jun 2023 02:01:12 GMT
+
+_Version update only_
+
+## 7.22.7
+Mon, 29 May 2023 15:21:15 GMT
+
+_Version update only_
+
+## 7.22.6
+Mon, 22 May 2023 06:34:33 GMT
+
+_Version update only_
+
+## 7.22.5
+Fri, 12 May 2023 00:23:05 GMT
+
+_Version update only_
+
+## 7.22.4
+Thu, 04 May 2023 00:20:28 GMT
+
+_Version update only_
+
+## 7.22.3
+Mon, 01 May 2023 15:23:19 GMT
+
+_Version update only_
+
+## 7.22.2
+Sat, 29 Apr 2023 00:23:02 GMT
+
+_Version update only_
+
+## 7.22.1
+Thu, 27 Apr 2023 17:18:42 GMT
+
+_Version update only_
+
+## 7.22.0
+Thu, 27 Apr 2023 00:22:57 GMT
+
+### Minor changes
+
+- Update OfficeYamlDocumenter to label all samples as TypeScript and no longer escape asterisks.
+
+## 7.21.7
+Tue, 04 Apr 2023 22:36:28 GMT
+
+_Version update only_
+
+## 7.21.6
+Sat, 18 Mar 2023 00:20:56 GMT
+
+_Version update only_
+
+## 7.21.5
+Fri, 10 Feb 2023 01:18:50 GMT
+
+_Version update only_
+
+## 7.21.4
+Sun, 05 Feb 2023 03:02:02 GMT
+
+_Version update only_
+
+## 7.21.3
+Wed, 01 Feb 2023 02:16:34 GMT
+
+_Version update only_
+
+## 7.21.2
+Mon, 30 Jan 2023 16:22:30 GMT
+
+_Version update only_
+
+## 7.21.1
+Mon, 30 Jan 2023 00:55:44 GMT
+
+_Version update only_
+
+## 7.21.0
+Sun, 29 Jan 2023 20:09:58 GMT
+
+### Minor changes
+
+- Fix an issue where `<b>`/`<i>` tags sometimes interfered with parsing of other Markdown on the same line; italics and boldface are now emitted using `*` and `_`
+
+## 7.20.1
+Thu, 26 Jan 2023 02:55:10 GMT
+
+_Version update only_
+
+## 7.20.0
+Wed, 25 Jan 2023 07:26:55 GMT
+
+### Minor changes
+
+- Display the 'abstract' modifier for classes and members (GitHub #3661)
+
+## 7.19.28
+Wed, 18 Jan 2023 22:44:12 GMT
+
+_Version update only_
+
+## 7.19.27
+Tue, 20 Dec 2022 01:18:22 GMT
+
+_Version update only_
+
+## 7.19.26
+Fri, 09 Dec 2022 16:18:28 GMT
+
+_Version update only_
+
+## 7.19.25
+Tue, 29 Nov 2022 01:16:49 GMT
+
+_Version update only_
+
+## 7.19.24
+Tue, 08 Nov 2022 01:20:55 GMT
+
+_Version update only_
+
+## 7.19.23
+Wed, 26 Oct 2022 00:16:16 GMT
+
+### Patches
+
+- Update the @microsoft/tsdoc dependency version to 0.14.2.
+
+## 7.19.22
+Mon, 17 Oct 2022 22:14:21 GMT
+
+_Version update only_
+
+## 7.19.21
+Mon, 17 Oct 2022 15:16:00 GMT
+
+_Version update only_
+
+## 7.19.20
+Fri, 14 Oct 2022 15:26:31 GMT
+
+_Version update only_
+
+## 7.19.19
+Thu, 13 Oct 2022 00:20:15 GMT
+
+_Version update only_
+
+## 7.19.18
+Tue, 11 Oct 2022 23:49:12 GMT
+
+_Version update only_
+
+## 7.19.17
+Mon, 10 Oct 2022 15:23:44 GMT
+
+_Version update only_
+
+## 7.19.16
+Thu, 29 Sep 2022 07:13:06 GMT
+
+_Version update only_
+
+## 7.19.15
+Tue, 27 Sep 2022 22:17:20 GMT
+
+_Version update only_
+
+## 7.19.14
+Wed, 21 Sep 2022 20:21:10 GMT
+
+_Version update only_
+
+## 7.19.13
+Thu, 15 Sep 2022 00:18:51 GMT
+
+_Version update only_
+
+## 7.19.12
+Tue, 13 Sep 2022 00:16:55 GMT
+
+_Version update only_
+
+## 7.19.11
+Mon, 12 Sep 2022 22:27:48 GMT
+
+_Version update only_
+
+## 7.19.10
+Fri, 02 Sep 2022 17:48:43 GMT
+
+_Version update only_
+
+## 7.19.9
+Wed, 31 Aug 2022 01:45:06 GMT
+
+_Version update only_
+
+## 7.19.8
+Wed, 31 Aug 2022 00:42:46 GMT
+
+_Version update only_
+
+## 7.19.7
+Wed, 24 Aug 2022 03:01:22 GMT
+
+_Version update only_
+
+## 7.19.6
+Wed, 24 Aug 2022 00:14:38 GMT
+
+_Version update only_
+
+## 7.19.5
+Fri, 19 Aug 2022 00:17:19 GMT
+
+_Version update only_
+
+## 7.19.4
+Wed, 10 Aug 2022 09:52:12 GMT
+
+_Version update only_
+
+## 7.19.3
+Wed, 10 Aug 2022 08:12:16 GMT
+
+_Version update only_
+
+## 7.19.2
+Wed, 03 Aug 2022 18:40:35 GMT
+
+_Version update only_
+
+## 7.19.1
+Mon, 01 Aug 2022 02:45:32 GMT
+
+_Version update only_
+
+## 7.19.0
+Thu, 21 Jul 2022 23:30:27 GMT
+
+### Minor changes
+
+- Add showInheritedMembers config to api-documenter that allows it to show an API item's inherited members.
+
+## 7.18.4
+Thu, 21 Jul 2022 00:16:14 GMT
+
+_Version update only_
+
+## 7.18.3
+Wed, 13 Jul 2022 21:31:13 GMT
+
+_Version update only_
+
+## 7.18.2
+Fri, 08 Jul 2022 15:17:46 GMT
+
+_Version update only_
+
+## 7.18.1
+Mon, 04 Jul 2022 15:15:13 GMT
+
+_Version update only_
+
+## 7.18.0
+Thu, 30 Jun 2022 04:48:53 GMT
+
+### Minor changes
+
+- Show protected and readonly modifiers for relevant API items
+
+## 7.17.26
+Tue, 28 Jun 2022 22:47:13 GMT
+
+_Version update only_
+
+## 7.17.25
+Tue, 28 Jun 2022 00:23:32 GMT
+
+_Version update only_
+
+## 7.17.24
+Mon, 27 Jun 2022 18:43:09 GMT
+
+_Version update only_
+
+## 7.17.23
+Sat, 25 Jun 2022 21:00:40 GMT
+
+### Patches
+
+- Minor change to support the new ApiInitializerMixin mixin.
+
+## 7.17.22
+Sat, 25 Jun 2022 01:54:29 GMT
+
+_Version update only_
+
+## 7.17.21
+Fri, 24 Jun 2022 07:16:47 GMT
+
+_Version update only_
+
+## 7.17.20
+Thu, 23 Jun 2022 22:14:24 GMT
+
+_Version update only_
+
+## 7.17.19
+Fri, 17 Jun 2022 09:17:54 GMT
+
+_Version update only_
+
+## 7.17.18
+Fri, 17 Jun 2022 00:16:18 GMT
+
+_Version update only_
+
+## 7.17.17
+Tue, 07 Jun 2022 09:37:04 GMT
+
+_Version update only_
+
+## 7.17.16
+Wed, 25 May 2022 22:25:07 GMT
+
+_Version update only_
+
+## 7.17.15
+Thu, 19 May 2022 15:13:20 GMT
+
+_Version update only_
+
+## 7.17.14
+Sat, 14 May 2022 03:01:27 GMT
+
+_Version update only_
+
+## 7.17.13
+Tue, 10 May 2022 01:20:43 GMT
+
+_Version update only_
+
+## 7.17.12
+Wed, 04 May 2022 23:29:13 GMT
+
+_Version update only_
+
+## 7.17.11
+Tue, 26 Apr 2022 00:10:15 GMT
+
+_Version update only_
+
+## 7.17.10
+Sat, 23 Apr 2022 02:13:06 GMT
+
+_Version update only_
+
+## 7.17.9
+Fri, 15 Apr 2022 00:12:36 GMT
+
+_Version update only_
+
+## 7.17.8
+Wed, 13 Apr 2022 15:12:40 GMT
+
+_Version update only_
+
+## 7.17.7
+Tue, 12 Apr 2022 23:29:34 GMT
+
+_Version update only_
+
+## 7.17.6
+Tue, 12 Apr 2022 02:58:32 GMT
+
+### Patches
+
+- Update TSDoc dependencies.
+
+## 7.17.5
+Sat, 09 Apr 2022 19:07:48 GMT
+
+_Version update only_
+
+## 7.17.4
+Sat, 09 Apr 2022 02:24:26 GMT
+
+### Patches
+
+- Rename the "master" branch to "main".
+
+## 7.17.3
+Fri, 08 Apr 2022 20:05:59 GMT
+
+_Version update only_
+
+## 7.17.2
+Wed, 06 Apr 2022 22:35:23 GMT
+
+_Version update only_
+
+## 7.17.1
+Tue, 05 Apr 2022 15:12:22 GMT
+
+### Patches
+
+- Update requirement set links in OfficeYamlDocumenter
+
+## 7.17.0
+Thu, 31 Mar 2022 02:06:05 GMT
+
+### Minor changes
+
+- Updated api-documenter to surface whether a parameter is optional.
+
+## 7.16.0
+Sat, 19 Mar 2022 08:05:37 GMT
+
+### Minor changes
+
+- Add --yaml-format flag for `api-documenter yaml` command, which allows for choosing between UDP (DocFX 2.x) and SDP (DocFX 3.x)
+
+## 7.15.4
+Tue, 15 Mar 2022 19:15:53 GMT
+
+_Version update only_
 
 ## 7.15.3
 Fri, 11 Feb 2022 10:30:25 GMT
@@ -2308,7 +2873,7 @@ Wed, 21 Mar 2018 21:05:22 GMT
 ### Patches
 
 - Change heading for code snippets section from `## Snippets` to `#### Examples`.
-- Customize the `API Set #.#` hyperlink target by host. 
+- Customize the `API Set #.#` hyperlink target by host.
 - Designate proper language for each code snippet (TypeScript or JavaScript).
 
 ## 1.1.24

@@ -37,6 +37,8 @@ function createParser(): DynamicCommandLineParser {
     description: 'The action remainder'
   });
 
+  commandLineParser._registerDefinedParameters();
+
   return commandLineParser;
 }
 
@@ -57,6 +59,27 @@ describe(CommandLineRemainder.name, () => {
     const commandLineParser: CommandLineParser = createParser();
     const action: CommandLineAction = commandLineParser.getAction('run');
     const args: string[] = ['run', '--title', 'The title', 'the', 'remaining', 'args'];
+
+    await commandLineParser.execute(args);
+
+    expect(commandLineParser.selectedAction).toBe(action);
+
+    const copiedArgs: string[] = [];
+    for (const parameter of action.parameters) {
+      copiedArgs.push(`### ${parameter.longName} output: ###`);
+      parameter.appendToArgList(copiedArgs);
+    }
+
+    copiedArgs.push(`### remainder output: ###`);
+    action.remainder!.appendToArgList(copiedArgs);
+
+    expect(copiedArgs).toMatchSnapshot();
+  });
+
+  it('parses an action input with remainder flagged options', async () => {
+    const commandLineParser: CommandLineParser = createParser();
+    const action: CommandLineAction = commandLineParser.getAction('run');
+    const args: string[] = ['run', '--title', 'The title', '--', '--the', 'remaining', '--args'];
 
     await commandLineParser.execute(args);
 

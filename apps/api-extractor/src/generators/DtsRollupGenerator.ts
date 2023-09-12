@@ -37,6 +37,13 @@ export enum DtsRollupKind {
   /**
    * Generate a *.d.ts file for a preview release.
    * This output file will contain all definitions that are reachable from the entry point,
+   * except definitions marked as \@internal.
+   */
+  AlphaRelease,
+
+  /**
+   * Generate a *.d.ts file for a preview release.
+   * This output file will contain all definitions that are reachable from the entry point,
    * except definitions marked as \@alpha or \@internal.
    */
   BetaRelease,
@@ -108,7 +115,7 @@ export class DtsRollupGenerator {
           : ReleaseTag.None;
 
         if (this._shouldIncludeReleaseTag(maxEffectiveReleaseTag, dtsKind)) {
-          DtsEmitHelpers.emitImport(writer, entity, astImport);
+          DtsEmitHelpers.emitImport(writer, collector, entity, astImport);
         }
       }
     }
@@ -262,6 +269,11 @@ export class DtsRollupGenerator {
       case ts.SyntaxKind.DefaultKeyword:
       case ts.SyntaxKind.DeclareKeyword:
         // Delete any explicit "export" or "declare" keywords -- we will re-add them below
+        span.modification.skipAll();
+        break;
+
+      case ts.SyntaxKind.ImportEqualsDeclaration:
+        // Delete "import Foo = Bar.Baz;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
         span.modification.skipAll();
         break;
 
@@ -445,10 +457,20 @@ export class DtsRollupGenerator {
     switch (dtsKind) {
       case DtsRollupKind.InternalRelease:
         return true;
-      case DtsRollupKind.BetaRelease:
-        // NOTE: If the release tag is "None", then we don't have enough information to trim it
+      case DtsRollupKind.AlphaRelease:
         return (
-          releaseTag === ReleaseTag.Beta || releaseTag === ReleaseTag.Public || releaseTag === ReleaseTag.None
+          releaseTag === ReleaseTag.Alpha ||
+          releaseTag === ReleaseTag.Beta ||
+          releaseTag === ReleaseTag.Public ||
+          // NOTE: If the release tag is "None", then we don't have enough information to trim it
+          releaseTag === ReleaseTag.None
+        );
+      case DtsRollupKind.BetaRelease:
+        return (
+          releaseTag === ReleaseTag.Beta ||
+          releaseTag === ReleaseTag.Public ||
+          // NOTE: If the release tag is "None", then we don't have enough information to trim it
+          releaseTag === ReleaseTag.None
         );
       case DtsRollupKind.PublicRelease:
         return releaseTag === ReleaseTag.Public || releaseTag === ReleaseTag.None;

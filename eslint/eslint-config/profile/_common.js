@@ -204,7 +204,7 @@ function buildRules(profile) {
           // - @typescript-eslint/interface-name-prefix
           // - @typescript-eslint/member-naming
           //
-          // Docs: https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/naming-convention.md
+          // Docs: https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/docs/rules/naming-convention.md
           '@typescript-eslint/naming-convention': [
             'warn',
             ...macros.expandNamingConventionSelectors([
@@ -418,7 +418,7 @@ function buildRules(profile) {
           //                    just to save some typing.
           //
           // STANDARDIZED BY:   @typescript-eslint\eslint-plugin\dist\configs\recommended.json
-          '@typescript-eslint/no-parameter-properties': 'warn',
+          '@typescript-eslint/parameter-properties': 'warn',
 
           // RATIONALE:         When left in shipping code, unused variables often indicate a mistake.  Dead code
           //                    may impact performance.

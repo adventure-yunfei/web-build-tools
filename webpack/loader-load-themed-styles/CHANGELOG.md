@@ -1,6 +1,642 @@
 # Change Log - @microsoft/loader-load-themed-styles
 
-This log was last generated on Tue, 15 Feb 2022 01:39:45 GMT and should not be manually modified.
+This log was last generated on Fri, 01 Sep 2023 04:53:58 GMT and should not be manually modified.
+
+## 2.0.72
+Fri, 01 Sep 2023 04:53:58 GMT
+
+_Version update only_
+
+## 2.0.71
+Tue, 08 Aug 2023 07:10:39 GMT
+
+_Version update only_
+
+## 2.0.70
+Sat, 05 Aug 2023 00:20:19 GMT
+
+_Version update only_
+
+## 2.0.69
+Fri, 04 Aug 2023 00:22:37 GMT
+
+_Version update only_
+
+## 2.0.68
+Mon, 31 Jul 2023 15:19:05 GMT
+
+_Version update only_
+
+## 2.0.67
+Sat, 29 Jul 2023 00:22:50 GMT
+
+_Version update only_
+
+## 2.0.66
+Thu, 20 Jul 2023 20:47:28 GMT
+
+_Version update only_
+
+## 2.0.65
+Wed, 19 Jul 2023 00:20:31 GMT
+
+_Version update only_
+
+## 2.0.64
+Mon, 17 Jul 2023 15:20:25 GMT
+
+_Version update only_
+
+## 2.0.63
+Fri, 14 Jul 2023 15:20:45 GMT
+
+_Version update only_
+
+## 2.0.62
+Thu, 13 Jul 2023 00:22:37 GMT
+
+_Version update only_
+
+## 2.0.61
+Wed, 12 Jul 2023 15:20:39 GMT
+
+_Version update only_
+
+## 2.0.60
+Wed, 12 Jul 2023 00:23:29 GMT
+
+_Version update only_
+
+## 2.0.59
+Fri, 07 Jul 2023 00:19:32 GMT
+
+_Version update only_
+
+## 2.0.58
+Thu, 06 Jul 2023 00:16:19 GMT
+
+_Version update only_
+
+## 2.0.57
+Tue, 04 Jul 2023 00:18:47 GMT
+
+_Version update only_
+
+## 2.0.56
+Mon, 19 Jun 2023 22:40:21 GMT
+
+_Version update only_
+
+## 2.0.55
+Thu, 15 Jun 2023 00:21:01 GMT
+
+_Version update only_
+
+## 2.0.54
+Wed, 14 Jun 2023 00:19:42 GMT
+
+_Version update only_
+
+## 2.0.53
+Tue, 13 Jun 2023 15:17:20 GMT
+
+_Version update only_
+
+## 2.0.52
+Tue, 13 Jun 2023 01:49:01 GMT
+
+_Version update only_
+
+## 2.0.51
+Fri, 09 Jun 2023 18:05:35 GMT
+
+_Version update only_
+
+## 2.0.50
+Fri, 09 Jun 2023 15:23:15 GMT
+
+_Version update only_
+
+## 2.0.49
+Fri, 09 Jun 2023 00:19:49 GMT
+
+_Version update only_
+
+## 2.0.48
+Thu, 08 Jun 2023 15:21:17 GMT
+
+_Version update only_
+
+## 2.0.47
+Thu, 08 Jun 2023 00:20:02 GMT
+
+_Version update only_
+
+## 2.0.46
+Wed, 07 Jun 2023 22:45:16 GMT
+
+_Version update only_
+
+## 2.0.45
+Tue, 06 Jun 2023 02:52:51 GMT
+
+_Version update only_
+
+## 2.0.44
+Mon, 05 Jun 2023 21:45:21 GMT
+
+_Version update only_
+
+## 2.0.43
+Fri, 02 Jun 2023 02:01:12 GMT
+
+_Version update only_
+
+## 2.0.42
+Fri, 02 Jun 2023 00:24:45 GMT
+
+_Version update only_
+
+## 2.0.41
+Mon, 29 May 2023 15:21:15 GMT
+
+_Version update only_
+
+## 2.0.40
+Mon, 22 May 2023 06:34:33 GMT
+
+_Version update only_
+
+## 2.0.39
+Fri, 12 May 2023 00:23:05 GMT
+
+_Version update only_
+
+## 2.0.38
+Thu, 11 May 2023 00:17:21 GMT
+
+_Version update only_
+
+## 2.0.37
+Thu, 04 May 2023 00:20:28 GMT
+
+_Version update only_
+
+## 2.0.36
+Mon, 01 May 2023 15:23:19 GMT
+
+_Version update only_
+
+## 2.0.35
+Sat, 29 Apr 2023 00:23:02 GMT
+
+_Version update only_
+
+## 2.0.34
+Thu, 27 Apr 2023 17:18:42 GMT
+
+_Version update only_
+
+## 2.0.33
+Thu, 20 Apr 2023 15:16:55 GMT
+
+_Version update only_
+
+## 2.0.32
+Tue, 11 Apr 2023 00:23:22 GMT
+
+_Version update only_
+
+## 2.0.31
+Fri, 07 Apr 2023 22:19:21 GMT
+
+_Version update only_
+
+## 2.0.30
+Tue, 04 Apr 2023 22:36:28 GMT
+
+_Version update only_
+
+## 2.0.29
+Sat, 18 Mar 2023 00:20:56 GMT
+
+_Version update only_
+
+## 2.0.28
+Sat, 11 Mar 2023 01:24:51 GMT
+
+_Version update only_
+
+## 2.0.27
+Fri, 10 Feb 2023 01:18:50 GMT
+
+_Version update only_
+
+## 2.0.26
+Sun, 05 Feb 2023 03:02:02 GMT
+
+_Version update only_
+
+## 2.0.25
+Wed, 01 Feb 2023 02:16:34 GMT
+
+_Version update only_
+
+## 2.0.24
+Tue, 31 Jan 2023 01:23:23 GMT
+
+_Version update only_
+
+## 2.0.23
+Mon, 30 Jan 2023 16:22:31 GMT
+
+_Version update only_
+
+## 2.0.22
+Mon, 30 Jan 2023 00:55:44 GMT
+
+_Version update only_
+
+## 2.0.21
+Thu, 26 Jan 2023 02:55:10 GMT
+
+_Version update only_
+
+## 2.0.20
+Wed, 25 Jan 2023 07:26:55 GMT
+
+_Version update only_
+
+## 2.0.19
+Sun, 22 Jan 2023 20:37:08 GMT
+
+_Version update only_
+
+## 2.0.18
+Wed, 18 Jan 2023 22:44:12 GMT
+
+_Version update only_
+
+## 2.0.17
+Tue, 20 Dec 2022 01:18:22 GMT
+
+_Version update only_
+
+## 2.0.16
+Fri, 09 Dec 2022 16:18:28 GMT
+
+_Version update only_
+
+## 2.0.15
+Fri, 02 Dec 2022 01:15:42 GMT
+
+_Version update only_
+
+## 2.0.14
+Thu, 01 Dec 2022 03:22:36 GMT
+
+_Version update only_
+
+## 2.0.13
+Tue, 29 Nov 2022 01:16:49 GMT
+
+_Version update only_
+
+## 2.0.12
+Mon, 14 Nov 2022 05:15:01 GMT
+
+### Patches
+
+- Updating webpack/loader-utils to resolve github advisory CVE-2022-37601. https://github.com/advisories/GHSA-76p3-8jx3-jpfq
+
+## 2.0.11
+Tue, 08 Nov 2022 01:20:55 GMT
+
+_Version update only_
+
+## 2.0.10
+Wed, 26 Oct 2022 15:16:29 GMT
+
+_Version update only_
+
+## 2.0.9
+Wed, 26 Oct 2022 00:16:16 GMT
+
+_Version update only_
+
+## 2.0.8
+Tue, 25 Oct 2022 00:20:44 GMT
+
+_Version update only_
+
+## 2.0.7
+Mon, 17 Oct 2022 22:14:21 GMT
+
+_Version update only_
+
+## 2.0.6
+Mon, 17 Oct 2022 15:16:00 GMT
+
+_Version update only_
+
+## 2.0.5
+Fri, 14 Oct 2022 15:26:32 GMT
+
+_Version update only_
+
+## 2.0.4
+Thu, 13 Oct 2022 00:20:15 GMT
+
+_Version update only_
+
+## 2.0.3
+Tue, 11 Oct 2022 23:49:12 GMT
+
+_Version update only_
+
+## 2.0.2
+Mon, 10 Oct 2022 15:23:44 GMT
+
+_Version update only_
+
+## 2.0.1
+Sat, 08 Oct 2022 02:30:08 GMT
+
+_Version update only_
+
+## 2.0.0
+Thu, 29 Sep 2022 07:13:06 GMT
+
+### Breaking changes
+
+- Make @microsoft/load-themed-styles a peer dependency.
+- Remove the namedExport option.
+
+## 1.9.180
+Tue, 27 Sep 2022 22:17:20 GMT
+
+_Version update only_
+
+## 1.9.179
+Wed, 21 Sep 2022 20:21:10 GMT
+
+_Version update only_
+
+## 1.9.178
+Thu, 15 Sep 2022 00:18:51 GMT
+
+_Version update only_
+
+## 1.9.177
+Tue, 13 Sep 2022 00:16:55 GMT
+
+_Version update only_
+
+## 1.9.176
+Mon, 12 Sep 2022 22:27:48 GMT
+
+_Version update only_
+
+## 1.9.175
+Fri, 02 Sep 2022 17:48:43 GMT
+
+_Version update only_
+
+## 1.9.174
+Wed, 31 Aug 2022 01:45:06 GMT
+
+_Version update only_
+
+## 1.9.173
+Wed, 31 Aug 2022 00:42:46 GMT
+
+_Version update only_
+
+## 1.9.172
+Wed, 24 Aug 2022 03:01:22 GMT
+
+_Version update only_
+
+## 1.9.171
+Wed, 24 Aug 2022 00:14:38 GMT
+
+_Version update only_
+
+## 1.9.170
+Fri, 19 Aug 2022 00:17:19 GMT
+
+_Version update only_
+
+## 1.9.169
+Wed, 10 Aug 2022 09:52:12 GMT
+
+_Version update only_
+
+## 1.9.168
+Wed, 10 Aug 2022 08:12:16 GMT
+
+_Version update only_
+
+## 1.9.167
+Wed, 03 Aug 2022 18:40:35 GMT
+
+_Version update only_
+
+## 1.9.166
+Mon, 01 Aug 2022 02:45:32 GMT
+
+_Version update only_
+
+## 1.9.165
+Thu, 21 Jul 2022 23:30:27 GMT
+
+_Version update only_
+
+## 1.9.164
+Thu, 21 Jul 2022 00:16:14 GMT
+
+_Version update only_
+
+## 1.9.163
+Wed, 13 Jul 2022 21:31:13 GMT
+
+_Version update only_
+
+## 1.9.162
+Fri, 08 Jul 2022 15:17:46 GMT
+
+_Version update only_
+
+## 1.9.161
+Mon, 04 Jul 2022 15:15:13 GMT
+
+_Version update only_
+
+## 1.9.160
+Thu, 30 Jun 2022 04:48:53 GMT
+
+_Version update only_
+
+## 1.9.159
+Tue, 28 Jun 2022 22:47:13 GMT
+
+_Version update only_
+
+## 1.9.158
+Tue, 28 Jun 2022 03:30:39 GMT
+
+### Patches
+
+- Include a missing optional peer dependency on @types/webpack.
+
+## 1.9.157
+Tue, 28 Jun 2022 00:23:32 GMT
+
+_Version update only_
+
+## 1.9.156
+Mon, 27 Jun 2022 18:43:09 GMT
+
+_Version update only_
+
+## 1.9.155
+Sat, 25 Jun 2022 21:00:40 GMT
+
+_Version update only_
+
+## 1.9.154
+Sat, 25 Jun 2022 01:54:29 GMT
+
+_Version update only_
+
+## 1.9.153
+Fri, 24 Jun 2022 07:16:47 GMT
+
+_Version update only_
+
+## 1.9.152
+Thu, 23 Jun 2022 22:14:24 GMT
+
+_Version update only_
+
+## 1.9.151
+Fri, 17 Jun 2022 09:17:54 GMT
+
+_Version update only_
+
+## 1.9.150
+Fri, 17 Jun 2022 00:16:18 GMT
+
+### Patches
+
+- Bump @types/webpack
+
+## 1.9.149
+Tue, 07 Jun 2022 09:37:04 GMT
+
+_Version update only_
+
+## 1.9.148
+Wed, 25 May 2022 22:25:07 GMT
+
+_Version update only_
+
+## 1.9.147
+Thu, 19 May 2022 15:13:20 GMT
+
+_Version update only_
+
+## 1.9.146
+Wed, 18 May 2022 15:10:56 GMT
+
+_Version update only_
+
+## 1.9.145
+Sat, 14 May 2022 03:01:27 GMT
+
+_Version update only_
+
+## 1.9.144
+Tue, 10 May 2022 01:20:43 GMT
+
+_Version update only_
+
+## 1.9.143
+Fri, 06 May 2022 18:54:42 GMT
+
+_Version update only_
+
+## 1.9.142
+Wed, 04 May 2022 23:29:13 GMT
+
+_Version update only_
+
+## 1.9.141
+Tue, 26 Apr 2022 00:10:15 GMT
+
+_Version update only_
+
+## 1.9.140
+Sat, 23 Apr 2022 02:13:06 GMT
+
+_Version update only_
+
+## 1.9.139
+Fri, 15 Apr 2022 00:12:36 GMT
+
+_Version update only_
+
+## 1.9.138
+Wed, 13 Apr 2022 15:12:40 GMT
+
+_Version update only_
+
+## 1.9.137
+Tue, 12 Apr 2022 23:29:34 GMT
+
+_Version update only_
+
+## 1.9.136
+Tue, 12 Apr 2022 02:58:32 GMT
+
+_Version update only_
+
+## 1.9.135
+Sat, 09 Apr 2022 19:07:48 GMT
+
+_Version update only_
+
+## 1.9.134
+Sat, 09 Apr 2022 02:24:26 GMT
+
+### Patches
+
+- Rename the "master" branch to "main".
+
+## 1.9.133
+Fri, 08 Apr 2022 20:05:59 GMT
+
+_Version update only_
+
+## 1.9.132
+Wed, 06 Apr 2022 22:35:23 GMT
+
+_Version update only_
+
+## 1.9.131
+Thu, 31 Mar 2022 02:06:05 GMT
+
+_Version update only_
+
+## 1.9.130
+Sat, 19 Mar 2022 08:05:37 GMT
+
+_Version update only_
+
+## 1.9.129
+Tue, 15 Mar 2022 19:15:53 GMT
+
+_Version update only_
 
 ## 1.9.128
 Tue, 15 Feb 2022 01:39:45 GMT

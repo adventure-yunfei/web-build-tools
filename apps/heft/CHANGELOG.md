@@ -1,6 +1,516 @@
 # Change Log - @rushstack/heft
 
-This log was last generated on Wed, 05 Jan 2022 16:07:47 GMT and should not be manually modified.
+This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+
+## 0.58.2
+Tue, 08 Aug 2023 07:10:39 GMT
+
+_Version update only_
+
+## 0.58.1
+Sat, 29 Jul 2023 00:22:50 GMT
+
+### Patches
+
+- Fix the `toolFinish` lifecycle hook so that it is invoked after the `recordMetrics` hook, rather than before. Ensure that the `toolFinish` lifecycle hook is invoked if the user performs a graceful shutdown of Heft (e.g. via Ctrl+C).
+
+## 0.58.0
+Thu, 20 Jul 2023 20:47:28 GMT
+
+### Minor changes
+
+- BREAKING CHANGE: Update the heft.json "cleanFiles" property and the delete-files-plugin to delete the contents of folders specified by "sourcePath" instead of deleting the folders themselves. To delete the folders, use the "includeGlobs" property to specify the folder to delete.
+
+## 0.57.1
+Wed, 19 Jul 2023 00:20:31 GMT
+
+_Version update only_
+
+## 0.57.0
+Thu, 13 Jul 2023 00:22:37 GMT
+
+### Minor changes
+
+- Support `--clean` in watch mode. Cleaning in watch mode is now performed only during the first-pass of lifecycle or phase operations. Once the clean has been completed, `--clean` will be ignored until the command is restarted
+
+## 0.56.3
+Wed, 12 Jul 2023 15:20:39 GMT
+
+_Version update only_
+
+## 0.56.2
+Fri, 07 Jul 2023 00:19:32 GMT
+
+### Patches
+
+- Revise README.md and UPGRADING.md documentation
+
+## 0.56.1
+Thu, 06 Jul 2023 00:16:19 GMT
+
+_Version update only_
+
+## 0.56.0
+Mon, 19 Jun 2023 22:40:21 GMT
+
+### Minor changes
+
+- Use the `IRigConfig` interface in the `HeftConfiguration` object insteacd of the `RigConfig` class.
+
+## 0.55.2
+Thu, 15 Jun 2023 00:21:01 GMT
+
+_Version update only_
+
+## 0.55.1
+Wed, 14 Jun 2023 00:19:41 GMT
+
+### Patches
+
+- Add MockScopedLogger to help plugin authors with unit testing.
+
+## 0.55.0
+Tue, 13 Jun 2023 15:17:20 GMT
+
+### Minor changes
+
+- Remove the deprecated `cacheFolderPath` property from the session object.
+
+## 0.54.0
+Tue, 13 Jun 2023 01:49:01 GMT
+
+### Minor changes
+
+- Add plugin support for parameter short-names.
+
+## 0.53.1
+Fri, 09 Jun 2023 18:05:34 GMT
+
+### Patches
+
+- Revise CHANGELOG.md to more clearly identify the breaking changes
+
+## 0.53.0
+Fri, 09 Jun 2023 00:19:49 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Remove "taskEvents" heft.json configuration option, and replace it with directly referencing the included plugins. Please read https://github.com/microsoft/rushstack/blob/main/apps/heft/UPGRADING.md
+
+### Patches
+
+- Update UPGRADING.md with new JSON schema URLs
+
+## 0.52.2
+Thu, 08 Jun 2023 15:21:17 GMT
+
+### Patches
+
+- Provide a useful error message when encountering legacy Heft configurations
+
+## 0.52.1
+Thu, 08 Jun 2023 00:20:02 GMT
+
+### Patches
+
+- Remove the concept of the cache folder, since it mostly just causes bugs.
+
+## 0.52.0
+Wed, 07 Jun 2023 22:45:16 GMT
+
+### Minor changes
+
+- Add a new API IHeftTaskSession.parsedCommandLine for accessing the invoked command name
+- (BREAKING CHANGE) The built-in task NodeServicePlugin now supports the "--serve" mode with semantics similar to heft-webpack5-plugin. Please read https://github.com/microsoft/rushstack/blob/main/apps/heft/UPGRADING.md
+
+### Patches
+
+- Add action aliases support. Action aliases can be used to create custom "heft <alias>" commands which call existing Heft commands with optional default arguments.
+
+## 0.51.0
+Fri, 02 Jun 2023 02:01:12 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Overhaul to support splitting single-project builds into more phases than "build" and "test", to align with Rush phased commands. Please read https://github.com/microsoft/rushstack/blob/main/apps/heft/UPGRADING.md
+
+## 0.50.7
+Mon, 29 May 2023 15:21:15 GMT
+
+_Version update only_
+
+## 0.50.6
+Mon, 22 May 2023 06:34:33 GMT
+
+_Version update only_
+
+## 0.50.5
+Fri, 12 May 2023 00:23:05 GMT
+
+_Version update only_
+
+## 0.50.4
+Thu, 04 May 2023 00:20:28 GMT
+
+_Version update only_
+
+## 0.50.3
+Mon, 01 May 2023 15:23:19 GMT
+
+_Version update only_
+
+## 0.50.2
+Sat, 29 Apr 2023 00:23:02 GMT
+
+### Patches
+
+- Fix issues where a terminal logging prefix may be added multiple times to the same line, or only to the first line
+
+## 0.50.1
+Thu, 27 Apr 2023 17:18:42 GMT
+
+_Version update only_
+
+## 0.50.0
+Sat, 18 Mar 2023 00:20:56 GMT
+
+### Minor changes
+
+- Remove monkey-patching of TypeScript for compatibility with 5.0. Refactors how the multi-emit logic works.
+
+## 0.49.7
+Fri, 10 Feb 2023 01:18:50 GMT
+
+_Version update only_
+
+## 0.49.6
+Sun, 05 Feb 2023 03:02:02 GMT
+
+_Version update only_
+
+## 0.49.5
+Wed, 01 Feb 2023 02:16:34 GMT
+
+_Version update only_
+
+## 0.49.4
+Mon, 30 Jan 2023 16:22:30 GMT
+
+_Version update only_
+
+## 0.49.3
+Thu, 26 Jan 2023 02:55:10 GMT
+
+_Version update only_
+
+## 0.49.2
+Wed, 25 Jan 2023 07:26:55 GMT
+
+_Version update only_
+
+## 0.49.1
+Wed, 18 Jan 2023 22:44:12 GMT
+
+_Version update only_
+
+## 0.49.0
+Tue, 20 Dec 2022 01:18:22 GMT
+
+### Minor changes
+
+- Replace Terminal with ITerminal in the API.
+
+## 0.48.9
+Fri, 09 Dec 2022 16:18:28 GMT
+
+_Version update only_
+
+## 0.48.8
+Tue, 08 Nov 2022 01:20:55 GMT
+
+_Version update only_
+
+## 0.48.7
+Wed, 26 Oct 2022 00:16:16 GMT
+
+_Version update only_
+
+## 0.48.6
+Mon, 17 Oct 2022 22:14:21 GMT
+
+_Version update only_
+
+## 0.48.5
+Mon, 17 Oct 2022 15:16:00 GMT
+
+_Version update only_
+
+## 0.48.4
+Fri, 14 Oct 2022 15:26:31 GMT
+
+_Version update only_
+
+## 0.48.3
+Thu, 13 Oct 2022 00:20:15 GMT
+
+_Version update only_
+
+## 0.48.2
+Tue, 11 Oct 2022 23:49:12 GMT
+
+_Version update only_
+
+## 0.48.1
+Mon, 10 Oct 2022 15:23:44 GMT
+
+_Version update only_
+
+## 0.48.0
+Thu, 29 Sep 2022 07:13:06 GMT
+
+### Minor changes
+
+- Add support for TypeScript 4.8.
+
+## 0.47.11
+Tue, 27 Sep 2022 22:17:20 GMT
+
+_Version update only_
+
+## 0.47.10
+Wed, 21 Sep 2022 20:21:10 GMT
+
+_Version update only_
+
+## 0.47.9
+Thu, 15 Sep 2022 00:18:51 GMT
+
+_Version update only_
+
+## 0.47.8
+Tue, 13 Sep 2022 00:16:55 GMT
+
+_Version update only_
+
+## 0.47.7
+Mon, 12 Sep 2022 22:27:48 GMT
+
+_Version update only_
+
+## 0.47.6
+Fri, 02 Sep 2022 17:48:43 GMT
+
+_Version update only_
+
+## 0.47.5
+Wed, 24 Aug 2022 03:01:22 GMT
+
+_Version update only_
+
+## 0.47.4
+Wed, 24 Aug 2022 00:14:38 GMT
+
+_Version update only_
+
+## 0.47.3
+Fri, 19 Aug 2022 00:17:19 GMT
+
+_Version update only_
+
+## 0.47.2
+Wed, 10 Aug 2022 09:52:12 GMT
+
+_Version update only_
+
+## 0.47.1
+Wed, 10 Aug 2022 08:12:16 GMT
+
+_Version update only_
+
+## 0.47.0
+Wed, 03 Aug 2022 18:40:35 GMT
+
+### Minor changes
+
+- Update the highest supported version of TypeScript to 4.7
+
+## 0.46.7
+Mon, 01 Aug 2022 02:45:32 GMT
+
+_Version update only_
+
+## 0.46.6
+Thu, 21 Jul 2022 23:30:27 GMT
+
+_Version update only_
+
+## 0.46.5
+Thu, 21 Jul 2022 00:16:14 GMT
+
+_Version update only_
+
+## 0.46.4
+Wed, 13 Jul 2022 21:31:13 GMT
+
+_Version update only_
+
+## 0.46.3
+Fri, 08 Jul 2022 15:17:46 GMT
+
+_Version update only_
+
+## 0.46.2
+Mon, 04 Jul 2022 15:15:13 GMT
+
+### Patches
+
+- Fix an issue with the `locales` build property. The property is now undefined if no `--locale` parameters are specified.
+
+## 0.46.1
+Thu, 30 Jun 2022 04:48:53 GMT
+
+_Version update only_
+
+## 0.46.0
+Tue, 28 Jun 2022 22:47:13 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Update the --locale build parameter to support multiple values and replace the `locale?: string` parameter in `IBuildStageProperties` with a `locales?: readonly string[]` parameter.
+
+## 0.45.14
+Tue, 28 Jun 2022 00:23:32 GMT
+
+_Version update only_
+
+## 0.45.13
+Mon, 27 Jun 2022 18:43:09 GMT
+
+_Version update only_
+
+## 0.45.12
+Sat, 25 Jun 2022 21:00:40 GMT
+
+_Version update only_
+
+## 0.45.11
+Sat, 25 Jun 2022 01:54:29 GMT
+
+_Version update only_
+
+## 0.45.10
+Fri, 24 Jun 2022 07:16:47 GMT
+
+_Version update only_
+
+## 0.45.9
+Thu, 23 Jun 2022 22:14:24 GMT
+
+_Version update only_
+
+## 0.45.8
+Fri, 17 Jun 2022 09:17:54 GMT
+
+_Version update only_
+
+## 0.45.7
+Fri, 17 Jun 2022 00:16:18 GMT
+
+_Version update only_
+
+## 0.45.6
+Tue, 07 Jun 2022 09:37:04 GMT
+
+_Version update only_
+
+## 0.45.5
+Wed, 25 May 2022 22:25:07 GMT
+
+_Version update only_
+
+## 0.45.4
+Thu, 19 May 2022 15:13:20 GMT
+
+_Version update only_
+
+## 0.45.3
+Sat, 14 May 2022 03:01:27 GMT
+
+_Version update only_
+
+## 0.45.2
+Tue, 10 May 2022 01:20:43 GMT
+
+_Version update only_
+
+## 0.45.1
+Wed, 04 May 2022 23:29:13 GMT
+
+_Version update only_
+
+## 0.45.0
+Sat, 23 Apr 2022 02:13:06 GMT
+
+### Minor changes
+
+- Add support for TypeScript 4.6
+
+## 0.44.13
+Fri, 15 Apr 2022 00:12:36 GMT
+
+_Version update only_
+
+## 0.44.12
+Wed, 13 Apr 2022 15:12:40 GMT
+
+_Version update only_
+
+## 0.44.11
+Tue, 12 Apr 2022 23:29:34 GMT
+
+_Version update only_
+
+## 0.44.10
+Tue, 12 Apr 2022 02:58:32 GMT
+
+_Version update only_
+
+## 0.44.9
+Sat, 09 Apr 2022 19:07:48 GMT
+
+_Version update only_
+
+## 0.44.8
+Sat, 09 Apr 2022 02:24:26 GMT
+
+### Patches
+
+- Rename the "master" branch to "main".
+
+## 0.44.7
+Fri, 08 Apr 2022 20:05:59 GMT
+
+_Version update only_
+
+## 0.44.6
+Wed, 06 Apr 2022 22:35:23 GMT
+
+_Version update only_
+
+## 0.44.5
+Thu, 31 Mar 2022 02:06:05 GMT
+
+_Version update only_
+
+## 0.44.4
+Sat, 19 Mar 2022 08:05:37 GMT
+
+_Version update only_
+
+## 0.44.3
+Tue, 15 Mar 2022 19:15:53 GMT
+
+_Version update only_
 
 ## 0.44.2
 Wed, 05 Jan 2022 16:07:47 GMT

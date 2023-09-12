@@ -27,10 +27,34 @@ module.exports = {
  * The return value is the updated object.
  */
 function readPackage(packageJson, context) {
-  if (packageJson.name === 'tslint-microsoft-contrib') {
-    // The `tslint-microsoft-contrib` repo is archived so it can't be updated to TS 4.4+.
-    // unmet peer typescript@"^2.1.0 || ^3.0.0": found 4.5.5
-    packageJson.peerDependencies['typescript'] = '*';
+  if (packageJson.name.startsWith('@radix-ui/')) {
+    if (packageJson.peerDependencies && packageJson.peerDependencies['react']) {
+      packageJson.peerDependencies['@types/react'] = '*';
+      packageJson.peerDependencies['@types/react-dom'] = '*';
+    }
+  }
+
+  switch (packageJson.name) {
+    case '@jest/test-result': {
+      // The `@jest/test-result` package takes undeclared dependencies on `jest-haste-map`
+      // and `jest-resolve`
+      packageJson.dependencies['jest-haste-map'] = packageJson.version;
+      packageJson.dependencies['jest-resolve'] = packageJson.version;
+    }
+
+    case '@serverless-stack/core': {
+      delete packageJson.dependencies['@typescript-eslint/eslint-plugin'];
+      delete packageJson.dependencies['eslint-config-serverless-stack'];
+      delete packageJson.dependencies['lerna'];
+      break;
+    }
+
+    case 'tslint-microsoft-contrib': {
+      // The `tslint-microsoft-contrib` repo is archived so it can't be updated to TS 4.4+.
+      // unmet peer typescript@"^2.1.0 || ^3.0.0": found 4.5.5
+      packageJson.peerDependencies['typescript'] = '*';
+      break;
+    }
   }
 
   return packageJson;

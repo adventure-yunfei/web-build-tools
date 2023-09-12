@@ -1,6 +1,69 @@
 # Change Log - @rushstack/eslint-patch
 
-This log was last generated on Fri, 05 Nov 2021 15:09:18 GMT and should not be manually modified.
+This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+
+## 1.3.3
+Tue, 08 Aug 2023 07:10:39 GMT
+
+### Patches
+
+- Fix patching for running eslint via eslint/use-at-your-own-risk, which VS Code's eslint extension does when enabling flat config support
+
+## 1.3.2
+Thu, 15 Jun 2023 00:21:01 GMT
+
+### Patches
+
+- [eslint-patch] add invalid importer path test to ESLint 7.x || 8.x block
+
+## 1.3.1
+Wed, 07 Jun 2023 22:45:16 GMT
+
+### Patches
+
+- Add test for invalid importer path to fallback to relative path when loading eslint 6 plugins
+
+## 1.3.0
+Mon, 22 May 2023 06:34:32 GMT
+
+### Minor changes
+
+- Upgrade the @typescript-eslint/* dependencies to ~5.59.2
+
+## 1.2.0
+Thu, 15 Sep 2022 00:18:51 GMT
+
+### Minor changes
+
+- Use original resolver if patched resolver fails.
+
+## 1.1.4
+Tue, 28 Jun 2022 00:23:32 GMT
+
+### Patches
+
+- Update the README to mention support for ESLint 8.
+
+## 1.1.3
+Fri, 15 Apr 2022 00:12:36 GMT
+
+### Patches
+
+- Fix an issue where tools could not determine the module type as CommonJS
+
+## 1.1.2
+Sat, 09 Apr 2022 02:24:26 GMT
+
+### Patches
+
+- Rename the "master" branch to "main".
+
+## 1.1.1
+Tue, 15 Mar 2022 19:15:53 GMT
+
+### Patches
+
+- Fix the path in the package.json "directory" field.
 
 ## 1.1.0
 Fri, 05 Nov 2021 15:09:18 GMT

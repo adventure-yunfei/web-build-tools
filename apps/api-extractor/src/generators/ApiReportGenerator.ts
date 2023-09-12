@@ -70,7 +70,7 @@ export class ApiReportGenerator {
     // Emit the imports
     for (const entity of collector.entities) {
       if (entity.astEntity instanceof AstImport) {
-        DtsEmitHelpers.emitImport(writer, entity, entity.astEntity);
+        DtsEmitHelpers.emitImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();
@@ -127,7 +127,9 @@ export class ApiReportGenerator {
                 }
 
                 writer.ensureSkippedLine();
-                writer.write(ApiReportGenerator._getAedocSynopsis(collector, astDeclaration, messagesToReport));
+                writer.write(
+                  ApiReportGenerator._getAedocSynopsis(collector, astDeclaration, messagesToReport)
+                );
 
                 const span: Span = new Span(astDeclaration.declaration);
 
@@ -164,7 +166,7 @@ export class ApiReportGenerator {
     // Emit the regular declarations
     for (const entity of collector.entities) {
       const astEntity: AstEntity = entity.astEntity;
-      if (entity.exported) {
+      if (entity.exported || collector.extractorConfig.apiReportIncludeForgottenExports) {
         // First, collect the list of export names for this symbol.  When reporting messages with
         // ExtractorMessage.properties.exportName, this will enable us to emit the warning comments alongside
         // the associated export statement.
