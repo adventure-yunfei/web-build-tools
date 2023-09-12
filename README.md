@@ -17,6 +17,10 @@ for large scale TypeScript monorepos.
 <a href="https://open.vscode.dev/microsoft/rushstack"><img src="https://open.vscode.dev/static/stable/favicon.ico" width="14px" /> Open in VS Code web view</a>
 </td></tr></table>
 
+## Fork Modifications by adventure-yunfei
+
+See [Fork Modifications](./ForkModifications.md).
+
 ## Documentation Links
 
 - [What is Rush Stack?](https://rushstack.io/) - learn about the mission behind these projects
@@ -197,4 +201,3 @@ provided by the bot. You will only need to do this once across all repos using o
 This repo has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-

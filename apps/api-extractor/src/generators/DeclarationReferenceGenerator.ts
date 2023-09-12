@@ -13,6 +13,7 @@ import {
 import { INodePackageJson, InternalError } from '@rushstack/node-core-library';
 import { TypeScriptHelpers } from '../analyzer/TypeScriptHelpers';
 import { TypeScriptInternals } from '../analyzer/TypeScriptInternals';
+import { ApiItem } from '@microsoft/api-extractor-model';
 import { Collector } from '../collector/Collector';
 import { CollectorEntity } from '../collector/CollectorEntity';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
@@ -22,8 +23,51 @@ export class DeclarationReferenceGenerator {
 
   private _collector: Collector;
 
+  private _placeholderCount = 0;
+  private _symbolByPlaceholder: Map<string, ts.Symbol> = new Map();
+  private _placeholderBySymbol: Map<ts.Symbol, DeclarationReference> = new Map();
+
   public constructor(collector: Collector) {
     this._collector = collector;
+  }
+
+  private static PLACEHOLDER_KEY = '__PLACEHOLDER__';
+
+  public static isPlaceholder(reference: DeclarationReference) {
+    return reference.toString().indexOf(this.PLACEHOLDER_KEY) !== undefined;
+  }
+
+  public getDeclarationReferencePlaceholderForIdentifier(
+    node: ts.Identifier
+  ): DeclarationReference | undefined {
+    const symbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(node);
+    if (symbol !== undefined) {
+      const followedSymbol = TypeScriptHelpers.followAliases(symbol, this._typeChecker);
+      let placeholder: DeclarationReference | undefined = this._placeholderBySymbol.get(followedSymbol);
+      if (placeholder === undefined) {
+        const placeholderKey = `${DeclarationReferenceGenerator.PLACEHOLDER_KEY}${this._placeholderCount++}`;
+        placeholder = DeclarationReference.empty().addNavigationStep(Navigation.Members, placeholderKey);
+        this._placeholderBySymbol.set(followedSymbol, placeholder);
+        this._symbolByPlaceholder.set(placeholder.toString(), followedSymbol);
+      }
+      return placeholder;
+    }
+  }
+
+  /**
+   * Turn placeholder to actual reference.
+   *
+   * NOTE: must call after api item tree is parsed.
+   */
+  public getDeclarationReferenceForPlaceholder(
+    placeholder: DeclarationReference,
+    getApiItemBySymbol: (followedSymbol: ts.Symbol) => ApiItem | undefined
+  ): DeclarationReference | undefined {
+    const symbol: ts.Symbol | undefined = this._symbolByPlaceholder.get(placeholder.toString());
+    const apiItem: ApiItem | undefined = symbol && getApiItemBySymbol(symbol);
+    if (apiItem) {
+      return apiItem.canonicalReference;
+    }
   }
 
   /**

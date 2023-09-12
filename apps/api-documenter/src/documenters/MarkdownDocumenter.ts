@@ -224,6 +224,21 @@ export class MarkdownDocumenter {
             language: 'typescript'
           })
         );
+
+        // show api references if there're.
+        if (
+          apiItem.excerptTokens.some(
+            (token) => token.kind === ExcerptTokenKind.Reference && token.canonicalReference !== undefined
+          )
+        ) {
+          const signatureLinkParagraph: DocParagraph = new DocParagraph({ configuration }, [
+            new DocEmphasisSpan({ configuration, bold: true }, [
+              new DocPlainText({ configuration, text: 'Links: ' })
+            ])
+          ]);
+          output.appendNode(new DocNoteBox({ configuration }, [signatureLinkParagraph]));
+          this._appendExcerptWithHyperlinks(signatureLinkParagraph, apiItem.excerpt);
+        }
       }
 
       this._writeHeritageTypes(output, apiItem);

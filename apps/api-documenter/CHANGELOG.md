@@ -1,3 +1,9 @@
+# Change Log - api-extractor custom version
+
+## 7.13.30-rc.0
+
+- 新增完整的引用类型链接支持
+
 # Change Log - @microsoft/api-documenter
 
 This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
@@ -2867,7 +2873,7 @@ Wed, 21 Mar 2018 21:05:22 GMT
 ### Patches
 
 - Change heading for code snippets section from `## Snippets` to `#### Examples`.
-- Customize the `API Set #.#` hyperlink target by host. 
+- Customize the `API Set #.#` hyperlink target by host.
 - Designate proper language for each code snippet (TypeScript or JavaScript).
 
 ## 1.1.24

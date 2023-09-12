@@ -70,15 +70,103 @@ export class ApiReportGenerator {
     // Emit the imports
     for (const entity of collector.entities) {
       if (entity.astEntity instanceof AstImport) {
-        DtsEmitHelpers.emitImport(writer, entity, entity.astEntity);
+        DtsEmitHelpers.emitImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();
 
+    /**
+     * Emit Api Report for local module import.
+     *
+     * TODO: won't handle duplicate case,
+     * AstImportInternal will be emitted multiple times if multi-exported
+     */
+    function emitForAstNamespaceImport(
+      entity: CollectorEntity,
+      astEntity: AstNamespaceImport,
+      shouldInlineExport: boolean
+    ): void {
+      if (shouldInlineExport) {
+        writer.write('export ');
+      }
+      writer.writeLine(`namespace ${entity.nameForEmit} {`);
+      writer.indentScope(() => {
+        collector.astSymbolTable
+          .fetchAstModuleExportInfo(astEntity.astModule)
+          .exportedLocalEntities.forEach((childAstEntity, exportName) => {
+            const childEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(childAstEntity);
+            if (!childEntity) {
+              throw new Error(`Cannot find CollectorEntity for AstEntity "${childAstEntity.localName}"`);
+            }
+            const shouldChildInlineExport: boolean = childEntity.nameForEmit === exportName;
+            if (childAstEntity instanceof AstSymbol) {
+              writer.writeLine();
+              // Copy from AstSymbol entity, but only pick emit-declarations part.
+
+              // Emit all the declarations for this entity
+              for (const astDeclaration of childAstEntity.astDeclarations || []) {
+                // Get the messages associated with this declaration
+                const fetchedMessages: ExtractorMessage[] =
+                  collector.messageRouter.fetchAssociatedMessagesForReviewFile(astDeclaration);
+
+                // Peel off the messages associated with an export statement and store them
+                // in IExportToEmit.associatedMessages (to be processed later).  The remaining messages will
+                // added to messagesToReport, to be emitted next to the declaration instead of the export statement.
+                const messagesToReport: ExtractorMessage[] = [];
+                for (const message of fetchedMessages) {
+                  // if (message.properties.exportName) {
+                  //   const exportToEmit: IExportToEmit | undefined = exportsToEmit.get(
+                  //     message.properties.exportName
+                  //   );
+                  //   if (exportToEmit) {
+                  //     exportToEmit.associatedMessages.push(message);
+                  //     continue;
+                  //   }
+                  // }
+                  messagesToReport.push(message);
+                }
+
+                writer.ensureSkippedLine();
+                writer.write(
+                  ApiReportGenerator._getAedocSynopsis(collector, astDeclaration, messagesToReport)
+                );
+
+                const span: Span = new Span(astDeclaration.declaration);
+
+                const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
+                if (apiItemMetadata.isPreapproved) {
+                  ApiReportGenerator._modifySpanForPreapproved(span);
+                } else {
+                  ApiReportGenerator._modifySpan(
+                    collector,
+                    span,
+                    shouldChildInlineExport,
+                    astDeclaration,
+                    false
+                  );
+                }
+
+                span.writeModifiedText(writer);
+                writer.ensureNewLine();
+              }
+            } else if (childAstEntity instanceof AstNamespaceImport) {
+              writer.writeLine();
+              emitForAstNamespaceImport(childEntity, childAstEntity, shouldChildInlineExport);
+            } else {
+              return;
+            }
+            if (!shouldChildInlineExport) {
+              DtsEmitHelpers.emitNamedExport(writer, exportName, childEntity);
+            }
+          });
+      });
+      writer.writeLine(`}`);
+    }
+
     // Emit the regular declarations
     for (const entity of collector.entities) {
       const astEntity: AstEntity = entity.astEntity;
-      if (entity.consumable || collector.extractorConfig.apiReportIncludeForgottenExports) {
+      if (entity.exported || collector.extractorConfig.apiReportIncludeForgottenExports) {
         // First, collect the list of export names for this symbol.  When reporting messages with
         // ExtractorMessage.properties.exportName, this will enable us to emit the warning comments alongside
         // the associated export statement.
@@ -127,74 +215,21 @@ export class ApiReportGenerator {
             if (apiItemMetadata.isPreapproved) {
               ApiReportGenerator._modifySpanForPreapproved(span);
             } else {
-              ApiReportGenerator._modifySpan(collector, span, entity, astDeclaration, false);
+              ApiReportGenerator._modifySpan(
+                collector,
+                span,
+                entity.shouldInlineExport,
+                astDeclaration,
+                false
+              );
             }
 
             span.writeModifiedText(writer);
             writer.ensureNewLine();
           }
-        }
-
-        if (astEntity instanceof AstNamespaceImport) {
-          const astModuleExportInfo: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
-
-          if (entity.nameForEmit === undefined) {
-            // This should never happen
-            throw new InternalError('referencedEntry.nameForEmit is undefined');
-          }
-
-          if (astModuleExportInfo.starExportedExternalModules.size > 0) {
-            // We could support this, but we would need to find a way to safely represent it.
-            throw new Error(
-              `The ${entity.nameForEmit} namespace import includes a star export, which is not supported:\n` +
-                SourceFileLocationFormatter.formatDeclaration(astEntity.declaration)
-            );
-          }
-
-          // Emit a synthetic declaration for the namespace.  It will look like this:
-          //
-          //    declare namespace example {
-          //      export {
-          //        f1,
-          //        f2
-          //      }
-          //    }
-          //
-          // Note that we do not try to relocate f1()/f2() to be inside the namespace because other type
-          // signatures may reference them directly (without using the namespace qualifier).
-
-          writer.ensureSkippedLine();
-          writer.writeLine(`declare namespace ${entity.nameForEmit} {`);
-
-          // all local exports of local imported module are just references to top-level declarations
-          writer.increaseIndent();
-          writer.writeLine('export {');
-          writer.increaseIndent();
-
-          const exportClauses: string[] = [];
-          for (const [exportedName, exportedEntity] of astModuleExportInfo.exportedLocalEntities) {
-            const collectorEntity: CollectorEntity | undefined =
-              collector.tryGetCollectorEntity(exportedEntity);
-            if (collectorEntity === undefined) {
-              // This should never happen
-              // top-level exports of local imported module should be added as collector entities before
-              throw new InternalError(
-                `Cannot find collector entity for ${entity.nameForEmit}.${exportedEntity.localName}`
-              );
-            }
-
-            if (collectorEntity.nameForEmit === exportedName) {
-              exportClauses.push(collectorEntity.nameForEmit);
-            } else {
-              exportClauses.push(`${collectorEntity.nameForEmit} as ${exportedName}`);
-            }
-          }
-          writer.writeLine(exportClauses.join(',\n'));
-
-          writer.decreaseIndent();
-          writer.writeLine('}'); // end of "export { ... }"
-          writer.decreaseIndent();
-          writer.writeLine('}'); // end of "declare namespace { ... }"
+        } else if (entity.astEntity instanceof AstNamespaceImport) {
+          emitForAstNamespaceImport(entity, entity.astEntity, entity.shouldInlineExport);
+          writer.writeLine();
         }
 
         // Now emit the export statements for this entity.
@@ -252,7 +287,7 @@ export class ApiReportGenerator {
   private static _modifySpan(
     collector: Collector,
     span: Span,
-    entity: CollectorEntity,
+    shouldInlineExport: boolean,
     astDeclaration: AstDeclaration,
     insideTypeLiteral: boolean
   ): void {
@@ -292,7 +327,7 @@ export class ApiReportGenerator {
         // Replace the stuff we possibly deleted above
         let replacedModifiers: string = '';
 
-        if (entity.shouldInlineExport) {
+        if (shouldInlineExport) {
           replacedModifiers = 'export ' + replacedModifiers;
         }
 
@@ -342,7 +377,7 @@ export class ApiReportGenerator {
           span.modification.prefix = listPrefix + span.modification.prefix;
           span.modification.suffix = ';';
 
-          if (entity.shouldInlineExport) {
+          if (shouldInlineExport) {
             span.modification.prefix = 'export ' + span.modification.prefix;
           }
         }
@@ -382,7 +417,7 @@ export class ApiReportGenerator {
             ApiReportGenerator._modifySpan(
               collector,
               childSpan,
-              entity,
+              shouldInlineExport,
               childAstDeclaration,
               insideTypeLiteral
             );
@@ -421,7 +456,13 @@ export class ApiReportGenerator {
           }
         }
 
-        ApiReportGenerator._modifySpan(collector, child, entity, childAstDeclaration, insideTypeLiteral);
+        ApiReportGenerator._modifySpan(
+          collector,
+          child,
+          shouldInlineExport,
+          childAstDeclaration,
+          insideTypeLiteral
+        );
       }
     }
   }

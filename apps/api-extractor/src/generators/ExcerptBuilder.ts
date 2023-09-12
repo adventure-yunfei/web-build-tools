@@ -142,7 +142,7 @@ export class ExcerptBuilder {
       if (span.kind === ts.SyntaxKind.Identifier) {
         const name: ts.Identifier = span.node as ts.Identifier;
         if (!ExcerptBuilder._isDeclarationName(name)) {
-          canonicalReference = state.referenceGenerator.getDeclarationReferenceForIdentifier(name);
+          canonicalReference = state.referenceGenerator.getDeclarationReferencePlaceholderForIdentifier(name);
         }
       }
 

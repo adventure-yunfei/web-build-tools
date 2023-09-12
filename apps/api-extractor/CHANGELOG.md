@@ -1,3 +1,33 @@
+# Change Log - api-extractor custom version
+
+## 7.19.4-rc.6
+- 优化 `AstNamespaceImport` 输出结果
+
+## 7.19.4-rc.1
+- 修正 import type `import('abc')` 语法支持
+
+## 7.18.16-rc.3
+
+- 修正 Entity 变量和 namespace 内的变量的命名冲突
+## 7.18.16-rc.1
+
+- 合并主分支代码
+
+## 7.16.1-rc.1
+
+- 合并主分支代码
+- fix：修复 API JSON 中的导出命名
+
+## 7.12.1-rc.5
+
+- 优化 `import Foo = Bar.Baz;` 语法支持：dts rollup 结果中移除 namespace 中多余的该语法
+
+## 7.12.1-rc.4
+
+- 新增 `import * as foo from './local-module';` 局部模块 namespace 导入支持
+- 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）
+- 新增完整的引用类型链接支持, 包括未导出的类型
+
 # Change Log - @microsoft/api-extractor
 
 This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
@@ -1756,7 +1786,7 @@ Thu, 25 Oct 2018 08:56:02 GMT
 
 ### Patches
 
-- Fix issue where `DocErrorText.text` returned `[object Object]` instead of the text 
+- Fix issue where `DocErrorText.text` returned `[object Object]` instead of the text
 
 ## 6.0.7
 Wed, 24 Oct 2018 16:03:10 GMT

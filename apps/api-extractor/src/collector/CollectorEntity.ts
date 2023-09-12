@@ -83,7 +83,7 @@ export class CollectorEntity {
    */
   public get shouldInlineExport(): boolean {
     // We don't inline an AstImport
-    if (this.astEntity instanceof AstSymbol) {
+    if (this.astEntity instanceof AstSymbol || this.astEntity instanceof AstNamespaceImport) {
       // We don't inline a symbol with more than one exported name
       if (this._singleExportName !== undefined && this._singleExportName !== ts.InternalSymbolName.Default) {
         // We can't inline a symbol whose emitted name is different from the export name

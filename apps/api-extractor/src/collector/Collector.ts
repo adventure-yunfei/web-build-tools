@@ -476,6 +476,12 @@ export class Collector {
           this._recursivelyCreateEntities(referencedAstEntity, alreadySeenAstEntities);
         }
       });
+    } else if (astEntity instanceof AstImport) {
+      const referencedImport: AstImport | undefined =
+        this.astSymbolTable.tryGetReferencedAstImport(astEntity);
+      if (referencedImport) {
+        this._createCollectorEntity(referencedImport, undefined);
+      }
     }
 
     if (astEntity instanceof AstNamespaceImport) {
@@ -522,6 +528,27 @@ export class Collector {
     const usedNames: Set<string> = new Set<string>();
 
     // First collect the names of explicit package exports, and perform a sanity check.
+    const markUniqueNamesInsideNamespace: (
+      astEntity: AstEntity,
+      alreadySeenEntities: Set<AstEntity>
+    ) => void = (astEntity, alreadySeenEntities) => {
+      if (alreadySeenEntities.has(astEntity)) {
+        return;
+      }
+      alreadySeenEntities.add(astEntity);
+
+      if (astEntity instanceof AstSymbol) {
+        astEntity.astDeclarations.forEach((astDeclaration) => {
+          if (ts.isModuleDeclaration(astDeclaration.declaration)) {
+            astDeclaration.children.forEach((childDeclaration) => {
+              usedNames.add(childDeclaration.astSymbol.localName);
+              markUniqueNamesInsideNamespace(childDeclaration.astSymbol, alreadySeenEntities);
+            });
+          }
+        });
+      }
+    };
+    const alreadySeenEntitiesForNamespaceUniqueName: Set<AstEntity> = new Set();
     for (const entity of this._entities) {
       for (const exportName of entity.exportNames) {
         if (usedNames.has(exportName)) {
@@ -530,6 +557,7 @@ export class Collector {
         }
         usedNames.add(exportName);
       }
+      markUniqueNamesInsideNamespace(entity.astEntity, alreadySeenEntitiesForNamespaceUniqueName);
     }
 
     // Ensure that each entity has a unique nameForEmit
