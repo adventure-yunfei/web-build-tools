@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.36.4-rc.1
+- 合并主分支代码
+- 优化 `AstNamespaceImport` 输出结果
+
 ## 7.19.4-rc.6
 - 优化 `AstNamespaceImport` 输出结果
 
@@ -2773,4 +2777,3 @@ Wed, 11 Jan 2017 14:11:26 GMT
 ### Breaking changes
 
 - Introducing API Extractor
-
