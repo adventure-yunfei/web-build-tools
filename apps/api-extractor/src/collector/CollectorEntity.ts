@@ -7,6 +7,7 @@ import { AstSymbol } from '../analyzer/AstSymbol';
 import { Collector } from './Collector';
 import { Sort } from '@rushstack/node-core-library';
 import { AstEntity } from '../analyzer/AstEntity';
+import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 
 /**
  * This is a data structure used by the Collector to track an AstEntity that may be emitted in the *.d.ts file.

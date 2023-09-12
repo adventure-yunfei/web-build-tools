@@ -120,7 +120,7 @@ export class ApiModelGenerator {
       if (entity.exportedFromEntryPoint || this._collector.extractorConfig.docModelIncludeForgottenExports) {
         const exportedName: string | undefined = Array.from(entity.exportNames)[0] || entity.nameForEmit;
         this._processAstEntity(entity.astEntity, {
-          name: exportedName,
+          name: exportedName!,
           isExported: entity.exportedFromEntryPoint,
           parentApiItem: apiEntryPoint
         });
@@ -132,7 +132,8 @@ export class ApiModelGenerator {
       name: 'UNEXPORTED',
       docComment: undefined,
       releaseTag: ReleaseTag.Public,
-      excerptTokens: []
+      excerptTokens: [],
+      isExported: true
     });
     for (const entity of this._collector.entities) {
       if (!entity.exported) {
@@ -142,7 +143,11 @@ export class ApiModelGenerator {
         ) {
           // Skip ancillary declarations; we will process them with the main declaration
           for (const astDeclaration of this._collector.getNonAncillaryDeclarations(entity.astEntity)) {
-            this._processDeclaration(astDeclaration, entity.nameForEmit, apiNamespaceForUnexported);
+            this._processDeclaration(astDeclaration, {
+              name: entity.nameForEmit!,
+              isExported: false,
+              parentApiItem: apiNamespaceForUnexported
+            });
           }
         } else {
           // TODO: Figure out how to represent reexported AstImport objects.  Basically we need to introduce a new

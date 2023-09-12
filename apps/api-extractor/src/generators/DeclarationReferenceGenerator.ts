@@ -40,9 +40,9 @@ export class DeclarationReferenceGenerator {
   public getDeclarationReferencePlaceholderForIdentifier(
     node: ts.Identifier
   ): DeclarationReference | undefined {
-    const symbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(node);
+    const symbol: ts.Symbol | undefined = this._collector.typeChecker.getSymbolAtLocation(node);
     if (symbol !== undefined) {
-      const followedSymbol = TypeScriptHelpers.followAliases(symbol, this._typeChecker);
+      const followedSymbol = TypeScriptHelpers.followAliases(symbol, this._collector.typeChecker);
       let placeholder: DeclarationReference | undefined = this._placeholderBySymbol.get(followedSymbol);
       if (placeholder === undefined) {
         const placeholderKey = `${DeclarationReferenceGenerator.PLACEHOLDER_KEY}${this._placeholderCount++}`;
