@@ -32,8 +32,6 @@ import {
   ApiTypeAlias,
   ApiCallSignature,
   IApiTypeParameterOptions,
-  ApiItem,
-  ApiDeclaredItem,
   EnumMemberOrder
 } from '@microsoft/api-extractor-model';
 import { Path } from '@rushstack/node-core-library';
@@ -49,7 +47,6 @@ import { DeclarationMetadata } from '../collector/DeclarationMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import { AstEntity } from '../analyzer/AstEntity';
 import { AstModule } from '../analyzer/AstModule';
-import { DeclarationReference } from '@microsoft/tsdoc/lib-commonjs/beta/DeclarationReference';
 import { TypeScriptInternals } from '../analyzer/TypeScriptInternals';
 
 interface IProcessAstEntityContext {
@@ -62,8 +59,6 @@ export class ApiModelGenerator {
   private readonly _collector: Collector;
   private readonly _apiModel: ApiModel;
   private readonly _referenceGenerator: DeclarationReferenceGenerator;
-  /** Record the generated api items by corresponding symbol */
-  private readonly _apiItemsBySymbol: Map<ts.Symbol, ApiItem> = new Map();
   private readonly _apiModelTrimming: ReleaseTag;
 
   public constructor(collector: Collector) {
@@ -126,41 +121,6 @@ export class ApiModelGenerator {
         });
       }
     }
-
-    // Create a CollectorEntity for each top-level unexported
-    const apiNamespaceForUnexported: ApiNamespace = new ApiNamespace({
-      name: 'UNEXPORTED',
-      docComment: undefined,
-      releaseTag: ReleaseTag.Public,
-      excerptTokens: [],
-      isExported: true
-    });
-    for (const entity of this._collector.entities) {
-      if (!entity.exported) {
-        if (
-          entity.astEntity instanceof AstSymbol &&
-          this._apiItemsBySymbol.get(entity.astEntity.followedSymbol) === undefined
-        ) {
-          // Skip ancillary declarations; we will process them with the main declaration
-          for (const astDeclaration of this._collector.getNonAncillaryDeclarations(entity.astEntity)) {
-            this._processDeclaration(astDeclaration, {
-              name: entity.nameForEmit!,
-              isExported: false,
-              parentApiItem: apiNamespaceForUnexported
-            });
-          }
-        } else {
-          // TODO: Figure out how to represent reexported AstImport objects.  Basically we need to introduce a new
-          // ApiItem subclass for "export alias", similar to a type alias, but representing declarations of the
-          // form "export { X } from 'external-package'".  We can also use this to solve GitHub issue #950.
-        }
-      }
-    }
-    if (apiNamespaceForUnexported.members.length) {
-      apiEntryPoint.addMember(apiNamespaceForUnexported);
-    }
-
-    this._replaceReferencePlaceholder(apiPackage);
 
     return apiPackage;
   }
@@ -232,39 +192,6 @@ export class ApiModelGenerator {
         });
       }
     );
-  }
-
-  private _getApiItemBySymbol: (followedSymbol: ts.Symbol) => ApiItem | undefined = (followedSymbol) => {
-    return this._apiItemsBySymbol.get(followedSymbol);
-  };
-  private _replaceReferencePlaceholder(apiItem: ApiItem): void {
-    if (apiItem instanceof ApiDeclaredItem) {
-      apiItem.excerptTokens.forEach((excerptToken) => {
-        if (
-          excerptToken.canonicalReference !== undefined &&
-          DeclarationReferenceGenerator.isPlaceholder(excerptToken.canonicalReference)
-        ) {
-          const actualReference: DeclarationReference | undefined =
-            this._referenceGenerator.getDeclarationReferenceForPlaceholder(
-              excerptToken.canonicalReference,
-              this._getApiItemBySymbol
-            );
-          // @ts-ignore
-          excerptToken._canonicalReference = actualReference;
-        }
-      });
-    }
-    if (ApiItemContainerMixin.isBaseClassOf(apiItem)) {
-      apiItem.members.forEach((child) => {
-        this._replaceReferencePlaceholder(child);
-      });
-    }
-  }
-
-  private _onApiItemCreated(apiItem: ApiItem, astDeclaration: AstDeclaration) {
-    if (this._apiItemsBySymbol.get(astDeclaration.astSymbol.followedSymbol) === undefined) {
-      this._apiItemsBySymbol.set(astDeclaration.astSymbol.followedSymbol, apiItem);
-    }
   }
 
   private _processDeclaration(astDeclaration: AstDeclaration, context: IProcessAstEntityContext): void {
@@ -411,7 +338,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiCallSignature);
-      this._onApiItemCreated(apiCallSignature, astDeclaration);
     }
   }
 
@@ -453,7 +379,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiConstructor);
-      this._onApiItemCreated(apiConstructor, astDeclaration);
     }
   }
 
@@ -513,7 +438,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiClass);
-      this._onApiItemCreated(apiClass, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, {
@@ -571,7 +495,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiConstructSignature);
-      this._onApiItemCreated(apiConstructSignature, astDeclaration);
     }
   }
 
@@ -600,7 +523,6 @@ export class ApiModelGenerator {
         fileUrlPath
       });
       parentApiItem.addMember(apiEnum);
-      this._onApiItemCreated(apiEnum, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, {
@@ -644,7 +566,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiEnumMember);
-      this._onApiItemCreated(apiEnumMember, astDeclaration);
     }
   }
 
@@ -695,7 +616,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiFunction);
-      this._onApiItemCreated(apiFunction, astDeclaration);
     }
   }
 
@@ -741,7 +661,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiIndexSignature);
-      this._onApiItemCreated(apiIndexSignature, astDeclaration);
     }
   }
 
@@ -794,7 +713,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiInterface);
-      this._onApiItemCreated(apiInterface, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, {
@@ -859,7 +777,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiMethod);
-      this._onApiItemCreated(apiMethod, astDeclaration);
     }
   }
 
@@ -915,7 +832,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiMethodSignature);
-      this._onApiItemCreated(apiMethodSignature, astDeclaration);
     }
   }
 
@@ -943,7 +859,6 @@ export class ApiModelGenerator {
         fileUrlPath
       });
       parentApiItem.addMember(apiNamespace);
-      this._onApiItemCreated(apiNamespace, astDeclaration);
     }
 
     this._processChildDeclarations(astDeclaration, {
@@ -1009,7 +924,6 @@ export class ApiModelGenerator {
         fileUrlPath
       });
       parentApiItem.addMember(apiProperty);
-      this._onApiItemCreated(apiProperty, astDeclaration);
     } else {
       // If the property was already declared before (via a merged interface declaration),
       // we assume its signature is identical, because the language requires that.
@@ -1056,7 +970,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiPropertySignature);
-      this._onApiItemCreated(apiPropertySignature, astDeclaration);
     } else {
       // If the property was already declared before (via a merged interface declaration),
       // we assume its signature is identical, because the language requires that.
@@ -1104,7 +1017,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiTypeAlias);
-      this._onApiItemCreated(apiTypeAlias, astDeclaration);
     }
   }
 
@@ -1150,7 +1062,6 @@ export class ApiModelGenerator {
       });
 
       parentApiItem.addMember(apiVariable);
-      this._onApiItemCreated(apiVariable, astDeclaration);
     }
   }
 
