@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.22.33-rc.1
+- markdown 输出结果兼容 mdx@1.x，以支持 Docusaurus 文档工具
+- 支持移除 Home 导航链接
+
 ## 7.13.30-rc.0
 
 - 新增完整的引用类型链接支持
@@ -3108,4 +3112,3 @@ Mon, 23 Oct 2017 21:53:12 GMT
 ### Breaking changes
 
 - Initial release
-

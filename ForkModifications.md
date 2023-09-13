@@ -13,3 +13,5 @@
 ## `api-documenter`
 
 - 新增完整的引用类型链接支持, 包括未导出的类型 (59e634c68baa4cac277bec171f4c6f404c9d384b)
+- markdown 输出结果兼容 mdx@1.x，以支持 Docusaurus 文档工具 (73be47af637970a5a54240a752e8fc579bbbde1f)
+- 支持移除 Home 导航链接 (59afa81a5545a93449e3a22a60a22a78054188b1)
