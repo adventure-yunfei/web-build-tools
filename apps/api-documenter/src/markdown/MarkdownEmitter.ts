@@ -72,7 +72,9 @@ export class MarkdownEmitter {
       .replace(/---/g, '\\-\\-\\-') // hyphens only if it's 3 or more
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;')
+      .replace(/\{/g, '&#123;') // encode "{}" to be compatible with mdx
+      .replace(/\}/g, '&#125;');
     return textWithBackslashes;
   }
 
@@ -82,7 +84,9 @@ export class MarkdownEmitter {
       .replace(/"/g, '&quot;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
-      .replace(/\|/g, '&#124;');
+      .replace(/\|/g, '&#124;')
+      .replace(/\{/g, '&#123;') // encode "{}" to be compatible with mdx
+      .replace(/\}/g, '&#125;');
   }
 
   /**
@@ -245,7 +249,9 @@ export class MarkdownEmitter {
           // This is no problem:        "**one** *two* **three**"
           // But this is trouble:       "**one***two***three**"
           // The most general solution: "**one**<!-- -->*two*<!-- -->**three**"
-          writer.write('<!-- -->');
+          //
+          // Update: generate "**one**_two_**three**" instead now, "<!-- -->" fix is no longer needed. But it'll cause parsing error by mdx@1.x
+          // writer.write('<!-- -->');
           break;
       }
 
