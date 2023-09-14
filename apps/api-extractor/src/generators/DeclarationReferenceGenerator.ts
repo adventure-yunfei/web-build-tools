@@ -50,11 +50,11 @@ export class DeclarationReferenceGenerator {
   /**
    * Gets the DeclarationReference for a TypeScript Symbol for a given meaning.
    */
-  public getDeclarationReferenceForSymbol(
+  private getDeclarationReferenceForSymbol(
     symbol: ts.Symbol,
     meaning: ts.SymbolFlags
   ): DeclarationReference | undefined {
-    return this._symbolToDeclarationReference(symbol, meaning, /*includeModuleSymbols*/ false);
+    return this._symbolToDeclarationReference(symbol, meaning, /*includeModuleSymbols*/ false, true);
   }
 
   private static _isInExpressionContext(node: ts.Node): boolean {
@@ -193,7 +193,9 @@ export class DeclarationReferenceGenerator {
   private _symbolToDeclarationReference(
     symbol: ts.Symbol,
     meaning: ts.SymbolFlags,
-    includeModuleSymbols: boolean
+    includeModuleSymbols: boolean,
+    /** return undefined if meaning not matched */
+    forceMeaning = false
   ): DeclarationReference | undefined {
     const declaration: ts.Node | undefined = TypeScriptHelpers.tryGetADeclaration(symbol);
     const sourceFile: ts.SourceFile | undefined = declaration?.getSourceFile();
@@ -266,9 +268,12 @@ export class DeclarationReferenceGenerator {
       parentRef = new DeclarationReference(GlobalSource.instance);
     }
 
-    return parentRef
-      .addNavigationStep(navigation, localName)
-      .withMeaning(DeclarationReferenceGenerator._getMeaningOfSymbol(followedSymbol, meaning));
+    const meaningOfSymbol = DeclarationReferenceGenerator._getMeaningOfSymbol(followedSymbol, meaning);
+    if (!meaningOfSymbol && forceMeaning) {
+      return undefined;
+    }
+
+    return parentRef.addNavigationStep(navigation, localName).withMeaning(meaningOfSymbol);
   }
 
   private _getParentReference(symbol: ts.Symbol): DeclarationReference | undefined {
