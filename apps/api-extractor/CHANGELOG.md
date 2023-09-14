@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.36.4-rc.2
+- 修正 DeclarationReference 解析
+- 回滚 "新增完整的引用类型链接支持, 包括未导出的类型" (api-extractor 正式版已支持)
+
 ## 7.36.4-rc.1
 - 合并主分支代码
 - 优化 `AstNamespaceImport` 输出结果

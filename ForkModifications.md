@@ -3,12 +3,42 @@
 ## `api-extractor`
 
 - 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）(3d696a3305c050a21c092de5378430e2851d61a0)
-- 新增完整的引用类型链接支持, 包括未导出的类型 (59e634c68baa4cac277bec171f4c6f404c9d384b)
+- ~~新增完整的引用类型链接支持, 包括未导出的类型 (59e634c68baa4cac277bec171f4c6f404c9d384b)~~ api-extractor 本身已支持, 已回滚 (62809e68ec1198506ca8a0604fd9eeace10110da)
 - fix：修复 API JSON 中的导出命名 (297e6c70dd7d5f4ea5bd28c4b20e49e94ed277d2)
 - 修正 Entity 变量和 namespace 内的变量的命名冲突 (c103df149fc202f1b8b28f401c4c848b6b566b1e)
 - 修正 import type `import('abc')` 语法支持 (fb6318877dbccb07ab6261bf3b2a2632aa28c297)
 - 优化 `AstNamespaceImport` 输出结果 (5ffd9dde49218c26b146de7ffa6701a4bf761309, 8c2d1295f1e6cbe09d0f8282cd09556f43551321)
 - 新增 Release Trimming 功能 (33c17c2c814a8b2ecd7058a9dc93b99a1e3243df)
+- 修正 DeclarationReference 解析 (e5fdc6c83bfff078c1d19ad50b47063d17641f1b)
+  <details>
+
+    此前的错误场景：
+    ```ts
+    // 原始文件：index.ts
+    interface ConstructorOf<T> {
+      new (...args: any[]): T;
+    }
+    function createSomeBaseClass<T>(): ConstructorOf<T> {
+      return class {} as ConstructorOf<T>;
+    }
+
+    export class Foo extends createSomeBaseClass<{ prop: number }>() {}
+
+    // 编译出 dts 文件：index.d.ts
+    interface ConstructorOf<T> {
+      new (...args: any[]): T;
+    }
+    declare const Foo_base: ConstructorOf<{
+      prop: number;
+    }>;
+    export declare class Foo extends Foo_base {
+    }
+    export {};
+    ```
+
+    此时使用 api-extractor (并配置`"includeForgottenExports": true`) 编译，`extends Foo_base` 中的 Foo_base 的 DeclarationReference 引用链接生成错误，导致找不到实际对象。
+
+  </details>
 
 ## `api-documenter`
 
