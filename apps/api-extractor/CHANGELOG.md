@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.36.4-rc.3
+- 修正 `includeForgottenExports` 激活时不必要的 api 内容生成
+- 修正 `AstNamespaceImport` members 的 DeclarationReference 解析
+
 ## 7.36.4-rc.2
 - 修正 DeclarationReference 解析
 - 回滚 "新增完整的引用类型链接支持, 包括未导出的类型" (api-extractor 正式版已支持)

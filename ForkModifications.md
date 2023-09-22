@@ -39,6 +39,28 @@
     此时使用 api-extractor (并配置`"includeForgottenExports": true`) 编译，`extends Foo_base` 中的 Foo_base 的 DeclarationReference 引用链接生成错误，导致找不到实际对象。
 
   </details>
+- 修正 `includeForgottenExports` 激活时不必要的 api 内容生成；修正 `AstNamespaceImport` members 的 DeclarationReference 解析 (cb9eee4a45d0cce9661d6282c7fc8d994fdc22e2)
+  <details>
+
+    此前的错误场景：
+    ```ts
+    // 原始文件: index.ts
+    import * as FooModule from './foo-reexport';
+    export { FooModule }
+    // 原始文件: foo.ts
+    export class OriginClass {}
+    export class Foo {
+      declare fooProp: OriginClass;
+    }
+    // 原始文件: foo-reexport.ts
+    import { OriginClass as AnotherClass, Foo } from './foo';
+    export { AnotherClass, Foo };
+    ```
+
+    - 问题1: 激活 `includeForgottenExports` 时，除了正常的 namespace 节点树 (`FooModule.AnotherClass`/`FooModule.Foo`) 外，还会额外在根节点生成重复的 `~OriginClass`/`~Foo` 节点
+    - 问题2: 解析 DeclarationReference 时，没有考虑 `AstNamespaceImport`, 导致在 `Foo.fooProp` 中生成了无效的 `FooModule.OriginClass` 引用路径
+
+  </details>
 
 ## `api-documenter`
 
