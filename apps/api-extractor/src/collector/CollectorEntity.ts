@@ -180,10 +180,12 @@ export class CollectorEntity {
    * Return the first consumable parent that exports this entity. If there is none, returns
    * `undefined`.
    */
-  public getFirstExportingConsumableParent(): CollectorEntity | undefined {
+  public getFirstExportingConsumableParent():
+    | { entity: CollectorEntity; exportNames: ReadonlySet<string> }
+    | undefined {
     for (const [parent, localExportNames] of this._localExportNamesByParent) {
       if (parent.consumable && localExportNames.size > 0) {
-        return parent;
+        return { entity: parent, exportNames: localExportNames };
       }
     }
     return undefined;

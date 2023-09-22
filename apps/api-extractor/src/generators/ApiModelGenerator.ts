@@ -111,8 +111,11 @@ export class ApiModelGenerator {
     for (const entity of this._collector.entities) {
       // Only process entities that are exported from the entry point. Entities that are exported from
       // `AstNamespaceImport` entities will be processed by `_processAstNamespaceImport`. However, if
-      // we are including forgotten exports, then process everything.
-      if (entity.exportedFromEntryPoint || this._collector.extractorConfig.docModelIncludeForgottenExports) {
+      // we are including forgotten exports, then process everything (except `AstNamespaceImport` members).
+      if (
+        entity.exportedFromEntryPoint ||
+        (this._collector.extractorConfig.docModelIncludeForgottenExports && !entity.exported)
+      ) {
         const exportedName: string | undefined = Array.from(entity.exportNames)[0] || entity.nameForEmit;
         this._processAstEntity(entity.astEntity, {
           name: exportedName!,
