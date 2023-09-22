@@ -3,6 +3,7 @@
 
 /* eslint-disable no-bitwise */
 import * as ts from 'typescript';
+import { first } from 'lodash';
 import {
   DeclarationReference,
   ModuleSource,
@@ -224,15 +225,21 @@ export class DeclarationReferenceGenerator {
       return undefined;
     }
 
-    let parentRef: DeclarationReference | undefined = this._getParentReference(followedSymbol);
-    if (!parentRef) {
+    let parentRefResult: { parentReference: DeclarationReference; exportNameInParent?: string } | undefined =
+      this._getParentReference(followedSymbol);
+    if (!parentRefResult) {
       return undefined;
     }
 
+    let parentRef: DeclarationReference = parentRefResult.parentReference;
     let localName: string = followedSymbol.name;
-    const entity: CollectorEntity | undefined = this._collector.tryGetEntityForSymbol(followedSymbol);
-    if (entity?.nameForEmit) {
-      localName = entity.nameForEmit;
+    if (parentRefResult.exportNameInParent) {
+      localName = parentRefResult.exportNameInParent;
+    } else {
+      const entity: CollectorEntity | undefined = this._collector.tryGetEntityForSymbol(followedSymbol);
+      if (entity?.nameForEmit) {
+        localName = entity.nameForEmit;
+      }
     }
 
     if (followedSymbol.escapedName === ts.InternalSymbolName.Constructor) {
@@ -271,7 +278,9 @@ export class DeclarationReferenceGenerator {
       .withMeaning(DeclarationReferenceGenerator._getMeaningOfSymbol(followedSymbol, meaning));
   }
 
-  private _getParentReference(symbol: ts.Symbol): DeclarationReference | undefined {
+  private _getParentReference(
+    symbol: ts.Symbol
+  ): { parentReference: DeclarationReference; exportNameInParent?: string } | undefined {
     const declaration: ts.Node | undefined = TypeScriptHelpers.tryGetADeclaration(symbol);
     const sourceFile: ts.SourceFile | undefined = declaration?.getSourceFile();
 
@@ -281,24 +290,34 @@ export class DeclarationReferenceGenerator {
     const entity: CollectorEntity | undefined = this._collector.tryGetEntityForSymbol(symbol);
     if (entity) {
       if (entity.exportedFromEntryPoint) {
-        return new DeclarationReference(this._sourceFileToModuleSource(sourceFile));
+        return {
+          parentReference: new DeclarationReference(this._sourceFileToModuleSource(sourceFile)),
+          exportNameInParent: first(Array.from(entity.exportNames))
+        };
       }
 
-      const firstExportingConsumableParent: CollectorEntity | undefined =
-        entity.getFirstExportingConsumableParent();
+      const firstExportingConsumableParent:
+        | { entity: CollectorEntity; exportNames: ReadonlySet<string> }
+        | undefined = entity.getFirstExportingConsumableParent();
       if (
         firstExportingConsumableParent &&
-        firstExportingConsumableParent.astEntity instanceof AstNamespaceImport
+        firstExportingConsumableParent.entity.astEntity instanceof AstNamespaceImport
       ) {
         const parentSymbol: ts.Symbol | undefined = TypeScriptInternals.tryGetSymbolForDeclaration(
-          firstExportingConsumableParent.astEntity.declaration,
+          firstExportingConsumableParent.entity.astEntity.declaration,
           this._collector.typeChecker
         );
         if (parentSymbol) {
-          return this._symbolToDeclarationReference(
+          const parentReference = this._symbolToDeclarationReference(
             parentSymbol,
             parentSymbol.flags,
             /*includeModuleSymbols*/ true
+          );
+          return (
+            parentReference && {
+              parentReference,
+              exportNameInParent: first(Array.from(firstExportingConsumableParent.exportNames))
+            }
           );
         }
       }
@@ -307,11 +326,12 @@ export class DeclarationReferenceGenerator {
     // Next, try to find a parent symbol via the symbol tree.
     const parentSymbol: ts.Symbol | undefined = TypeScriptInternals.getSymbolParent(symbol);
     if (parentSymbol) {
-      return this._symbolToDeclarationReference(
+      const parentReference = this._symbolToDeclarationReference(
         parentSymbol,
         parentSymbol.flags,
         /*includeModuleSymbols*/ true
       );
+      return parentReference && { parentReference };
     }
 
     // If that doesn't work, try to find a parent symbol via the node tree. As far as we can tell,
@@ -333,19 +353,20 @@ export class DeclarationReferenceGenerator {
         this._collector.typeChecker
       );
       if (grandParentSymbol) {
-        return this._symbolToDeclarationReference(
+        const parentReference = this._symbolToDeclarationReference(
           grandParentSymbol,
           grandParentSymbol.flags,
           /*includeModuleSymbols*/ true
         );
+        return parentReference && { parentReference };
       }
     }
 
     // At this point, we have a local symbol in a module.
     if (sourceFile && ts.isExternalModule(sourceFile)) {
-      return new DeclarationReference(this._sourceFileToModuleSource(sourceFile));
+      return { parentReference: new DeclarationReference(this._sourceFileToModuleSource(sourceFile)) };
     } else {
-      return new DeclarationReference(GlobalSource.instance);
+      return { parentReference: new DeclarationReference(GlobalSource.instance) };
     }
   }
 
