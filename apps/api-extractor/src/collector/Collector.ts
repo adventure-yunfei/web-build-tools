@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
+import { first, takeRight } from 'lodash';
+import * as path from 'path';
 import * as ts from 'typescript';
 import * as tsdoc from '@microsoft/tsdoc';
 import { PackageJsonLookup, Sort, InternalError } from '@rushstack/node-core-library';
@@ -568,6 +570,7 @@ export class Collector {
       // Generate a unique name based on idealNameForEmit
       let suffix: number = 1;
       let nameForEmit: string = idealNameForEmit;
+      let idealNameForEmitWithSuffix: string | undefined;
 
       // Choose a name that doesn't conflict with usedNames or a global name
       while (
@@ -575,10 +578,46 @@ export class Collector {
         usedNames.has(nameForEmit) ||
         this.globalVariableAnalyzer.hasGlobalName(nameForEmit)
       ) {
-        nameForEmit = `${idealNameForEmit}_${++suffix}`;
+        if (idealNameForEmitWithSuffix === undefined) {
+          idealNameForEmitWithSuffix = `${idealNameForEmit}${
+            this._getNameForEmitSuffixWhenConflict(entity) ?? ''
+          }`;
+          nameForEmit = idealNameForEmitWithSuffix;
+        } else {
+          nameForEmit = `${idealNameForEmitWithSuffix}_${++suffix}`;
+        }
       }
       entity.nameForEmit = nameForEmit;
       usedNames.add(nameForEmit);
+    }
+  }
+
+  private _getNameForEmitSuffixWhenConflict(entity: CollectorEntity): string | undefined {
+    const entrySourceFile: ts.SourceFile | undefined = this._astEntryPoint?.sourceFile;
+
+    let entitySourceFile: ts.SourceFile | undefined;
+    if (entity.astEntity instanceof AstSymbol) {
+      entitySourceFile = first(entity.astEntity.astDeclarations)?.declaration.getSourceFile();
+    } else if (entity.astEntity instanceof AstNamespaceImport) {
+      entitySourceFile = entity.astEntity.astModule.sourceFile;
+    }
+
+    if (entrySourceFile && entitySourceFile) {
+      // add path to the suffix to make it unique and readable
+      const relativePath: string = path.relative(
+        path.dirname(entrySourceFile.fileName),
+        entitySourceFile.fileName
+      );
+      if (!relativePath.startsWith('..')) {
+        const parts: string[] = relativePath
+          .replace(/(\.d)?\.tsx?$/, '')
+          .split(path.sep)
+          .map((part) => part.replace(/[^\w\d\$]/g, '_'))
+          .filter((part) => part !== 'index');
+        if (parts.length) {
+          return `__${takeRight(parts, 2).join('_')}`;
+        }
+      }
     }
   }
 
