@@ -61,6 +61,46 @@
     - 问题2: 解析 DeclarationReference 时，没有考虑 `AstNamespaceImport`, 导致在 `Foo.fooProp` 中生成了无效的 `FooModule.OriginClass` 引用路径
 
   </details>
+- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1)
+  <details>
+
+    输入类型：
+    ```ts
+    // propA.d.ts
+    export interface Prop {}
+    // propB.d.ts
+    export interface Prop {}
+    // index.d.ts
+    import { Prop as PropA } from './propA';
+    import { Prop as PropB } from './propB';
+    export declare class Foo {
+      prop: PropA | PropB;
+    }
+    ```
+
+    优化前的 dts 输出：
+    ```ts
+    interface Prop {}
+    interface Prop_2 {}
+    export declare class Foo {
+      prop: Prop | Prop_2;
+    }
+    export {};
+    ```
+
+    优化后的 dts 输出：
+    ```ts
+    interface Prop {}
+    interface Prop__propB {}
+    export declare class Foo {
+      prop: Prop | Prop__propB;
+    }
+    export {};
+    ```
+
+    冲突概率也会更小，输出文件不会频繁大面积变更。
+
+  </details>
 
 ## `api-documenter`
 

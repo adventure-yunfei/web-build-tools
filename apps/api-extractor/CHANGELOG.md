@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.36.4-rc.4
+- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源
+
 ## 7.36.4-rc.3
 - 修正 `includeForgottenExports` 激活时不必要的 api 内容生成
 - 修正 `AstNamespaceImport` members 的 DeclarationReference 解析
