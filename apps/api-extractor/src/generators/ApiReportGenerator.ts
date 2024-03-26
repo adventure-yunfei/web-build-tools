@@ -424,6 +424,19 @@ export class ApiReportGenerator {
           }
         );
         break;
+
+      case ts.SyntaxKind.StringLiteral:
+        if (
+          span.parent?.kind === ts.SyntaxKind.LiteralType &&
+          (span.parent.parent?.kind === ts.SyntaxKind.UnionType ||
+            (span.parent.parent?.kind === ts.SyntaxKind.SyntaxList &&
+              span.parent.parent.parent?.kind === ts.SyntaxKind.UnionType))
+        ) {
+          // sort union of string literals: "bar" | "foo" | "baz" -> "foo" | "bar" | "baz"
+          span.parent.parent.modification.sortChildren = true;
+          span.parent.modification.sortKey = span.node.getText();
+        }
+        break;
     }
 
     if (recurseChildren) {
