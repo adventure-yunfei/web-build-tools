@@ -101,6 +101,29 @@
     冲突概率也会更小，输出文件不会频繁大面积变更。
 
   </details>
+- 新增 api-review string union type 结果排序 (4869e262d5de89051cd689230d52207daa8f15f4)
+  <details>
+
+    输入类型：
+    ```ts
+    export type Foo = 'b' | 'c' | 'a';
+    ```
+
+    优化前的 dts 输出：
+    ```ts
+    export type Foo = 'b' | 'c' | 'a';
+    export {};
+    ```
+
+    优化后的 dts 输出：
+    ```ts
+    export type Foo = 'a' | 'b' | 'c';
+    export {};
+    ```
+
+    某些情况下 ts 会自动编译产出一些 string union 类型（比如 `Omit` 类型），这些 string 类型有时候会变更顺序，导致不必要的 api review 变更；排序可以消除这类变更。
+
+  </details>
 
 ## `api-documenter`
 

@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.36.4-rc.5
+- 新增 api-review string union type 结果排序
+
 ## 7.36.4-rc.4
 - 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源
 
