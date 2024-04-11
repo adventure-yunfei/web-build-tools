@@ -522,6 +522,7 @@ export class Collector {
 
     // Set of names that should NOT be used when generating a unique nameForEmit
     const usedNames: Set<string> = new Set<string>();
+    const localNameCount: Map<string, number> = new Map<string, number>();
 
     // First collect the names of explicit package exports, and perform a sanity check.
     for (const entity of this._entities) {
@@ -532,6 +533,10 @@ export class Collector {
         }
         usedNames.add(exportName);
       }
+      localNameCount.set(
+        entity.astEntity.localName,
+        (localNameCount.get(entity.astEntity.localName) ?? 0) + 1
+      );
     }
 
     // Ensure that each entity has a unique nameForEmit
@@ -567,10 +572,14 @@ export class Collector {
         }
       }
 
+      // If the idealNameForEmit has conflict, append a meaningful suffix
+      if ((localNameCount.get(idealNameForEmit) ?? 0) >= 2) {
+        idealNameForEmit = `${idealNameForEmit}${this._getNameForEmitSuffixWhenConflict(entity)}`;
+      }
+
       // Generate a unique name based on idealNameForEmit
       let suffix: number = 1;
       let nameForEmit: string = idealNameForEmit;
-      let idealNameForEmitWithSuffix: string | undefined;
 
       // Choose a name that doesn't conflict with usedNames or a global name
       while (
@@ -578,14 +587,7 @@ export class Collector {
         usedNames.has(nameForEmit) ||
         this.globalVariableAnalyzer.hasGlobalName(nameForEmit)
       ) {
-        if (idealNameForEmitWithSuffix === undefined) {
-          idealNameForEmitWithSuffix = `${idealNameForEmit}${
-            this._getNameForEmitSuffixWhenConflict(entity) ?? ''
-          }`;
-          nameForEmit = idealNameForEmitWithSuffix;
-        } else {
-          nameForEmit = `${idealNameForEmitWithSuffix}_${++suffix}`;
-        }
+        nameForEmit = `${idealNameForEmit}_${++suffix}`;
       }
       entity.nameForEmit = nameForEmit;
       usedNames.add(nameForEmit);
