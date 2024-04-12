@@ -574,7 +574,7 @@ export class Collector {
 
       // If the idealNameForEmit has conflict, append a meaningful suffix
       if ((localNameCount.get(idealNameForEmit) ?? 0) >= 2) {
-        idealNameForEmit = `${idealNameForEmit}${this._getNameForEmitSuffixWhenConflict(entity)}`;
+        idealNameForEmit = `${idealNameForEmit}${this._getNameForEmitSuffixWhenConflict(entity) ?? ''}`;
       }
 
       // Generate a unique name based on idealNameForEmit
