@@ -41,7 +41,14 @@ export class ApiReportGenerator {
     return normalizedActual === normalizedExpected;
   }
 
-  public static generateReviewFileContent(collector: Collector): string {
+  public static generateReviewFileContent(
+    collector: Collector,
+    apiReportTimming: ReleaseTag = ReleaseTag.Beta,
+    // Remove some root-export that are not needed in the report (by export name)
+    rootExportTrimmings: ReadonlySet<string> = new Set(
+      process.env.API_REPORT_EXPORT_TRIMMINGS?.split(',') || []
+    )
+  ): string {
     const writer: IndentedWriter = new IndentedWriter();
     writer.trimLeadingSpaces = true;
 
@@ -142,7 +149,8 @@ export class ApiReportGenerator {
                     span,
                     shouldChildInlineExport,
                     astDeclaration,
-                    false
+                    false,
+                    apiReportTimming
                   );
                 }
 
@@ -164,9 +172,27 @@ export class ApiReportGenerator {
     }
 
     // Emit the regular declarations
+    const referencedEntities: ReadonlySet<CollectorEntity> = ApiReportGenerator._collectReferencedEntities(
+      collector,
+      apiReportTimming,
+      rootExportTrimmings
+    );
     for (const entity of collector.entities) {
       const astEntity: AstEntity = entity.astEntity;
-      if (entity.exportedFromEntryPoint || collector.extractorConfig.apiReportIncludeForgottenExports) {
+      let shouldEmitEntity: boolean = false;
+      if (entity.exportedFromEntryPoint) {
+        shouldEmitEntity = Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name));
+      } else if (!collector.extractorConfig.apiReportIncludeForgottenExports) {
+        shouldEmitEntity = false;
+      } else if (entity.exported) {
+        // If entity is exported from local namespace, it'll be emitted as part of the namespace.
+        shouldEmitEntity = false;
+      } else {
+        // Only emit entities that are referenced by other entities
+        shouldEmitEntity = referencedEntities.has(entity);
+      }
+
+      if (shouldEmitEntity) {
         // First, collect the list of export names for this symbol.  When reporting messages with
         // ExtractorMessage.properties.exportName, this will enable us to emit the warning comments alongside
         // the associated export statement.
@@ -220,7 +246,8 @@ export class ApiReportGenerator {
                 span,
                 entity.shouldInlineExport,
                 astDeclaration,
-                false
+                false,
+                apiReportTimming
               );
             }
 
@@ -281,6 +308,65 @@ export class ApiReportGenerator {
     return writer.toString().replace(ApiReportGenerator._trimSpacesRegExp, '');
   }
 
+  private static _collectReferencedEntities(
+    collector: Collector,
+    apiReportTimming: ReleaseTag,
+    rootExportTrimmings: ReadonlySet<string>
+  ): ReadonlySet<CollectorEntity> {
+    const referencedAstEntities: Set<AstEntity> = new Set<AstEntity>();
+
+    const alreadySeenAstEntities: Set<AstEntity> = new Set();
+    function collectReferencesFromAstEntity(astEntity: AstEntity) {
+      if (alreadySeenAstEntities.has(astEntity)) {
+        return;
+      }
+      alreadySeenAstEntities.add(astEntity);
+
+      referencedAstEntities.add(astEntity);
+
+      if (astEntity instanceof AstSymbol) {
+        for (const astDeclaration of astEntity.astDeclarations) {
+          const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
+          const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
+          if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
+            continue; // trim out items under specified release tag
+          }
+
+          for (const referencedAstEntity of astDeclaration.referencedAstEntities) {
+            collectReferencesFromAstEntity(referencedAstEntity);
+          }
+          for (const childDeclaration of astDeclaration.children) {
+            collectReferencesFromAstEntity(childDeclaration.astSymbol);
+          }
+        }
+      } else if (astEntity instanceof AstNamespaceImport) {
+        const astModuleExport: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
+        for (const exportedLocalEntity of astModuleExport.exportedLocalEntities.values()) {
+          collectReferencesFromAstEntity(exportedLocalEntity);
+        }
+      }
+    }
+
+    for (const entity of collector.entities) {
+      if (
+        entity.exportedFromEntryPoint &&
+        Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name))
+      ) {
+        collectReferencesFromAstEntity(entity.astEntity);
+      }
+    }
+
+    const referencedCollectorEntities: Set<CollectorEntity> = new Set();
+    for (const referencedAstEntity of referencedAstEntities) {
+      const referencedCollectorEntity: CollectorEntity | undefined =
+        collector.tryGetCollectorEntity(referencedAstEntity);
+      if (referencedCollectorEntity) {
+        referencedCollectorEntities.add(referencedCollectorEntity);
+      }
+    }
+    return referencedCollectorEntities;
+  }
+
   /**
    * Before writing out a declaration, _modifySpan() applies various fixups to make it nice.
    */
@@ -289,11 +375,19 @@ export class ApiReportGenerator {
     span: Span,
     shouldInlineExport: boolean,
     astDeclaration: AstDeclaration,
-    insideTypeLiteral: boolean
+    insideTypeLiteral: boolean,
+    apiReportTimming: ReleaseTag
   ): void {
     // Should we process this declaration at all?
     // eslint-disable-next-line no-bitwise
     if ((astDeclaration.modifierFlags & ts.ModifierFlags.Private) !== 0) {
+      span.modification.skipAll();
+      return;
+    }
+
+    const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
+    const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
+    if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
       span.modification.skipAll();
       return;
     }
@@ -419,7 +513,8 @@ export class ApiReportGenerator {
               childSpan,
               shouldInlineExport,
               childAstDeclaration,
-              insideTypeLiteral
+              insideTypeLiteral,
+              apiReportTimming
             );
           }
         );
@@ -474,7 +569,8 @@ export class ApiReportGenerator {
           child,
           shouldInlineExport,
           childAstDeclaration,
-          insideTypeLiteral
+          insideTypeLiteral,
+          apiReportTimming
         );
       }
     }
