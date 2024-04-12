@@ -43,7 +43,11 @@ export class ApiReportGenerator {
 
   public static generateReviewFileContent(
     collector: Collector,
-    apiReportTimming: ReleaseTag = ReleaseTag.Beta
+    apiReportTimming: ReleaseTag = ReleaseTag.Beta,
+    // Remove some root-export that are not needed in the report (by export name)
+    rootExportTrimmings: ReadonlySet<string> = new Set(
+      process.env.API_REPORT_EXPORT_TRIMMINGS?.split(',') || []
+    )
   ): string {
     const writer: IndentedWriter = new IndentedWriter();
     writer.trimLeadingSpaces = true;
@@ -170,13 +174,14 @@ export class ApiReportGenerator {
     // Emit the regular declarations
     const referencedEntities: ReadonlySet<CollectorEntity> = ApiReportGenerator._collectReferencedEntities(
       collector,
-      apiReportTimming
+      apiReportTimming,
+      rootExportTrimmings
     );
     for (const entity of collector.entities) {
       const astEntity: AstEntity = entity.astEntity;
       let shouldEmitEntity: boolean = false;
       if (entity.exportedFromEntryPoint) {
-        shouldEmitEntity = true;
+        shouldEmitEntity = Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name));
       } else if (!collector.extractorConfig.apiReportIncludeForgottenExports) {
         shouldEmitEntity = false;
       } else if (entity.exported) {
@@ -305,7 +310,8 @@ export class ApiReportGenerator {
 
   private static _collectReferencedEntities(
     collector: Collector,
-    apiReportTimming: ReleaseTag
+    apiReportTimming: ReleaseTag,
+    rootExportTrimmings: ReadonlySet<string>
   ): ReadonlySet<CollectorEntity> {
     const referencedAstEntities: Set<AstEntity> = new Set<AstEntity>();
 
@@ -342,7 +348,10 @@ export class ApiReportGenerator {
     }
 
     for (const entity of collector.entities) {
-      if (entity.consumable) {
+      if (
+        entity.exportedFromEntryPoint &&
+        Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name))
+      ) {
         collectReferencesFromAstEntity(entity.astEntity);
       }
     }
