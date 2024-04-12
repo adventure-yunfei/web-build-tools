@@ -61,7 +61,7 @@
     - 问题2: 解析 DeclarationReference 时，没有考虑 `AstNamespaceImport`, 导致在 `Foo.fooProp` 中生成了无效的 `FooModule.OriginClass` 引用路径
 
   </details>
-- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1)
+- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1, bfbfe5610f65ff908ec0ec843335bab9bdb5c9f4)
   <details>
 
     输入类型：
@@ -90,10 +90,10 @@
 
     优化后的 dts 输出：
     ```ts
-    interface Prop {}
+    interface Prop__propA {}
     interface Prop__propB {}
     export declare class Foo {
-      prop: Prop | Prop__propB;
+      prop: Prop__propA | Prop__propB;
     }
     export {};
     ```
@@ -124,6 +124,10 @@
     某些情况下 ts 会自动编译产出一些 string union 类型（比如 `Omit` 类型），这些 string 类型有时候会变更顺序，导致不必要的 api review 变更；排序可以消除这类变更。
 
   </details>
+- 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff)
+  - 默认开启 `@beta` release 裁剪，移除 `@internal` 变更
+  - 新增 entity 有效引用分析，`includeForgottenExports` 下仅导出实际被引用的 entity
+  - 新增 rootExportTrimmings 选项，裁剪根节点导出内容 (通过 `env.API_REPORT_EXPORT_TRIMMINGS` 环境变量设置)
 
 ## `api-documenter`
 

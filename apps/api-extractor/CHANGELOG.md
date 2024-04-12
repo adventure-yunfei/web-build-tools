@@ -1,5 +1,11 @@
 # Change Log - api-extractor custom version
 
+## 7.36.4-rc.7
+- 优化 `nameForEmit` 在冲突时的命名策略，同样应用到首个声明
+- 优化&裁剪 api-review 导出，仅导出有效引用的、非 `@internal` 标记的类型，并支持裁剪部分导出类型
+
+## ~~7.36.4-rc.6~~
+
 ## 7.36.4-rc.5
 - 新增 api-review string union type 结果排序
 
