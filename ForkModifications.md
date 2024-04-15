@@ -61,7 +61,7 @@
     - 问题2: 解析 DeclarationReference 时，没有考虑 `AstNamespaceImport`, 导致在 `Foo.fooProp` 中生成了无效的 `FooModule.OriginClass` 引用路径
 
   </details>
-- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1, bfbfe5610f65ff908ec0ec843335bab9bdb5c9f4)
+- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1, bfbfe5610f65ff908ec0ec843335bab9bdb5c9f4, d38122b09c990aac3946fee936b184f2757aa38f)
   <details>
 
     输入类型：
