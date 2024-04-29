@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.22.33-rc.2
+- 提取 `_getApiItemPageTitle` 方法
+
 ## 7.22.33-rc.1
 - markdown 输出结果兼容 mdx@1.x，以支持 Docusaurus 文档工具
 - 支持移除 Home 导航链接

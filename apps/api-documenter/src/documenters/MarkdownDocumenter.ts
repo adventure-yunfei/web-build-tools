@@ -118,13 +118,17 @@ export class MarkdownDocumenter {
     }
   }
 
+  private _getApiItemPageTitle(apiItem: ApiItem): string {
+    return apiItem.getScopedNameWithinPackage();
+  }
+
   private _writeApiItemPage(apiItem: ApiItem): void {
     const configuration: TSDocConfiguration = this._tsdocConfiguration;
     const output: DocSection = new DocSection({ configuration });
 
     this._writeBreadcrumb(output, apiItem);
 
-    const scopedName: string = apiItem.getScopedNameWithinPackage();
+    const scopedName: string = this._getApiItemPageTitle(apiItem);
 
     switch (apiItem.kind) {
       case ApiItemKind.Class:
