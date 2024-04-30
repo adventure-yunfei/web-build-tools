@@ -1,17 +1,29 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { StdioSummarizer } from '@rushstack/terminal';
-import { InternalError } from '@rushstack/node-core-library';
-import { CollatedWriter, StreamCollator } from '@rushstack/stream-collator';
+import {
+  type ITerminal,
+  type ITerminalProvider,
+  DiscardStdoutTransform,
+  SplitterTransform,
+  StderrLineTransform,
+  StdioSummarizer,
+  TextRewriterTransform,
+  Terminal,
+  type TerminalWritable
+} from '@rushstack/terminal';
+import { InternalError, NewlineKind } from '@rushstack/node-core-library';
+import { CollatedTerminal, type CollatedWriter, type StreamCollator } from '@rushstack/stream-collator';
 
 import { OperationStatus } from './OperationStatus';
-import { IOperationRunner, IOperationRunnerContext } from './IOperationRunner';
-import { Operation } from './Operation';
+import type { IOperationRunner, IOperationRunnerContext } from './IOperationRunner';
+import type { Operation } from './Operation';
 import { Stopwatch } from '../../utilities/Stopwatch';
 import { OperationMetadataManager } from './OperationMetadataManager';
 import type { IPhase } from '../../api/CommandLineConfiguration';
 import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import { CollatedTerminalProvider } from '../../utilities/CollatedTerminalProvider';
+import { ProjectLogWritable } from './ProjectLogWritable';
 
 export interface IOperationExecutionRecordContext {
   streamCollator: StreamCollator;
@@ -19,7 +31,6 @@ export interface IOperationExecutionRecordContext {
 
   debugMode: boolean;
   quietMode: boolean;
-  changedProjectsOnly: boolean;
 }
 
 /**
@@ -32,14 +43,6 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
    * The associated operation.
    */
   public readonly operation: Operation;
-
-  /**
-   * The current execution status of an operation. Operations start in the 'ready' state,
-   * but can be 'blocked' if an upstream operation failed. It is 'executing' when
-   * the operation is executing. Once execution is complete, it is either 'success' or
-   * 'failure'.
-   */
-  public status: OperationStatus = OperationStatus.Ready;
 
   /**
    * The error which occurred while executing this operation, this is stored in case we need
@@ -101,6 +104,7 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
   private readonly _context: IOperationExecutionRecordContext;
 
   private _collatedWriter: CollatedWriter | undefined = undefined;
+  private _status: OperationStatus;
 
   public constructor(operation: Operation, context: IOperationExecutionRecordContext) {
     const { runner, associatedPhase, associatedProject } = operation;
@@ -123,6 +127,7 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
       });
     }
     this._context = context;
+    this._status = operation.dependencies.size > 0 ? OperationStatus.Waiting : OperationStatus.Ready;
   }
 
   public get name(): string {
@@ -135,10 +140,6 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
 
   public get quietMode(): boolean {
     return this._context.quietMode;
-  }
-
-  public get changedProjectsOnly(): boolean {
-    return this._context.changedProjectsOnly;
   }
 
   public get collatedWriter(): CollatedWriter {
@@ -159,6 +160,109 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
     return this._operationMetadataManager?.stateFile.state?.cobuildRunnerId;
   }
 
+  /**
+   * The current execution status of an operation. Operations start in the 'ready' state,
+   * but can be 'blocked' if an upstream operation failed. It is 'executing' when
+   * the operation is executing. Once execution is complete, it is either 'success' or
+   * 'failure'.
+   */
+  public get status(): OperationStatus {
+    return this._status;
+  }
+  public set status(newStatus: OperationStatus) {
+    if (newStatus === this._status) {
+      return;
+    }
+    this._status = newStatus;
+    this._context.onOperationStatusChanged?.(this);
+  }
+
+  /**
+   * {@inheritdoc IOperationRunnerContext.runWithTerminalAsync}
+   */
+  public async runWithTerminalAsync<T>(
+    callback: (terminal: ITerminal, terminalProvider: ITerminalProvider) => Promise<T>,
+    options: {
+      createLogFile: boolean;
+      logFileSuffix: string;
+    }
+  ): Promise<T> {
+    const { associatedPhase, associatedProject, stdioSummarizer } = this;
+    const { createLogFile, logFileSuffix = '' } = options;
+    const projectLogWritable: ProjectLogWritable | undefined =
+      createLogFile && associatedProject && associatedPhase
+        ? new ProjectLogWritable(
+            associatedProject,
+            this.collatedWriter.terminal,
+            `${associatedPhase.logFilenameIdentifier}${logFileSuffix}`
+          )
+        : undefined;
+
+    try {
+      //#region OPERATION LOGGING
+      // TERMINAL PIPELINE:
+      //
+      //                             +--> quietModeTransform? --> collatedWriter
+      //                             |
+      // normalizeNewlineTransform --1--> stderrLineTransform --2--> removeColorsTransform --> projectLogWritable
+      //                                                        |
+      //                                                        +--> stdioSummarizer
+      const destination: TerminalWritable = projectLogWritable
+        ? new SplitterTransform({
+            destinations: [
+              new TextRewriterTransform({
+                destination: projectLogWritable,
+                removeColors: true,
+                normalizeNewlines: NewlineKind.OsDefault
+              }),
+              stdioSummarizer
+            ]
+          })
+        : stdioSummarizer;
+
+      const stderrLineTransform: StderrLineTransform = new StderrLineTransform({
+        destination,
+        newlineKind: NewlineKind.Lf // for StdioSummarizer
+      });
+
+      const splitterTransform1: SplitterTransform = new SplitterTransform({
+        destinations: [
+          this.quietMode
+            ? new DiscardStdoutTransform({ destination: this.collatedWriter })
+            : this.collatedWriter,
+          stderrLineTransform
+        ]
+      });
+
+      const normalizeNewlineTransform: TextRewriterTransform = new TextRewriterTransform({
+        destination: splitterTransform1,
+        normalizeNewlines: NewlineKind.Lf,
+        ensureNewlineAtEnd: true
+      });
+
+      const collatedTerminal: CollatedTerminal = new CollatedTerminal(normalizeNewlineTransform);
+      const terminalProvider: CollatedTerminalProvider = new CollatedTerminalProvider(collatedTerminal, {
+        debugEnabled: this.debugMode
+      });
+      const terminal: Terminal = new Terminal(terminalProvider);
+      //#endregion
+
+      const result: T = await callback(terminal, terminalProvider);
+
+      normalizeNewlineTransform.close();
+
+      // If the pipeline is wired up correctly, then closing normalizeNewlineTransform should
+      // have closed projectLogWritable.
+      if (projectLogWritable?.isOpen) {
+        throw new InternalError('The output file handle was not closed');
+      }
+
+      return result;
+    } finally {
+      projectLogWritable?.close();
+    }
+  }
+
   public async executeAsync({
     onStart,
     onResult
@@ -169,9 +273,8 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
     if (this.status === OperationStatus.RemoteExecuting) {
       this.stopwatch.reset();
     }
-    this.status = OperationStatus.Executing;
     this.stopwatch.start();
-    this._context.onOperationStatusChanged?.(this);
+    this.status = OperationStatus.Executing;
 
     try {
       const earlyReturnStatus: OperationStatus | undefined = await onStart(this);
@@ -194,7 +297,6 @@ export class OperationExecutionRecord implements IOperationRunnerContext {
         this.stdioSummarizer.close();
         this.stopwatch.stop();
       }
-      this._context.onOperationStatusChanged?.(this);
     }
   }
 }

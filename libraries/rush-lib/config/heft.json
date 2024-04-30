@@ -4,7 +4,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/heft/v0/heft.schema.json",
 
-  "extends": "@rushstack/heft-node-rig/profiles/default/config/heft.json",
+  "extends": "local-node-rig/profiles/default/config/heft.json",
 
   // TODO: Add comments
   "phasesByName": {
@@ -36,6 +36,11 @@
                   "sourcePath": "src/logic/pnpm/test",
                   "destinationFolders": ["lib-commonjs/logic/pnpm/test"],
                   "fileExtensions": [".yaml"]
+                },
+                {
+                  "sourcePath": "src/logic/test",
+                  "destinationFolders": ["lib-commonjs/logic/test"],
+                  "includeGlobs": ["**/.mergequeueignore"]
                 }
               ]
             }

@@ -5,19 +5,23 @@ import * as child_process from 'child_process';
 import * as os from 'os';
 import * as path from 'path';
 import { performance } from 'perf_hooks';
+import { Transform } from 'stream';
 import {
   JsonFile,
-  IPackageJson,
+  type IPackageJson,
   FileSystem,
   FileConstants,
-  FileSystemStats
+  type FileSystemStats,
+  SubprocessTerminator
 } from '@rushstack/node-core-library';
-import type * as stream from 'stream';
 
-import { RushConfiguration } from '../api/RushConfiguration';
+import type { RushConfiguration } from '../api/RushConfiguration';
 import { syncNpmrc } from './npmrcUtilities';
+import { EnvironmentVariableNames } from '../api/EnvironmentConfiguration';
+import { RushConstants } from '../logic/RushConstants';
 
 export type UNINITIALIZED = 'UNINITIALIZED';
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UNINITIALIZED: UNINITIALIZED = 'UNINITIALIZED';
 
 export interface IEnvironment {
@@ -75,9 +79,24 @@ export interface ILifecycleCommandOptions {
   handleOutput: boolean;
 
   /**
+   * an existing environment to copy instead of process.env
+   */
+  initialEnvironment?: IEnvironment;
+
+  /**
    * Options for what should be added to the PATH variable
    */
   environmentPathOptions: IEnvironmentPathOptions;
+
+  /**
+   * If true, attempt to establish a NodeJS IPC channel to the child process.
+   */
+  ipc?: boolean;
+
+  /**
+   * If true, wire up SubprocessTerminator to the child process.
+   */
+  connectSubprocessTerminator?: boolean;
 }
 
 export interface IEnvironmentPathOptions {
@@ -186,6 +205,7 @@ export class Utilities {
       const totalSeconds: string = ((currentTime - startTime) / 1000.0).toFixed(2);
       // This logging statement isn't meaningful to the end-user. `fnName` should be updated
       // to something like `operationDescription`
+      // eslint-disable-next-line no-console
       console.log(`${fnName}() stalled for ${totalSeconds} seconds`);
     }
 
@@ -296,6 +316,29 @@ export class Utilities {
   /**
    * Executes the command with the specified command-line parameters, and waits for it to complete.
    * The current directory will be set to the specified workingDirectory.
+   *
+   * It's basically the same as executeCommand() except that it returns a Promise.
+   */
+  public static async executeCommandAndInspectOutputAsync(
+    options: IExecuteCommandOptions,
+    onStdoutStreamChunk?: (chunk: string) => string | void,
+    onExit?: (code: number, signal: string) => void
+  ): Promise<void> {
+    await Utilities._executeCommandAndInspectOutputInternalAsync(
+      options.command,
+      options.args,
+      options.workingDirectory,
+      options.suppressOutput ? undefined : onStdoutStreamChunk ? ['inherit', 'pipe', 'inherit'] : [0, 1, 2],
+      options.environment,
+      options.keepEnvironment,
+      onStdoutStreamChunk,
+      onExit
+    );
+  }
+
+  /**
+   * Executes the command with the specified command-line parameters, and waits for it to complete.
+   * The current directory will be set to the specified workingDirectory.
    */
   public static executeCommandAndCaptureOutput(
     command: string,
@@ -334,12 +377,16 @@ export class Utilities {
       try {
         Utilities.executeCommand(options);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.log('\nThe command failed:');
+        // eslint-disable-next-line no-console
         console.log(` ${options.command} ` + options.args.join(' '));
+        // eslint-disable-next-line no-console
         console.log(`ERROR: ${(error as Error).toString()}`);
 
         if (attemptNumber < maxAttempts) {
           ++attemptNumber;
+          // eslint-disable-next-line no-console
           console.log(`Trying again (attempt #${attemptNumber})...\n`);
           if (retryCallback) {
             retryCallback();
@@ -347,6 +394,56 @@ export class Utilities {
 
           continue;
         } else {
+          // eslint-disable-next-line no-console
+          console.error(`Giving up after ${attemptNumber} attempts\n`);
+          throw error;
+        }
+      }
+
+      break;
+    }
+  }
+
+  /**
+   * Attempts to run Utilities.executeCommand() up to maxAttempts times before giving up.
+   * Using `onStdoutStreamChunk` to process the output of the command.
+   *
+   * Note: This is similar to {@link executeCommandWithRetry} except that it returns a Promise and provides a callback to process the output.
+   */
+  public static async executeCommandAndProcessOutputWithRetryAsync(
+    options: IExecuteCommandOptions,
+    maxAttempts: number,
+    onStdoutStreamChunk?: (chunk: string) => string | void,
+    retryCallback?: () => void
+  ): Promise<void> {
+    if (maxAttempts < 1) {
+      throw new Error('The maxAttempts parameter cannot be less than 1');
+    }
+
+    let attemptNumber: number = 1;
+
+    for (;;) {
+      try {
+        await Utilities.executeCommandAndInspectOutputAsync(options, onStdoutStreamChunk);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log('\nThe command failed:');
+        // eslint-disable-next-line no-console
+        console.log(` ${options.command} ` + options.args.join(' '));
+        // eslint-disable-next-line no-console
+        console.log(`ERROR: ${(error as Error).toString()}`);
+
+        if (attemptNumber < maxAttempts) {
+          ++attemptNumber;
+          // eslint-disable-next-line no-console
+          console.log(`Trying again (attempt #${attemptNumber})...\n`);
+          if (retryCallback) {
+            retryCallback();
+          }
+
+          continue;
+        } else {
+          // eslint-disable-next-line no-console
           console.error(`Giving up after ${attemptNumber} attempts\n`);
           throw error;
         }
@@ -385,7 +482,15 @@ export class Utilities {
     command: string,
     options: ILifecycleCommandOptions
   ): child_process.ChildProcess {
-    return Utilities._executeLifecycleCommandInternal(command, child_process.spawn, options);
+    const child: child_process.ChildProcess = Utilities._executeLifecycleCommandInternal(
+      command,
+      child_process.spawn,
+      options
+    );
+    if (options.connectSubprocessTerminator) {
+      SubprocessTerminator.killProcessTreeOnExit(child, SubprocessTerminator.RECOMMENDED_OPTIONS);
+    }
+    return child;
   }
 
   /**
@@ -406,6 +511,7 @@ export class Utilities {
   public static installPackageInDirectory(options: IInstallPackageInDirectoryOptions): void {
     const directory: string = path.resolve(options.directory);
     if (FileSystem.exists(directory)) {
+      // eslint-disable-next-line no-console
       console.log('Deleting old files from ' + directory);
     }
 
@@ -423,9 +529,13 @@ export class Utilities {
     JsonFile.save(npmPackageJson, path.join(directory, FileConstants.PackageJson));
 
     if (options.commonRushConfigFolder) {
-      Utilities.syncNpmrc(options.commonRushConfigFolder, directory);
+      Utilities.syncNpmrc({
+        sourceNpmrcFolder: options.commonRushConfigFolder,
+        targetNpmrcFolder: directory
+      });
     }
 
+    // eslint-disable-next-line no-console
     console.log('\nRunning "npm install" in ' + directory);
 
     // NOTE: Here we use whatever version of NPM we happen to find in the PATH
@@ -447,12 +557,15 @@ export class Utilities {
    */
   public static syncFile(sourcePath: string, destinationPath: string): void {
     if (FileSystem.exists(sourcePath)) {
+      // eslint-disable-next-line no-console
       console.log(`Copying "${sourcePath}"`);
+      // eslint-disable-next-line no-console
       console.log(`  --> "${destinationPath}"`);
       FileSystem.copyFile({ sourcePath, destinationPath });
     } else {
       if (FileSystem.exists(destinationPath)) {
         // If the source file doesn't exist and there is one in the target, delete the one in the target
+        // eslint-disable-next-line no-console
         console.log(`Deleting ${destinationPath}`);
         FileSystem.deleteFile(destinationPath);
       }
@@ -460,7 +573,7 @@ export class Utilities {
   }
 
   public static getRushConfigNotFoundError(): Error {
-    return new Error('Unable to find rush.json configuration file');
+    return new Error(`Unable to find ${RushConstants.rushJsonFilename} configuration file`);
   }
 
   public static async usingAsync<TDisposable extends IDisposable>(
@@ -473,6 +586,27 @@ export class Utilities {
       await doActionAsync(disposable);
     } finally {
       disposable?.dispose();
+    }
+  }
+
+  public static trimAfterLastSlash(filePath: string): string {
+    const indexOfLastSlash: number = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'));
+    if (indexOfLastSlash < 0) {
+      return filePath;
+    }
+    return filePath.substring(0, indexOfLastSlash);
+  }
+
+  /**
+   * If the path refers to a symlink, `FileSystem.exists()` would normally test whether the symlink
+   * points to a target that exists. By contrast, `existsOrIsBrokenSymlink()` will return true even if
+   * the symlink exists but its target does not. */
+  public static existsOrIsSymlink(linkPath: string): boolean {
+    try {
+      FileSystem.getLinkStatistics(linkPath);
+      return true;
+    } catch (err) {
+      return false;
     }
   }
 
@@ -496,6 +630,7 @@ export class Utilities {
 
     const environment: IEnvironment = Utilities._createEnvironmentForRushCommand({
       initCwd: options.initCwd,
+      initialEnvironment: options.initialEnvironment,
       pathOptions: {
         ...options.environmentPathOptions,
         rushJsonFolder: options.rushConfiguration?.rushJsonFolder,
@@ -504,12 +639,23 @@ export class Utilities {
       }
     });
 
-    return spawnFunction(shellCommand, [commandFlags, command], {
+    const stdio: child_process.StdioOptions = options.handleOutput ? ['pipe', 'pipe', 'pipe'] : [0, 1, 2];
+    if (options.ipc) {
+      stdio.push('ipc');
+    }
+
+    const spawnOptions: child_process.SpawnOptions = {
       cwd: options.workingDirectory,
       shell: useShell,
       env: environment,
-      stdio: options.handleOutput ? ['pipe', 'pipe', 'pipe'] : [0, 1, 2]
-    });
+      stdio
+    };
+
+    if (options.connectSubprocessTerminator) {
+      Object.assign(spawnOptions, SubprocessTerminator.RECOMMENDED_OPTIONS);
+    }
+
+    return spawnFunction(shellCommand, [commandFlags, command], spawnOptions);
   }
 
   /**
@@ -590,6 +736,9 @@ export class Utilities {
       }
     }
 
+    // Communicate to downstream calls that they should not try to run hooks
+    environment[EnvironmentVariableNames._RUSH_RECURSIVE_RUSHX_CALL] = '1';
+
     return environment;
   }
 
@@ -613,17 +762,80 @@ export class Utilities {
   /**
    * Executes the command with the specified command-line parameters, and waits for it to complete.
    * The current directory will be set to the specified workingDirectory.
+   *
+   * It's the same as _executeCommandInternal except that it returns a promise.
+   */
+  private static async _executeCommandAndInspectOutputInternalAsync(
+    command: string,
+    args: string[],
+    workingDirectory: string,
+    stdio: child_process.SpawnSyncOptions['stdio'],
+    environment?: IEnvironment,
+    keepEnvironment: boolean = false,
+    onStdoutStreamChunk?: (chunk: string) => string | void,
+    onExit?: (code: number, signal: string) => void
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const options: child_process.SpawnOptions = {
+        cwd: workingDirectory,
+        shell: true,
+        stdio: stdio,
+        env: keepEnvironment
+          ? environment
+          : Utilities._createEnvironmentForRushCommand({ initialEnvironment: environment })
+      };
+
+      // Only escape the command if it actually contains spaces:
+      const escapedCommand: string =
+        command.indexOf(' ') < 0 ? command : Utilities.escapeShellParameter(command);
+
+      const escapedArgs: string[] = args.map((x) => Utilities.escapeShellParameter(x));
+
+      const childProcess: child_process.ChildProcess = child_process.spawn(
+        escapedCommand,
+        escapedArgs,
+        options
+      );
+
+      const inspectStream: Transform = new Transform({
+        transform: onStdoutStreamChunk
+          ? (
+              chunk: string | Buffer,
+              encoding: BufferEncoding,
+              callback: (error?: Error, data?: string | Buffer) => void
+            ) => {
+              const chunkString: string = chunk.toString();
+              const updatedChunk: string | void = onStdoutStreamChunk(chunkString);
+              callback(undefined, updatedChunk ?? chunk);
+            }
+          : undefined
+      });
+
+      childProcess.on('close', (code: number, signal: string) => {
+        onExit?.(code, signal);
+
+        // TODO: Is it possible that the childProcess is closed before the receiving the last chunks?
+        if (code === 0) {
+          resolve();
+        } else {
+          // mimic the current sync version "_executeCommandInternal" behavior.
+          reject(new Error(`The command failed with exit code ${code}`));
+        }
+      });
+
+      childProcess.stdout?.pipe(inspectStream).pipe(process.stdout);
+    });
+  }
+
+  /**
+   * Executes the command with the specified command-line parameters, and waits for it to complete.
+   * The current directory will be set to the specified workingDirectory.
    */
   private static _executeCommandInternal(
     command: string,
     args: string[],
     workingDirectory: string,
-    stdio:
-      | 'pipe'
-      | 'ignore'
-      | 'inherit'
-      | (number | 'pipe' | 'ignore' | 'inherit' | 'ipc' | stream.Stream | null | undefined)[]
-      | undefined,
+    stdio: child_process.SpawnSyncOptions['stdio'],
     environment?: IEnvironment,
     keepEnvironment: boolean = false
   ): child_process.SpawnSyncReturns<string | Buffer> {

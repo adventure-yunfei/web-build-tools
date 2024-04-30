@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { IPackageJson } from '@rushstack/node-core-library';
+import type { IPackageJson } from '@rushstack/node-core-library';
 
 import { VersionPolicyConfiguration } from '../VersionPolicyConfiguration';
 import { VersionPolicy, LockStepVersionPolicy, IndividualVersionPolicy, BumpType } from '../VersionPolicy';
@@ -88,6 +88,14 @@ describe(VersionPolicy.name, () => {
       lockStepVersionPolicy.bump();
       expect(lockStepVersionPolicy.version).toEqual('1.2.0');
       expect(lockStepVersionPolicy.nextBump).toEqual(undefined);
+    });
+
+    it('bumps version for preminor release', () => {
+      expect(versionPolicy1).toBeInstanceOf(LockStepVersionPolicy);
+      const lockStepVersionPolicy: LockStepVersionPolicy = versionPolicy1 as LockStepVersionPolicy;
+      lockStepVersionPolicy.bump(BumpType.preminor, 'pr');
+      expect(lockStepVersionPolicy.version).toEqual('1.2.0-pr.0');
+      expect(lockStepVersionPolicy.nextBump).toEqual(BumpType.patch);
     });
 
     it('bumps version for minor release', () => {

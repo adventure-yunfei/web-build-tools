@@ -1,6 +1,311 @@
 # Change Log - @rushstack/heft-web-rig
 
-This log was last generated on Tue, 08 Aug 2023 07:10:40 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 21:59:39 GMT and should not be manually modified.
+
+## 0.24.0
+Wed, 10 Apr 2024 21:59:39 GMT
+
+### Minor changes
+
+- Bump ESLint to ~8.57.0.
+
+## 0.23.6
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.23.5
+Fri, 29 Mar 2024 05:46:41 GMT
+
+_Version update only_
+
+## 0.23.4
+Thu, 28 Mar 2024 22:42:23 GMT
+
+_Version update only_
+
+## 0.23.3
+Thu, 28 Mar 2024 18:11:12 GMT
+
+_Version update only_
+
+## 0.23.2
+Wed, 27 Mar 2024 19:47:21 GMT
+
+_Version update only_
+
+## 0.23.1
+Wed, 20 Mar 2024 02:09:14 GMT
+
+_Version update only_
+
+## 0.23.0
+Tue, 19 Mar 2024 15:10:18 GMT
+
+### Minor changes
+
+- Upgrade to TypeScript 5.4
+
+## 0.22.9
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 0.22.8
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 0.22.7
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 0.22.6
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 0.22.5
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 0.22.4
+Thu, 29 Feb 2024 07:11:45 GMT
+
+_Version update only_
+
+## 0.22.3
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 0.22.2
+Mon, 26 Feb 2024 16:10:56 GMT
+
+_Version update only_
+
+## 0.22.1
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 0.22.0
+Thu, 22 Feb 2024 06:31:58 GMT
+
+### Minor changes
+
+- Update the "asset/resource" rule to include file extensions for font assets
+
+## 0.21.5
+Thu, 22 Feb 2024 05:54:17 GMT
+
+_Version update only_
+
+## 0.21.4
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 0.21.3
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 0.21.2
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 0.21.1
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 0.21.0
+Tue, 20 Feb 2024 16:10:52 GMT
+
+### Minor changes
+
+- Include the `set-environment-variables-plugin` plugin from the `@rushstack/heft` package to set the `BROWSERSLIST_IGNORE_OLD_DATA` environment variable to `1` to suppress the warning printed when the `browserslist` package decides it's out of date.
+- Rename the `sass-typings` task in the "library" profile to `sass`, which more accurately describes what the task does and matches what's in the "app" profile.
+
+## 0.20.10
+Mon, 19 Feb 2024 21:54:27 GMT
+
+_Version update only_
+
+## 0.20.9
+Sat, 17 Feb 2024 06:24:35 GMT
+
+_Version update only_
+
+## 0.20.8
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 0.20.7
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.20.6
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 0.20.5
+Thu, 25 Jan 2024 23:03:58 GMT
+
+_Version update only_
+
+## 0.20.4
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.20.3
+Wed, 24 Jan 2024 07:38:34 GMT
+
+_Version update only_
+
+## 0.20.2
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 0.20.1
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 0.20.0
+Tue, 16 Jan 2024 18:30:10 GMT
+
+### Minor changes
+
+- Upgrade to TypeScript 5.3
+
+## 0.19.17
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.19.16
+Wed, 20 Dec 2023 01:09:45 GMT
+
+_Version update only_
+
+## 0.19.15
+Fri, 15 Dec 2023 01:10:06 GMT
+
+_Version update only_
+
+## 0.19.14
+Fri, 08 Dec 2023 20:48:44 GMT
+
+_Version update only_
+
+## 0.19.13
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.19.12
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.19.11
+Wed, 22 Nov 2023 01:45:18 GMT
+
+_Version update only_
+
+## 0.19.10
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.19.9
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.19.8
+Mon, 30 Oct 2023 23:36:37 GMT
+
+_Version update only_
+
+## 0.19.7
+Thu, 26 Oct 2023 00:27:48 GMT
+
+_Version update only_
+
+## 0.19.6
+Mon, 23 Oct 2023 15:18:38 GMT
+
+_Version update only_
+
+## 0.19.5
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 0.19.4
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 0.19.3
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 0.19.2
+Wed, 27 Sep 2023 00:21:38 GMT
+
+_Version update only_
+
+## 0.19.1
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 0.19.0
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Minor changes
+
+- Add an optional patch which can be used to allow ESLint to extend configurations from packages that do not have the "eslint-config-" prefix. This change also includes the ESLint configurations sourced from "@rushstack/eslint-config"
+
+## 0.18.30
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 0.18.29
+Fri, 22 Sep 2023 00:05:51 GMT
+
+_Version update only_
+
+## 0.18.28
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 0.18.27
+Fri, 15 Sep 2023 00:36:58 GMT
+
+_Version update only_
+
+## 0.18.26
+Wed, 13 Sep 2023 00:32:29 GMT
+
+_Version update only_
 
 ## 0.18.25
 Tue, 08 Aug 2023 07:10:40 GMT

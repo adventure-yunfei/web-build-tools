@@ -1,6 +1,250 @@
 # Change Log - @rushstack/webpack5-localization-plugin
 
-This log was last generated on Tue, 08 Aug 2023 07:10:40 GMT and should not be manually modified.
+This log was last generated on Tue, 16 Apr 2024 22:49:20 GMT and should not be manually modified.
+
+## 0.10.0
+Tue, 16 Apr 2024 22:49:20 GMT
+
+### Minor changes
+
+- Perform localization before devtool runs instead of after. This is more expensive but ensures source maps are correct.
+
+## 0.9.15
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.9.14
+Tue, 19 Mar 2024 15:10:18 GMT
+
+_Version update only_
+
+## 0.9.13
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 0.9.12
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 0.9.11
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 0.9.10
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 0.9.9
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 0.9.8
+Thu, 29 Feb 2024 07:11:46 GMT
+
+_Version update only_
+
+## 0.9.7
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 0.9.6
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 0.9.5
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 0.9.4
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 0.9.3
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 0.9.2
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 0.9.1
+Tue, 20 Feb 2024 16:10:53 GMT
+
+_Version update only_
+
+## 0.9.0
+Mon, 19 Feb 2024 21:54:27 GMT
+
+### Minor changes
+
+- Filter out non-JS chunks.
+
+## 0.8.1
+Sat, 17 Feb 2024 06:24:35 GMT
+
+_Version update only_
+
+## 0.8.0
+Sat, 10 Feb 2024 01:40:49 GMT
+
+### Minor changes
+
+- Export a `TrueHashPlugin` that performs what the `realContentHash` option does, but without validating the localization plugin's options.
+
+## 0.7.3
+Sat, 10 Feb 2024 01:29:22 GMT
+
+### Patches
+
+- Add support for the `output.hashSalt` option when the `realContentHashes` feature is enabled.
+
+## 0.7.2
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 0.7.1
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.7.0
+Mon, 05 Feb 2024 23:46:52 GMT
+
+### Minor changes
+
+- Include an option called `realContentHash` that updates "[contenthash]" hashes to the actual hashes of chunks.
+- Add a warning if `optimization.realContentHash` is set.
+
+## 0.6.4
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.6.3
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 0.6.2
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 0.6.1
+Tue, 16 Jan 2024 18:30:11 GMT
+
+_Version update only_
+
+## 0.6.0
+Thu, 04 Jan 2024 01:08:53 GMT
+
+### Minor changes
+
+- Introduce a `formatLocaleForFilename` option to customize how a locale (or the lack thereof) is rendered in file paths.
+
+## 0.5.16
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.5.15
+Wed, 20 Dec 2023 01:09:46 GMT
+
+_Version update only_
+
+## 0.5.14
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.5.13
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.5.12
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.5.11
+Wed, 01 Nov 2023 23:11:36 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.5.10
+Mon, 30 Oct 2023 23:36:38 GMT
+
+_Version update only_
+
+## 0.5.9
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 0.5.8
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 0.5.7
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 0.5.6
+Wed, 27 Sep 2023 00:21:38 GMT
+
+_Version update only_
+
+## 0.5.5
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 0.5.4
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 0.5.3
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 0.5.2
+Fri, 22 Sep 2023 00:05:51 GMT
+
+_Version update only_
+
+## 0.5.1
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 0.5.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 0.4.41
 Tue, 08 Aug 2023 07:10:40 GMT

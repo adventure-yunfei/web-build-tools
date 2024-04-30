@@ -1,21 +1,28 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors/safe';
 import * as path from 'path';
 
-import { FileSystem, IPackageJson, JsonFile, LockFile, NewlineKind } from '@rushstack/node-core-library';
-import { Utilities } from '../utilities/Utilities';
+import {
+  FileSystem,
+  type IPackageJson,
+  JsonFile,
+  LockFile,
+  NewlineKind,
+  PackageName,
+  type IParsedPackageNameOrError
+} from '@rushstack/node-core-library';
+import { Colorize } from '@rushstack/terminal';
 
-import { PackageName, IParsedPackageNameOrError } from '@rushstack/node-core-library';
-import { RushConfiguration } from '../api/RushConfiguration';
+import { Utilities } from '../utilities/Utilities';
+import type { RushConfiguration } from '../api/RushConfiguration';
 import { PackageJsonEditor } from '../api/PackageJsonEditor';
 import { InstallHelpers } from './installManager/InstallHelpers';
 import type { RushGlobalFolder } from '../api/RushGlobalFolder';
 import { RushConstants } from './RushConstants';
 import { LastInstallFlag } from '../api/LastInstallFlag';
 import { RushCommandLineParser } from '../cli/RushCommandLineParser';
-import { PnpmPackageManager } from '../api/packageManager/PnpmPackageManager';
+import type { PnpmPackageManager } from '../api/packageManager/PnpmPackageManager';
 
 interface IAutoinstallerOptions {
   autoinstallerName: string;
@@ -127,7 +134,10 @@ export class Autoinstaller {
         }
 
         // Copy: .../common/autoinstallers/my-task/.npmrc
-        Utilities.syncNpmrc(this._rushConfiguration.commonRushConfigFolder, autoinstallerFullPath);
+        Utilities.syncNpmrc({
+          sourceNpmrcFolder: this._rushConfiguration.commonRushConfigFolder,
+          targetNpmrcFolder: autoinstallerFullPath
+        });
 
         this._logIfConsoleOutputIsNotRestricted(
           `Installing dependencies under ${autoinstallerFullPath}...\n`
@@ -209,7 +219,10 @@ export class Autoinstaller {
 
     this._logIfConsoleOutputIsNotRestricted();
 
-    Utilities.syncNpmrc(this._rushConfiguration.commonRushConfigFolder, this.folderFullPath);
+    Utilities.syncNpmrc({
+      sourceNpmrcFolder: this._rushConfiguration.commonRushConfigFolder,
+      targetNpmrcFolder: this.folderFullPath
+    });
 
     Utilities.executeCommand({
       command: this._rushConfiguration.packageManagerToolFilename,
@@ -221,7 +234,7 @@ export class Autoinstaller {
     this._logIfConsoleOutputIsNotRestricted();
 
     if (this._rushConfiguration.packageManager === 'npm') {
-      this._logIfConsoleOutputIsNotRestricted(colors.bold('Running "npm shrinkwrap"...'));
+      this._logIfConsoleOutputIsNotRestricted(Colorize.bold('Running "npm shrinkwrap"...'));
       Utilities.executeCommand({
         command: this._rushConfiguration.packageManagerToolFilename,
         args: ['shrinkwrap'],
@@ -243,16 +256,17 @@ export class Autoinstaller {
     });
     if (oldFileContents !== newFileContents) {
       this._logIfConsoleOutputIsNotRestricted(
-        colors.green('The shrinkwrap file has been updated.') + '  Please commit the updated file:'
+        Colorize.green('The shrinkwrap file has been updated.') + '  Please commit the updated file:'
       );
       this._logIfConsoleOutputIsNotRestricted(`\n  ${this.shrinkwrapFilePath}`);
     } else {
-      this._logIfConsoleOutputIsNotRestricted(colors.green('Already up to date.'));
+      this._logIfConsoleOutputIsNotRestricted(Colorize.green('Already up to date.'));
     }
   }
 
   private _logIfConsoleOutputIsNotRestricted(message?: string): void {
     if (!this._restrictConsoleOutput) {
+      // eslint-disable-next-line no-console
       console.log(message ?? '');
     }
   }

@@ -3,26 +3,18 @@
 
 import path from 'node:path';
 
-import {
-  Async,
-  ColorValue,
-  FileSystem,
-  JsonFile,
-  type ITerminal,
-  type JsonObject
-} from '@rushstack/node-core-library';
-import { PrintUtilities } from '@rushstack/terminal';
+import { Async, FileSystem, JsonFile, type JsonObject } from '@rushstack/node-core-library';
+import { PrintUtilities, Colorize, type ITerminal } from '@rushstack/terminal';
 
-import { Operation } from './Operation';
+import type { Operation } from './Operation';
 import { OperationStatus } from './OperationStatus';
 import type {
-  ICreateOperationsContext,
+  IExecuteOperationsContext,
   IPhasedCommandPlugin,
   PhasedCommandHooks
 } from '../../pluginFramework/PhasedCommandHooks';
-import { IOperationRunnerContext } from './IOperationRunner';
-import { IOperationExecutionResult } from './IOperationExecutionResult';
-import { ProjectChangeAnalyzer } from '../ProjectChangeAnalyzer';
+import type { IOperationRunnerContext } from './IOperationRunner';
+import type { IOperationExecutionResult } from './IOperationExecutionResult';
 
 const PLUGIN_NAME: 'LegacySkipPlugin' = 'LegacySkipPlugin';
 
@@ -55,6 +47,7 @@ export interface ILegacySkipPluginOptions {
   terminal: ITerminal;
   changedProjectsOnly: boolean;
   isIncrementalBuildAllowed: boolean;
+  allowWarningsInSuccessfulBuild?: boolean;
 }
 
 /**
@@ -70,22 +63,15 @@ export class LegacySkipPlugin implements IPhasedCommandPlugin {
   public apply(hooks: PhasedCommandHooks): void {
     const stateMap: WeakMap<Operation, ILegacySkipRecord> = new WeakMap();
 
-    let projectChangeAnalyzer!: ProjectChangeAnalyzer;
-
-    const { terminal, changedProjectsOnly, isIncrementalBuildAllowed } = this._options;
-
-    hooks.createOperations.tap(
-      PLUGIN_NAME,
-      (operations: Set<Operation>, context: ICreateOperationsContext): Set<Operation> => {
-        projectChangeAnalyzer = context.projectChangeAnalyzer;
-
-        return operations;
-      }
-    );
+    const { terminal, changedProjectsOnly, isIncrementalBuildAllowed, allowWarningsInSuccessfulBuild } =
+      this._options;
 
     hooks.beforeExecuteOperations.tapPromise(
       PLUGIN_NAME,
-      async (operations: ReadonlyMap<Operation, IOperationExecutionResult>): Promise<void> => {
+      async (
+        operations: ReadonlyMap<Operation, IOperationExecutionResult>,
+        { projectChangeAnalyzer }: IExecuteOperationsContext
+      ): Promise<void> => {
         let logGitWarning: boolean = false;
 
         await Async.forEachAsync(operations.values(), async (record: IOperationExecutionResult) => {
@@ -138,10 +124,9 @@ export class LegacySkipPlugin implements IPhasedCommandPlugin {
               `Unable to calculate incremental state for ${record.operation.name}: ` +
                 (error as Error).toString()
             );
-            terminal.writeLine({
-              text: 'Rush will proceed without incremental execution and change detection.',
-              foregroundColor: ColorValue.Cyan
-            });
+            terminal.writeLine(
+              Colorize.cyan('Rush will proceed without incremental execution and change detection.')
+            );
           }
 
           stateMap.set(operation, {
@@ -154,13 +139,14 @@ export class LegacySkipPlugin implements IPhasedCommandPlugin {
         if (logGitWarning) {
           // To test this code path:
           // Remove the `.git` folder then run "rush build --verbose"
-          terminal.writeLine({
-            text: PrintUtilities.wrapWords(
-              'This workspace does not appear to be tracked by Git. ' +
-                'Rush will proceed without incremental execution, caching, and change detection.'
-            ),
-            foregroundColor: ColorValue.Cyan
-          });
+          terminal.writeLine(
+            Colorize.cyan(
+              PrintUtilities.wrapWords(
+                'This workspace does not appear to be tracked by Git. ' +
+                  'Rush will proceed without incremental execution, caching, and change detection.'
+              )
+            )
+          );
         }
       }
     );
@@ -257,7 +243,14 @@ export class LegacySkipPlugin implements IPhasedCommandPlugin {
 
         const { packageDeps, packageDepsPath } = skipRecord;
 
-        if ((packageDeps && status === OperationStatus.Success) || status === OperationStatus.NoOp) {
+        if (
+          status === OperationStatus.NoOp ||
+          (packageDeps &&
+            (status === OperationStatus.Success ||
+              (status === OperationStatus.SuccessWithWarning &&
+                record.operation.runner!.warningsAreAllowed &&
+                allowWarningsInSuccessfulBuild)))
+        ) {
           // Write deps on success.
           await JsonFile.saveAsync(packageDeps, packageDepsPath, {
             ensureFolderExists: true

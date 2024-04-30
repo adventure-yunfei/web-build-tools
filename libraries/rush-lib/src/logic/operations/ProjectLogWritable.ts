@@ -2,15 +2,14 @@
 // See LICENSE in the project root for license information.
 
 import { FileSystem, FileWriter, InternalError } from '@rushstack/node-core-library';
-import { TerminalChunkKind, TerminalWritable, ITerminalChunk } from '@rushstack/terminal';
-import { CollatedTerminal } from '@rushstack/stream-collator';
+import { TerminalChunkKind, TerminalWritable, type ITerminalChunk } from '@rushstack/terminal';
+import type { CollatedTerminal } from '@rushstack/stream-collator';
 
-import { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import { PackageNameParsers } from '../../api/PackageNameParsers';
 import { RushConstants } from '../RushConstants';
 
 export class ProjectLogWritable extends TerminalWritable {
-  private readonly _project: RushConfigurationProject;
   private readonly _terminal: CollatedTerminal;
 
   public readonly logPath: string;
@@ -27,7 +26,6 @@ export class ProjectLogWritable extends TerminalWritable {
     logFilenameIdentifier: string
   ) {
     super();
-    this._project = project;
     this._terminal = terminal;
 
     // Delete the legacy logs

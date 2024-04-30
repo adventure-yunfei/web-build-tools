@@ -1,6 +1,224 @@
 # Change Log - @rushstack/stream-collator
 
-This log was last generated on Thu, 24 Aug 2023 15:20:46 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+
+## 4.1.41
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 4.1.40
+Tue, 19 Mar 2024 15:10:18 GMT
+
+_Version update only_
+
+## 4.1.39
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 4.1.38
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 4.1.37
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 4.1.36
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 4.1.35
+Fri, 01 Mar 2024 01:10:09 GMT
+
+_Version update only_
+
+## 4.1.34
+Thu, 29 Feb 2024 07:11:46 GMT
+
+_Version update only_
+
+## 4.1.33
+Wed, 28 Feb 2024 16:09:28 GMT
+
+_Version update only_
+
+## 4.1.32
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 4.1.31
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 4.1.30
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 4.1.29
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 4.1.28
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 4.1.27
+Tue, 20 Feb 2024 16:10:53 GMT
+
+_Version update only_
+
+## 4.1.26
+Mon, 19 Feb 2024 21:54:27 GMT
+
+_Version update only_
+
+## 4.1.25
+Sat, 17 Feb 2024 06:24:35 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 4.1.24
+Thu, 08 Feb 2024 01:09:22 GMT
+
+_Version update only_
+
+## 4.1.23
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 4.1.22
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 4.1.21
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 4.1.20
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 4.1.19
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 4.1.18
+Tue, 16 Jan 2024 18:30:11 GMT
+
+_Version update only_
+
+## 4.1.17
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 4.1.16
+Wed, 20 Dec 2023 01:09:46 GMT
+
+_Version update only_
+
+## 4.1.15
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 4.1.14
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 4.1.13
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 4.1.12
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 4.1.11
+Mon, 30 Oct 2023 23:36:38 GMT
+
+_Version update only_
+
+## 4.1.10
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 4.1.9
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 4.1.8
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 4.1.7
+Wed, 27 Sep 2023 00:21:39 GMT
+
+_Version update only_
+
+## 4.1.6
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 4.1.5
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 4.1.4
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 4.1.3
+Fri, 22 Sep 2023 00:05:50 GMT
+
+_Version update only_
+
+## 4.1.2
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 4.1.1
+Tue, 19 Sep 2023 00:36:30 GMT
+
+_Version update only_
+
+## 4.1.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 4.0.263
 Thu, 24 Aug 2023 15:20:46 GMT

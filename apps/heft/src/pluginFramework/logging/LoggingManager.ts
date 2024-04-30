@@ -4,11 +4,10 @@
 import { ScopedLogger } from './ScopedLogger';
 import {
   FileError,
-  FileLocationStyle,
-  ITerminalProvider,
-  IFileErrorFormattingOptions
+  type FileLocationStyle,
+  type IFileErrorFormattingOptions
 } from '@rushstack/node-core-library';
-
+import type { ITerminalProvider } from '@rushstack/terminal';
 export interface ILoggingManagerOptions {
   terminalProvider: ITerminalProvider;
 }
@@ -17,10 +16,15 @@ export class LoggingManager {
   private _options: ILoggingManagerOptions;
   private _scopedLoggers: Map<string, ScopedLogger> = new Map<string, ScopedLogger>();
   private _shouldPrintStacks: boolean = false;
+  private _hasAnyWarnings: boolean = false;
   private _hasAnyErrors: boolean = false;
 
   public get errorsHaveBeenEmitted(): boolean {
     return this._hasAnyErrors;
+  }
+
+  public get warningsHaveBeenEmitted(): boolean {
+    return this._hasAnyWarnings;
   }
 
   public constructor(options: ILoggingManagerOptions) {
@@ -33,6 +37,7 @@ export class LoggingManager {
 
   public resetScopedLoggerErrorsAndWarnings(): void {
     this._hasAnyErrors = false;
+    this._hasAnyWarnings = false;
     for (const scopedLogger of this._scopedLoggers.values()) {
       scopedLogger.resetErrorsAndWarnings();
     }
@@ -47,7 +52,8 @@ export class LoggingManager {
         loggerName,
         terminalProvider: this._options.terminalProvider,
         getShouldPrintStacks: () => this._shouldPrintStacks,
-        errorHasBeenEmittedCallback: () => (this._hasAnyErrors = true)
+        errorHasBeenEmittedCallback: () => (this._hasAnyErrors = true),
+        warningHasBeenEmittedCallback: () => (this._hasAnyWarnings = true)
       });
       this._scopedLoggers.set(loggerName, scopedLogger);
       return scopedLogger;

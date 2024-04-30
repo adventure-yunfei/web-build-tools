@@ -1,18 +1,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import type { ITerminal } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 import {
-  ICloudBuildCacheProvider,
+  type ICloudBuildCacheProvider,
   EnvironmentVariableNames,
   RushConstants,
   EnvironmentConfiguration,
-  ICredentialCacheEntry
+  type ICredentialCacheEntry
 } from '@rushstack/rush-sdk';
-import { BlobClient, BlobServiceClient, BlockBlobClient, ContainerClient } from '@azure/storage-blob';
+import {
+  type BlobClient,
+  BlobServiceClient,
+  type BlockBlobClient,
+  type ContainerClient
+} from '@azure/storage-blob';
 import { AzureAuthorityHosts } from '@azure/identity';
 
-import { AzureStorageAuthentication, IAzureStorageAuthenticationOptions } from './AzureStorageAuthentication';
+import {
+  AzureStorageAuthentication,
+  type IAzureStorageAuthenticationOptions
+} from './AzureStorageAuthentication';
 
 export interface IAzureStorageBuildCacheProviderOptions extends IAzureStorageAuthenticationOptions {
   blobPrefix?: string;

@@ -1,6 +1,456 @@
 # Change Log - @microsoft/rush
 
-This log was last generated on Fri, 08 Sep 2023 04:09:06 GMT and should not be manually modified.
+This log was last generated on Thu, 25 Apr 2024 07:33:18 GMT and should not be manually modified.
+
+## 5.122.0
+Thu, 25 Apr 2024 07:33:18 GMT
+
+### Updates
+
+- Support rush-pnpm for subspace feature
+- Skip determining merge base if given git hash
+- (BREAKING CHANGE) Improve the `disallowInsecureSha1` policy to support exemptions for certain package versions. This is a breaking change for the `disallowInsecureSha1` field in pnpm-config.json since Rush 5.119.0.
+
+## 5.121.0
+Mon, 22 Apr 2024 19:11:26 GMT
+
+### Updates
+
+- Add support for auth via microsoft/ado-codespaces-auth vscode extension in `@rushstack/rush-azure-storage-build-cache-plugin`
+
+## 5.120.6
+Thu, 18 Apr 2024 23:20:02 GMT
+
+### Updates
+
+- Fix an issue where "rush deploy" did not correctly deploy build outputs combining multiple Rush subspaces
+
+## 5.120.5
+Wed, 17 Apr 2024 21:58:17 GMT
+
+### Updates
+
+- Fix an issue where rush add affects all packages in a subspace
+
+## 5.120.4
+Tue, 16 Apr 2024 20:04:25 GMT
+
+### Updates
+
+- Fix an issue where `rush deploy` sometimes used an incorrect temp folder when the experimental subspaces feature is enabled
+
+## 5.120.3
+Tue, 16 Apr 2024 02:59:48 GMT
+
+### Updates
+
+- Fix an issue where `pnpm-sync copy` was skipped when a build is restored from build cache.
+- Upgrade `tar` dependency to 6.2.1
+
+## 5.120.2
+Mon, 15 Apr 2024 00:25:04 GMT
+
+### Updates
+
+- Fixes an issue where rush install fails in monorepos with subspaces enabled
+
+## 5.120.1
+Sat, 13 Apr 2024 18:31:00 GMT
+
+### Updates
+
+- Fix an issue where install-run-rush.js sometimes incorrectly invoked .cmd files on Windows OS due to a recent Node.js behavior change.
+- Fix an issue with the skip install logic when the experimental subspaces feature is enabled
+
+## 5.120.0
+Wed, 10 Apr 2024 21:59:57 GMT
+
+### Updates
+
+- Bump express.
+- Add support for `optionalDependencies` in transitive injected install in the Subspaces feature.
+- Update dependency: pnpm-sync-lib@0.2.2
+- Remove a restriction where the repo root would not be found if the CWD is >10 directory levels deep.
+- Improve the error message that is printed in a repo using PNPM workspaces when a non-`workspace:` version is used for a project inside the repo.
+- Include a missing space in a logging message printed when running `rush add`.
+- Clarify the copyright notice emitted in common/scripts/*.js
+- Fix an issue with loading of implicitly preferred versions when the experimental subspaces feature is enabled
+
+## 5.119.0
+Sat, 30 Mar 2024 04:32:31 GMT
+
+### Updates
+
+- Add a policy to forbid sha1 hashes in pnpm-lock.yaml.
+- (BREAKING API CHANGE) Refactor phased action execution to analyze the repo after the initial operations are created. This removes the `projectChangeAnalyzer` property from the context parameter passed to the `createOperations` hook.
+
+## 5.118.7
+Thu, 28 Mar 2024 19:55:27 GMT
+
+### Updates
+
+- Fix an issue where in the previous release, built-in plugins were not included.
+
+## 5.118.6
+Wed, 27 Mar 2024 05:31:17 GMT
+
+### Updates
+
+- Symlinks are now generated for workspace projects in the temp folder when subspaces and splitWorkspaceCompatibility is enabled.
+
+## 5.118.5
+Tue, 26 Mar 2024 19:58:40 GMT
+
+### Updates
+
+- Use pnpm-sync-lib logging APIs to customize the log message for pnpm-sync operations
+
+## 5.118.4
+Tue, 26 Mar 2024 02:39:06 GMT
+
+### Updates
+
+- Added warnings if there are .npmrc or .pnpmfile.cjs files in project folders after migrating to subspaces
+
+## 5.118.3
+Sat, 23 Mar 2024 01:41:10 GMT
+
+### Updates
+
+- Fix an edge case for computing the PNPM store path when the experimental subspaces feature is enabled
+
+## 5.118.2
+Fri, 22 Mar 2024 17:30:47 GMT
+
+### Updates
+
+- Fix bugs related to path operation in Windows OS for subspace feature
+
+## 5.118.1
+Thu, 21 Mar 2024 16:39:32 GMT
+
+### Updates
+
+- Support PNPM injected installation in Rush subspace feature
+
+## 5.118.0
+Wed, 20 Mar 2024 20:45:18 GMT
+
+### Updates
+
+- (BREAKING API CHANGE) Rename `AzureAuthenticationBase._getCredentialFromDeviceCodeAsync` to `AzureAuthenticationBase._getCredentialFromTokenAsync` in `@rushstack/rush-azure-storage-build-cache-plugin`. Adding support for InteractiveBrowserCredential.
+
+## 5.117.10
+Wed, 20 Mar 2024 04:57:57 GMT
+
+### Updates
+
+- Improve the "splitWorkspaceCompatibility" setting to simulate hoisted dependencies when the experimental Rush subspaces feature is enabled
+
+## 5.117.9
+Tue, 12 Mar 2024 19:15:07 GMT
+
+### Updates
+
+- Add functionality to disable filtered installs for specific subspaces
+
+## 5.117.8
+Sat, 09 Mar 2024 01:11:16 GMT
+
+### Updates
+
+- Fixes a bug where the syncNpmrc function incorrectly uses the folder instead of the path
+
+## 5.117.7
+Fri, 08 Mar 2024 23:45:24 GMT
+
+### Updates
+
+- Fix an issue where, when the experimental subspace feature is enabled, the subspace's ".npmrc" file did not take precedence over ".npmrc-global".
+
+## 5.117.6
+Thu, 07 Mar 2024 19:35:20 GMT
+
+### Updates
+
+- Fixes an issue where cobuilds would write success with warnings as successful cache entries.
+
+## 5.117.5
+Wed, 06 Mar 2024 23:03:27 GMT
+
+### Updates
+
+- Add filtered installs for subspaces
+
+## 5.117.4
+Tue, 05 Mar 2024 21:15:26 GMT
+
+### Updates
+
+- Add support for subspace level scoped pnpm-config.json e.g. `common/config/subspaces/default/pnpm-config.json`
+
+## 5.117.3
+Tue, 05 Mar 2024 01:19:42 GMT
+
+### Updates
+
+- Fix an issue where if a patch is removed from `common/pnpm-patches` after `rush install` had already been run with that patch present, pnpm would try to continue applying the patch.
+- Intercept the output printed by `rush-pnpm patch` to update the next step's instructions to run `rush-pnpm patch-commit ...` instead of `pnpm patch-commit ...`.
+
+## 5.117.2
+Fri, 01 Mar 2024 23:12:43 GMT
+
+### Updates
+
+- Fix an issue with the experimental subspaces feature, where version checks incorrectly scanned irrelevant subspaces.
+
+## 5.117.1
+Thu, 29 Feb 2024 07:34:31 GMT
+
+### Updates
+
+- Update "rush init" template to document the new build-cache.json constants
+- Remove trailing slashes from `node_modules` and `jspm_packages` paths in the `.gitignore` file generated by `rush init`.
+- Introduce a `RushCommandLine` API that exposes an object representing the skeleton of the Rush command-line.
+- Fix an issue where, when the experimental subspaces feature was enabled, the lockfile validation would check irrelevant subspaces
+
+## 5.117.0
+Mon, 26 Feb 2024 21:39:36 GMT
+
+### Updates
+
+- Include the ability to add `[os]` and `[arch]` tokens to cache entry name patterns.
+- (BREAKING CHANGE) Remove the 'installation variants' feature and its related APIs, which have been superceded by the Subspaces feature.
+- Extract the "rush.json" filename to a constant as `RushConstants.rushJsonFilename`.
+
+## 5.116.0
+Mon, 26 Feb 2024 20:04:02 GMT
+
+### Updates
+
+- Upgrade the `pnpm-sync-lib` dependency version.
+- Handle `workspace:~` and `workspace:^` wildcard specifiers when publishing. They remain as-is in package.json but get converted to `~${current}` and `^${current}` in changelogs.
+- Validate that the "projectFolder" and "publishFolder" fields in the "projects" list in "rush.json" are normalized POSIX relative paths that do not end in trailing "/" or contain "\\".
+
+## 5.115.0
+Thu, 22 Feb 2024 01:36:27 GMT
+
+### Updates
+
+- Add a "runWithTerminalAsync" resource lifetime helper to `IOperationRunnerContext` to manage the creation and cleanup of logging for operation execution.
+- Adds a new experiment `useIPCScriptsInWatchMode`. When this flag is enabled and Rush is running in watch mode, it will check for npm scripts named `_phase:<phase-name>:ipc`, and if found, use them instead of the normal invocation of `_phase:<phase-name>`. When doing so, it will provide an IPC channel to the child process and expect the child to outlive the current build pass.
+
+## 5.114.3
+Thu, 22 Feb 2024 00:10:32 GMT
+
+### Updates
+
+- Replace deprecated function, and fix a path bug in Windows env
+
+## 5.114.2
+Wed, 21 Feb 2024 21:45:46 GMT
+
+### Updates
+
+- Replace the dependency on the `colors` package with `Colorize` from `@rushstack/terminal`.
+
+## 5.114.1
+Wed, 21 Feb 2024 08:56:05 GMT
+
+### Updates
+
+- Improve `rush scan` to analyze APIs such as `Import.lazy()` and `await import()`
+- Fix a recent regression where `@rushstack/rush-sdk` did not declare its dependency on `@rushstack/terminal`
+
+## 5.114.0
+Mon, 19 Feb 2024 21:54:44 GMT
+
+### Updates
+
+- (EXPERIMENTAL) Add `enablePnpmSyncForInjectedDependenciesMeta` to experiments.json; it is part of an upcoming feature for managing PNPM "injected" dependencies: https://www.npmjs.com/package/pnpm-sync
+- Include a `pnpmPatchesCommonFolderName` constant for the folder name "pnpm-patches" that gets placed under "common".
+- Add a feature to generate a `project-impact-graph.yaml` file in the repo root. This feature is gated under the new `generateProjectImpactGraphDuringRushUpdate` experiment.
+- Fix a formatting issue with the LICENSE.
+- Fix an issue with filtered installs when the experimental subspaces feature is enabled
+
+## 5.113.4
+Wed, 31 Jan 2024 22:49:17 GMT
+
+### Updates
+
+- Introduce an explicit warning message during `rush install` or `rush update` about `dependenciesMeta` not being up-to-date.
+
+## 5.113.3
+Wed, 31 Jan 2024 22:25:55 GMT
+
+### Updates
+
+- Fix an issue where `rush update` would sometimes not correctly sync the `pnpm-lock.yaml` file back to `common/config/rush/` after a project's `package.json` has been updated.
+
+## 5.113.2
+Wed, 31 Jan 2024 18:45:33 GMT
+
+### Updates
+
+- Fix some minor issues when the experimental subspaces feature is enabled
+
+## 5.113.1
+Wed, 31 Jan 2024 07:07:50 GMT
+
+### Updates
+
+- (EXPERIMENTAL) Enable filtered installs of subspaces and add a "preventSelectingAllSubspaces" setting
+
+## 5.113.0
+Tue, 30 Jan 2024 22:58:52 GMT
+
+### Updates
+
+- Fix an issue where Rush does not detect changes to the `dependenciesMeta` field in project's `package.json` files, so may incorrectly skip updating/installation.
+- Add ability to enable IPC channels in `Utilities#executeLifeCycleCommand`.
+- Update `rush init` template to document the "buildSkipWithAllowWarningsInSuccessfulBuild" experiment
+- (BREAKING CHANGE) Begin removal of APIs for the deprecated "installation variants" feature, since subspaces are a more robust solution for that problem
+- (EXPERIMENTAL) Implement installation for the not-yet-released "subspaces" feature (GitHub #4230)
+
+## 5.112.2
+Tue, 12 Dec 2023 00:20:51 GMT
+
+### Updates
+
+- Bring back the erroneously removed `preminor` bump type for lockstepped packages.
+- Fix an issue where the contents of a folder set in the `"folderToCopy"` field of the `deploy.json` config file would be copied into a subfolder instead of into the root of the deploy folder.
+- (EXPERIMENTAL) Implemented config file loader for the not-yet-released "subspaces" feature (GitHub #4230)
+
+## 5.112.1
+Wed, 29 Nov 2023 08:59:31 GMT
+
+### Updates
+
+- Allow the device code credential options to be extended Azure authentication subclasses, used in advanced authentication scenarios.
+
+## 5.112.0
+Mon, 27 Nov 2023 23:36:11 GMT
+
+### Updates
+
+- Update the `@azure/identity` and `@azure/storage-blob` dependencies of `@rushstack/rush-azure-storage-build-cache-plugin` to eliminate an `EBADENGINE` error when installing Rush on Node 20.
+
+## 5.111.0
+Sat, 18 Nov 2023 00:06:20 GMT
+
+### Updates
+
+- Add experiment `buildSkipWithAllowWarningsInSuccessfulBuild` to allow skipping builds that succeeded with warnings in the previous run.
+
+## 5.110.2
+Thu, 16 Nov 2023 01:36:10 GMT
+
+_Version update only_
+
+## 5.110.1
+Wed, 01 Nov 2023 23:29:47 GMT
+
+### Updates
+
+- Fix line endings in published package.
+
+## 5.110.0
+Mon, 30 Oct 2023 23:37:07 GMT
+
+### Updates
+
+- Include the filename of the shrinkwrap file in logging messages for all package managers, not just Yarn.
+- performance improvements by running asynchronous code concurrently using Promise.all
+
+## 5.109.2
+Fri, 20 Oct 2023 01:54:21 GMT
+
+### Updates
+
+- Allow the output preservation incremental strategy if the build cache is configured but disabled. When running in verbose mode, log the incremental strategy that is being used.
+- Log the cache key in `--verbose` mode when the cache is successfully read from or written to.
+- Fix an issue where console colors were sometimes not enabled correctly during `rush install`
+- Fix an issue where running `rush update-cloud-credentials --interactive` sometimes used the wrong working directory when invoked in a repo configured to use the `http` build cache provider (GitHub #4396)
+
+## 5.109.1
+Sat, 07 Oct 2023 01:20:56 GMT
+
+### Updates
+
+- Fix incorrect capitalization in the "rush init" template
+
+## 5.109.0
+Sat, 07 Oct 2023 00:25:27 GMT
+
+### Updates
+
+- (IMPORTANT) Add a new setting `autoInstallPeers` in pnpm-config.json; be aware that Rush changes PNPM's default if you are using PNPM 8 or newer
+- (IMPORTANT) After upgrading, if `rush install` fails with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`, please run `rush update --recheck`
+- Improve visual formatting of custom tips
+- Add start `preRushx` and `postRushx` event hooks for monitoring the `rushx` command
+- Update the oldest usable Node.js version to 14.18.0, since 14.17.0 fails to load
+
+## 5.108.0
+Mon, 02 Oct 2023 20:23:27 GMT
+
+### Updates
+
+- Fix an issue where `rush purge` fails on Linux and Mac if the `common/temp/rush-recycler` folder does not exist.
+- Add "--offline" parameter for "rush install" and "rush update"
+- Ignore pause/resume watcher actions when the process is not TTY mode
+
+## 5.107.4
+Tue, 26 Sep 2023 21:02:52 GMT
+
+### Updates
+
+- Update type-only imports to include the type modifier.
+- Make the project watcher status and keyboard commands message more visible.
+
+## 5.107.3
+Fri, 22 Sep 2023 09:01:38 GMT
+
+### Updates
+
+- Fix filtered installs in pnpm@8.
+
+## 5.107.2
+Fri, 22 Sep 2023 00:06:12 GMT
+
+### Updates
+
+- Fix a bug in which an operation failing incorrectly does not block its consumers.
+- Add `resolutionMode` to `rush init` template for pnpm-config.json
+
+## 5.107.1
+Tue, 19 Sep 2023 21:13:23 GMT
+
+### Updates
+
+- Fix pnpm's install status printing when pnpm custom tips are defined.
+
+## 5.107.0
+Tue, 19 Sep 2023 00:36:50 GMT
+
+### Updates
+
+- Update @types/node from 14 to 18
+- Remove previously removed fields from the `custom-tips.json` schema.
+- (BREAKING API CHANGE) Refactor the `CustomTipsConfiguration` by removing the `configuration` property and adding a `providedCustomTipsByTipId` map property.
+- Fix an issue where pnpm would would not rewrite the current status line on a TTY console, and instead would print a series of separate status lines during installation. Note that this is only fixed when there are no custom PNPM tips provided.
+- Add "Waiting" operation status for operations that have one or more dependencies still pending. Ensure that the `onOperationStatusChanged` hook fires for every status change.
+- Add support for optional build status notifications over a web socket connection to `@rushstack/rush-serve-plugin`.
+- Add pause/resume option to project watcher
+
+## 5.106.0
+Thu, 14 Sep 2023 09:20:11 GMT
+
+### Updates
+
+- (IMPORTANT) Add a new setting `resolutionMode` in pnpm-config.json; be aware that Rush now overrides the default behavior if you are using PNPM 8.0.0 through 8.6.12 (GitHub #4283)
+- Support adding custom tips for pnpm-printed logs
+- (BREAKING CHANGE) Remove the "defaultMessagePrefix" config in custom-tips.json
+- Rename the `PnpmStoreOptions` type to `PnpmStoreLocation`.
 
 ## 5.105.0
 Fri, 08 Sep 2023 04:09:06 GMT
@@ -196,7 +646,7 @@ Fri, 17 Feb 2023 02:14:43 GMT
 
 ### Updates
 
-- Add code path to @rushstack/rush-sdk for inheriting @microsoft/rush-lib location from a parent process via the RUSH_LIB_PATH environment variable.
+- Add code path to @rushstack/rush-sdk for inheriting @microsoft/rush-lib location from a parent process via the _RUSH_LIB_PATH environment variable.
 
 ## 5.92.0
 Sun, 12 Feb 2023 02:50:42 GMT

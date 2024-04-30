@@ -6,7 +6,8 @@ import {
   type CommandLineFlagParameter,
   type CommandLineStringListParameter
 } from '@rushstack/ts-command-line';
-import type { ITerminal } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
+import { OperationStatus } from '@rushstack/operation-graph';
 
 import type { IHeftAction, IHeftActionOptions } from './IHeftAction';
 import type { HeftPhase } from '../../pluginFramework/HeftPhase';
@@ -17,9 +18,7 @@ import type { HeftTaskSession } from '../../pluginFramework/HeftTaskSession';
 import { Constants } from '../../utilities/Constants';
 import { definePhaseScopingParameters, expandPhases } from './RunAction';
 import { deleteFilesAsync, type IDeleteOperation } from '../../plugins/DeleteFilesPlugin';
-import { initializeHeft, runWithLoggingAsync } from '../HeftActionRunner';
-import { CancellationToken } from '../../pluginFramework/CancellationToken';
-import { OperationStatus } from '../../operations/OperationStatus';
+import { ensureCliAbortSignal, initializeHeft, runWithLoggingAsync } from '../HeftActionRunner';
 
 export class CleanAction extends CommandLineAction implements IHeftAction {
   public readonly watch: boolean = false;
@@ -79,8 +78,10 @@ export class CleanAction extends CommandLineAction implements IHeftAction {
 
   protected async onExecute(): Promise<void> {
     const { heftConfiguration } = this._internalHeftSession;
-    const cancellationToken: CancellationToken = new CancellationToken();
+    const abortSignal: AbortSignal = ensureCliAbortSignal(this._terminal);
 
+    // Record this as the start of task execution.
+    this._metricsCollector.setStartTime();
     initializeHeft(heftConfiguration, this._terminal, this._verboseFlag.value);
     await runWithLoggingAsync(
       this._cleanFilesAsync.bind(this),
@@ -88,7 +89,7 @@ export class CleanAction extends CommandLineAction implements IHeftAction {
       this._internalHeftSession.loggingManager,
       this._terminal,
       this._metricsCollector,
-      cancellationToken
+      abortSignal
     );
   }
 

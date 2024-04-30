@@ -6,7 +6,6 @@ import * as crypto from 'crypto';
 import uriEncode from 'strict-uri-encode';
 import pnpmLinkBins from '@pnpm/link-bins';
 import * as semver from 'semver';
-import colors from 'colors/safe';
 
 import {
   AlreadyReportedError,
@@ -15,15 +14,16 @@ import {
   InternalError,
   Path
 } from '@rushstack/node-core-library';
+import { Colorize } from '@rushstack/terminal';
 
 import { BaseLinkManager } from '../base/BaseLinkManager';
 import { BasePackage } from '../base/BasePackage';
 import { RushConstants } from '../../logic/RushConstants';
-import { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import {
   PnpmShrinkwrapFile,
-  IPnpmShrinkwrapDependencyYaml,
-  IPnpmVersionSpecifier,
+  type IPnpmShrinkwrapDependencyYaml,
+  type IPnpmVersionSpecifier,
   normalizePnpmVersionSpecifier
 } from './PnpmShrinkwrapFile';
 
@@ -43,8 +43,9 @@ export class PnpmLinkManager extends BaseLinkManager {
     const useWorkspaces: boolean =
       this._rushConfiguration.pnpmOptions && this._rushConfiguration.pnpmOptions.useWorkspaces;
     if (useWorkspaces) {
+      // eslint-disable-next-line no-console
       console.log(
-        colors.red(
+        Colorize.red(
           'Linking is not supported when using workspaces. Run "rush install" or "rush update" ' +
             'to restore project node_modules folders.'
         )
@@ -60,12 +61,12 @@ export class PnpmLinkManager extends BaseLinkManager {
       // Use shrinkwrap from temp as the committed shrinkwrap may not always be up to date
       // See https://github.com/microsoft/rushstack/issues/1273#issuecomment-492779995
       const pnpmShrinkwrapFile: PnpmShrinkwrapFile | undefined = PnpmShrinkwrapFile.loadFromFile(
-        this._rushConfiguration.tempShrinkwrapFilename
+        this._rushConfiguration.defaultSubspace.getTempShrinkwrapFilename()
       );
 
       if (!pnpmShrinkwrapFile) {
         throw new InternalError(
-          `Cannot load shrinkwrap at "${this._rushConfiguration.tempShrinkwrapFilename}"`
+          `Cannot load shrinkwrap at "${this._rushConfiguration.defaultSubspace.getTempShrinkwrapFilename()}"`
         );
       }
 
@@ -73,9 +74,10 @@ export class PnpmLinkManager extends BaseLinkManager {
         await this._linkProject(rushProject, pnpmShrinkwrapFile);
       }
     } else {
+      // eslint-disable-next-line no-console
       console.log(
-        colors.yellow(
-          '\nWarning: Nothing to do. Please edit rush.json and add at least one project' +
+        Colorize.yellow(
+          `\nWarning: Nothing to do. Please edit ${RushConstants.rushJsonFilename} and add at least one project` +
             ' to the "projects" section.\n'
         )
       );
@@ -91,6 +93,7 @@ export class PnpmLinkManager extends BaseLinkManager {
     project: RushConfigurationProject,
     pnpmShrinkwrapFile: PnpmShrinkwrapFile
   ): Promise<void> {
+    // eslint-disable-next-line no-console
     console.log(`\nLINKING: ${project.packageName}`);
 
     // first, read the temp package.json information
@@ -276,7 +279,10 @@ export class PnpmLinkManager extends BaseLinkManager {
     const projectBinFolder: string = path.join(localPackage.folderPath, 'node_modules', '.bin');
 
     await pnpmLinkBins(projectFolder, projectBinFolder, {
-      warn: (msg: string) => console.warn(colors.yellow(msg))
+      warn: (msg: string) => {
+        // eslint-disable-next-line no-console
+        console.warn(Colorize.yellow(msg));
+      }
     });
   }
 

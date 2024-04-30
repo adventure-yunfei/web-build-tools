@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { trueCasePathSync } from 'true-case-path';
 
-import { IEnvironment } from '../utilities/Utilities';
+import type { IEnvironment } from '../utilities/Utilities';
 
 /**
  * @beta
@@ -49,14 +49,6 @@ export const EnvironmentVariableNames = {
    * or `0` to disallow them. (See the comments in the command-line.json file for more information).
    */
   RUSH_ALLOW_WARNINGS_IN_SUCCESSFUL_BUILD: 'RUSH_ALLOW_WARNINGS_IN_SUCCESSFUL_BUILD',
-
-  /**
-   * This variable selects a specific installation variant for Rush to use when installing
-   * and linking package dependencies.
-   * For more information, see the command-line help for the `--variant` parameter
-   * and this article:  https://rushjs.io/pages/advanced/installation_variants/
-   */
-  RUSH_VARIANT: 'RUSH_VARIANT',
 
   /**
    * Specifies the maximum number of concurrent processes to launch during a build.
@@ -185,10 +177,16 @@ export const EnvironmentVariableNames = {
   RUSH_TAR_BINARY_PATH: 'RUSH_TAR_BINARY_PATH',
 
   /**
+   * Internal variable used by `rushx` when recursively invoking another `rushx` process, to avoid
+   * nesting event hooks.
+   */
+  _RUSH_RECURSIVE_RUSHX_CALL: '_RUSH_RECURSIVE_RUSHX_CALL',
+
+  /**
    * Internal variable that explicitly specifies the path for the version of `@microsoft/rush-lib` being executed.
    * Will be set upon loading Rush.
    */
-  RUSH_LIB_PATH: '_RUSH_LIB_PATH',
+  _RUSH_LIB_PATH: '_RUSH_LIB_PATH',
 
   /**
    * When Rush executes shell scripts, it sometimes changes the working directory to be a project folder or
@@ -199,7 +197,18 @@ export const EnvironmentVariableNames = {
    * The `RUSH_INVOKED_FOLDER` variable is the same idea as the `INIT_CWD` variable that package managers
    * assign when they execute lifecycle scripts.
    */
-  RUSH_INVOKED_FOLDER: 'RUSH_INVOKED_FOLDER'
+  RUSH_INVOKED_FOLDER: 'RUSH_INVOKED_FOLDER',
+
+  /**
+   * When running a hook script, this environment variable communicates the original arguments
+   * passed to the `rush` or `rushx` command.
+   *
+   * @remarks
+   * Unlike `RUSH_INVOKED_FOLDER`, the `RUSH_INVOKED_ARGS` variable is only available for hook scripts.
+   * Other lifecycle scripts should not make assumptions about Rush's command line syntax
+   * if Rush did not explicitly pass along command-line parameters to their process.
+   */
+  RUSH_INVOKED_ARGS: 'RUSH_INVOKED_ARGS'
 } as const;
 
 /**
@@ -524,14 +533,18 @@ export class EnvironmentConfiguration {
 
           case EnvironmentVariableNames.RUSH_PARALLELISM:
           case EnvironmentVariableNames.RUSH_PREVIEW_VERSION:
-          case EnvironmentVariableNames.RUSH_VARIANT:
           case EnvironmentVariableNames.RUSH_DEPLOY_TARGET_FOLDER:
             // Handled by @microsoft/rush front end
             break;
 
           case EnvironmentVariableNames.RUSH_INVOKED_FOLDER:
-          case EnvironmentVariableNames.RUSH_LIB_PATH:
+          case EnvironmentVariableNames.RUSH_INVOKED_ARGS:
+          case EnvironmentVariableNames._RUSH_LIB_PATH:
             // Assigned by Rush itself
+            break;
+
+          case EnvironmentVariableNames._RUSH_RECURSIVE_RUSHX_CALL:
+            // Assigned/read internally by RushXCommandLine
             break;
 
           default:

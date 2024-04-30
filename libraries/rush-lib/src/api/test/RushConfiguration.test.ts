@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { JsonFile, Path, Text } from '@rushstack/node-core-library';
 import { RushConfiguration } from '../RushConfiguration';
-import { ApprovedPackagesPolicy } from '../ApprovedPackagesPolicy';
+import type { ApprovedPackagesPolicy } from '../ApprovedPackagesPolicy';
 import { RushConfigurationProject } from '../RushConfigurationProject';
 import { EnvironmentConfiguration } from '../EnvironmentConfiguration';
 import { DependencyType } from '../PackageJsonEditor';
@@ -48,11 +48,6 @@ describe(RushConfiguration.name, () => {
     const rushConfiguration: RushConfiguration = RushConfiguration.loadFromConfigurationFile(rushFilename);
 
     expect(rushConfiguration.packageManager).toEqual('npm');
-    assertPathProperty(
-      'committedShrinkwrapFilename',
-      rushConfiguration.committedShrinkwrapFilename,
-      './repo/common/config/rush/npm-shrinkwrap.json'
-    );
     assertPathProperty('commonFolder', rushConfiguration.commonFolder, './repo/common');
     assertPathProperty(
       'commonRushConfigFolder',
@@ -121,11 +116,6 @@ describe(RushConfiguration.name, () => {
 
     expect(rushConfiguration.packageManager).toEqual('pnpm');
     expect(rushConfiguration.shrinkwrapFilename).toEqual('pnpm-lock.yaml');
-    assertPathProperty(
-      'committedShrinkwrapFilename',
-      rushConfiguration.getCommittedShrinkwrapFilename(),
-      './repo/common/config/rush/pnpm-lock.yaml'
-    );
     assertPathProperty(
       'getPnpmfilePath',
       rushConfiguration.getPnpmfilePath(),

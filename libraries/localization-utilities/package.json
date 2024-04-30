@@ -1,6 +1,6 @@
 {
   "name": "@rushstack/localization-utilities",
-  "version": "0.8.83",
+  "version": "0.9.40",
   "description": "This plugin contains some useful functions for localization.",
   "main": "lib/index.js",
   "typings": "dist/localization-utilities.d.ts",
@@ -17,16 +17,14 @@
   },
   "dependencies": {
     "@rushstack/node-core-library": "workspace:*",
+    "@rushstack/terminal": "workspace:*",
     "@rushstack/typings-generator": "workspace:*",
     "pseudolocale": "~1.1.0",
     "xmldoc": "~1.1.2"
   },
   "devDependencies": {
-    "@rushstack/eslint-config": "workspace:*",
     "@rushstack/heft": "workspace:*",
-    "@rushstack/heft-node-rig": "workspace:*",
-    "@types/heft-jest": "1.0.1",
-    "@types/node": "14.18.36",
-    "@types/xmldoc": "1.1.4"
+    "@types/xmldoc": "1.1.4",
+    "local-node-rig": "workspace:*"
   }
 }

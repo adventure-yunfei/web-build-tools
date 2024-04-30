@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/heft/v0/heft.schema.json",
 
-  "extends": "@rushstack/heft-node-rig/profiles/default/config/heft.json",
+  "extends": "local-node-rig/profiles/default/config/heft.json",
 
   // TODO: Add comments
   "phasesByName": {
@@ -19,6 +19,21 @@
                   "sourcePath": "./src",
                   "includeGlobs": ["ambientTypes.d.ts"],
                   "destinationFolders": ["."]
+                }
+              ]
+            }
+          }
+        },
+        "copy-test-assets": {
+          "taskPlugin": {
+            "pluginPackage": "@rushstack/heft",
+            "pluginName": "copy-files-plugin",
+            "options": {
+              "copyOperations": [
+                {
+                  "sourcePath": "./src/test/scenarios/",
+                  "includeGlobs": ["**/*"],
+                  "destinationFolders": ["lib/test/scenarios"]
                 }
               ]
             }

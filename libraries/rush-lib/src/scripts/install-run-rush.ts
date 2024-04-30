@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
-// See the @microsoft/rush package's LICENSE file for license information.
+// See LICENSE in the project root for license information.
+
+/* eslint-disable no-console */
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -36,8 +38,8 @@ function _getRushVersion(logger: ILogger): string {
     return rushJsonMatches[1];
   } catch (e) {
     throw new Error(
-      `Unable to determine the required version of Rush from rush.json (${rushJsonFolder}). ` +
-        "The 'rushVersion' field is either not assigned in rush.json or was specified " +
+      `Unable to determine the required version of Rush from ${RUSH_JSON_FILENAME} (${rushJsonFolder}). ` +
+        `The 'rushVersion' field is either not assigned in ${RUSH_JSON_FILENAME} or was specified ` +
         'using an unexpected syntax.'
     );
   }
@@ -105,7 +107,7 @@ function _run(): void {
 
   runWithErrorAndStatusCode(logger, () => {
     const version: string = _getRushVersion(logger);
-    logger.info(`The rush.json configuration requests Rush version ${version}`);
+    logger.info(`The ${RUSH_JSON_FILENAME} configuration requests Rush version ${version}`);
 
     const lockFilePath: string | undefined = process.env[INSTALL_RUN_RUSH_LOCKFILE_PATH_VARIABLE];
     if (lockFilePath) {

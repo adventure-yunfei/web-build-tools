@@ -6,7 +6,8 @@ import {
   type CommandLineParameterProvider,
   type CommandLineStringListParameter
 } from '@rushstack/ts-command-line';
-import { AlreadyReportedError, type ITerminal } from '@rushstack/node-core-library';
+import { AlreadyReportedError } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 
 import { Selection } from '../../utilities/Selection';
 import { HeftActionRunner } from '../HeftActionRunner';
@@ -78,21 +79,18 @@ export function definePhaseScopingParameters(action: IHeftAction): IScopingParam
   return {
     toParameter: action.defineStringListParameter({
       parameterLongName: Constants.toParameterLongName,
-      parameterShortName: Constants.toParameterShortName,
       description: `The phase to ${action.actionName} to, including all transitive dependencies.`,
       argumentName: 'PHASE',
       parameterGroup: ScopedCommandLineAction.ScopingParameterGroup
     }),
     toExceptParameter: action.defineStringListParameter({
       parameterLongName: Constants.toExceptParameterLongName,
-      parameterShortName: Constants.toExceptParameterShortName,
       description: `The phase to ${action.actionName} to (but not include), including all transitive dependencies.`,
       argumentName: 'PHASE',
       parameterGroup: ScopedCommandLineAction.ScopingParameterGroup
     }),
     onlyParameter: action.defineStringListParameter({
       parameterLongName: Constants.onlyParameterLongName,
-      parameterShortName: Constants.onlyParameterShortName,
       description: `The phase to ${action.actionName}.`,
       argumentName: 'PHASE',
       parameterGroup: ScopedCommandLineAction.ScopingParameterGroup

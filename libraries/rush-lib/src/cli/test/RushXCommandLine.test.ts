@@ -2,12 +2,12 @@
 // See LICENSE in the project root for license information.
 
 import { PackageJsonLookup } from '@rushstack/node-core-library';
-import * as colorsPackage from 'colors';
 
 import { Utilities } from '../../utilities/Utilities';
-import { Rush } from '../../api/Rush';
+import { Rush, type ILaunchOptions } from '../../api/Rush';
 import { RushConfiguration } from '../../api/RushConfiguration';
-import { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import { NodeJsCompatibility } from '../../logic/NodeJsCompatibility';
 
 import { RushXCommandLine } from '../RushXCommandLine';
 
@@ -17,14 +17,8 @@ describe(RushXCommandLine.name, () => {
   let executeLifecycleCommandMock: jest.SpyInstance | undefined;
   let logMock: jest.SpyInstance | undefined;
   let rushConfiguration: RushConfiguration | undefined;
-  let colorsEnabled: boolean;
 
   beforeEach(() => {
-    colorsEnabled = colorsPackage.enabled;
-    if (!colorsEnabled) {
-      colorsPackage.enable();
-    }
-
     // Mock process
     $argv = process.argv;
     process.argv = [...process.argv];
@@ -74,13 +68,11 @@ describe(RushXCommandLine.name, () => {
 
     // Mock console log
     logMock = jest.spyOn(console, 'log');
+
+    jest.spyOn(NodeJsCompatibility, 'isLtsVersion', 'get').mockReturnValue(true);
   });
 
   afterEach(() => {
-    if (!colorsEnabled) {
-      colorsPackage.disable();
-    }
-
     process.argv = $argv;
     Object.defineProperty(process, 'versions', {
       value: $versions
@@ -91,12 +83,12 @@ describe(RushXCommandLine.name, () => {
     jest.restoreAllMocks();
   });
 
-  describe(RushXCommandLine.launchRushX.name, () => {
+  describe(RushXCommandLine.launchRushXAsync.name, () => {
     it('prints usage info', () => {
       process.argv = ['node', 'startx.js', '--help'];
       executeLifecycleCommandMock!.mockReturnValue(0);
 
-      RushXCommandLine.launchRushX('', true);
+      Rush.launchRushX('0.0.0', true as unknown as ILaunchOptions);
 
       expect(executeLifecycleCommandMock).not.toHaveBeenCalled();
       expect(logMock!.mock.calls).toMatchSnapshot();
@@ -106,7 +98,7 @@ describe(RushXCommandLine.name, () => {
       process.argv = ['node', 'startx.js', 'build'];
       executeLifecycleCommandMock!.mockReturnValue(0);
 
-      RushXCommandLine.launchRushX('', true);
+      Rush.launchRushX('0.0.0', true as unknown as ILaunchOptions);
 
       expect(executeLifecycleCommandMock).toHaveBeenCalledWith('an acme project build command', {
         rushConfiguration,
@@ -124,7 +116,7 @@ describe(RushXCommandLine.name, () => {
       process.argv = ['node', 'startx.js', '--quiet', 'build'];
       executeLifecycleCommandMock!.mockReturnValue(0);
 
-      RushXCommandLine.launchRushX('', true);
+      Rush.launchRushX('0.0.0', { isManaged: true });
 
       expect(executeLifecycleCommandMock).toHaveBeenCalledWith('an acme project build command', {
         rushConfiguration,
@@ -142,7 +134,7 @@ describe(RushXCommandLine.name, () => {
       process.argv = ['node', 'startx.js', 'asdf'];
       executeLifecycleCommandMock!.mockReturnValue(0);
 
-      RushXCommandLine.launchRushX('', true);
+      Rush.launchRushX('0.0.0', { isManaged: true });
 
       expect(executeLifecycleCommandMock).not.toHaveBeenCalled();
       expect(logMock!.mock.calls).toMatchSnapshot();

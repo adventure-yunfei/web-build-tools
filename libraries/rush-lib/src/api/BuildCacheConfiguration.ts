@@ -6,18 +6,18 @@ import {
   JsonFile,
   JsonSchema,
   FileSystem,
-  JsonObject,
-  AlreadyReportedError,
-  ITerminal
+  type JsonObject,
+  AlreadyReportedError
 } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 
-import { RushConfiguration } from './RushConfiguration';
+import type { RushConfiguration } from './RushConfiguration';
 import { FileSystemBuildCacheProvider } from '../logic/buildCache/FileSystemBuildCacheProvider';
 import { RushConstants } from '../logic/RushConstants';
-import { ICloudBuildCacheProvider } from '../logic/buildCache/ICloudBuildCacheProvider';
+import type { ICloudBuildCacheProvider } from '../logic/buildCache/ICloudBuildCacheProvider';
 import { RushUserConfiguration } from './RushUserConfiguration';
 import { EnvironmentConfiguration } from './EnvironmentConfiguration';
-import { CacheEntryId, GetCacheEntryIdFunction } from '../logic/buildCache/CacheEntryId';
+import { CacheEntryId, type GetCacheEntryIdFunction } from '../logic/buildCache/CacheEntryId';
 import type { CloudBuildCacheProviderFactory, RushSession } from '../pluginFramework/RushSession';
 import schemaJson from '../schemas/build-cache.schema.json';
 
@@ -27,6 +27,20 @@ import schemaJson from '../schemas/build-cache.schema.json';
 export interface IBaseBuildCacheJson {
   buildCacheEnabled: boolean;
   cacheProvider: string;
+  /**
+   * Used to specify the cache entry ID format. If this property is set, it must
+   * contain a `[hash]` token. It may also contain one of the following tokens:
+   * - `[projectName]`
+   * - `[projectName:normalize]`
+   * - `[phaseName]`
+   * - `[phaseName:normalize]`
+   * - `[phaseName:trimPrefix]`
+   * - `[os]`
+   * - `[arch]`
+   * @privateRemarks
+   * NOTE: If you update this comment, make sure to update build-cache.json in the "rush init" template.
+   * The token parser is in CachEntryId.ts
+   */
   cacheEntryNamePattern?: string;
 }
 

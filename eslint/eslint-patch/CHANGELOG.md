@@ -1,6 +1,106 @@
 # Change Log - @rushstack/eslint-patch
 
-This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 21:59:39 GMT and should not be manually modified.
+
+## 1.10.2
+Wed, 10 Apr 2024 21:59:39 GMT
+
+### Patches
+
+- Bump maximum supported ESLint version for the bulk-suppressions tool to `8.57.0`.
+
+## 1.10.1
+Fri, 29 Mar 2024 05:46:41 GMT
+
+### Patches
+
+- Fix an issue where the `eslint-bulk prune` command would crash if a bulk suppressions file exists that speicifies no suppressions.
+- Exit with success under normal conditions.
+
+## 1.10.0
+Thu, 28 Mar 2024 18:11:12 GMT
+
+### Minor changes
+
+- Delete the `.eslint-bulk-suppressions.json` file during pruning if all suppressions have been eliminated.
+
+### Patches
+
+- Fix an issue with running `eslint-bulk prune` in a project with suppressions that refer to deleted files.
+
+## 1.9.0
+Wed, 27 Mar 2024 19:47:21 GMT
+
+### Minor changes
+
+- Fix an issue where `eslint-bulk prune` does not work if there are no files to lint in the project root.
+
+## 1.8.0
+Wed, 20 Mar 2024 02:09:14 GMT
+
+### Minor changes
+
+- Refactor the bulk-suppressions feature to fix some performance issues.
+
+### Patches
+
+- Fix an issue where linting issues that were already suppressed via suppression comments were recorded in the bulk suppressions list.
+
+## 1.7.2
+Thu, 25 Jan 2024 23:03:57 GMT
+
+### Patches
+
+- Some minor documentation updates
+
+## 1.7.1
+Wed, 24 Jan 2024 07:38:34 GMT
+
+### Patches
+
+- Update documentation
+
+## 1.7.0
+Tue, 16 Jan 2024 18:30:10 GMT
+
+### Minor changes
+
+- Add support for TypeScript 5.3 with @typescript-eslint 6.19.x
+
+## 1.6.1
+Fri, 15 Dec 2023 01:10:06 GMT
+
+### Patches
+
+- Fix bulk suppression patch's eslintrc detection in polyrepos
+
+## 1.6.0
+Wed, 22 Nov 2023 01:45:18 GMT
+
+### Minor changes
+
+- Add an experimental new feature for ESLint bulk suppressions; for details see GitHub #4303
+
+## 1.5.1
+Sun, 01 Oct 2023 02:56:29 GMT
+
+### Patches
+
+- Fix patch compatibility with ESLint 7 for versions matching <7.12.0
+
+## 1.5.0
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Minor changes
+
+- Add an optional patch which can be used to allow ESLint to extend configurations from packages that do not have the "eslint-config-" prefix
+
+## 1.4.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 1.3.3
 Tue, 08 Aug 2023 07:10:39 GMT

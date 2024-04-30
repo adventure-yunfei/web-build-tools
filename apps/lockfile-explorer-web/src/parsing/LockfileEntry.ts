@@ -2,9 +2,7 @@
 // See LICENSE in the project root for license information.
 
 import { Path } from '@lifaon/path';
-import { ILockfileNode, LockfileDependency } from './LockfileDependency';
-
-const ROOT_PACKAGE_PATH: string = 'common/temp/package.json';
+import { type ILockfileNode, LockfileDependency } from './LockfileDependency';
 
 export enum LockfileEntryFilter {
   Project,
@@ -18,6 +16,7 @@ interface IProps {
   kind: LockfileEntryFilter;
   rawYamlData: ILockfileNode;
   duplicates?: Set<string>;
+  subspaceName?: string;
 }
 
 /**
@@ -62,7 +61,7 @@ export class LockfileEntry {
   public entrySuffix: string = '';
 
   public constructor(data: IProps) {
-    const { rawEntryId, kind, rawYamlData, duplicates } = data;
+    const { rawEntryId, kind, rawYamlData, duplicates, subspaceName } = data;
     this.rawEntryId = rawEntryId;
     this.kind = kind;
 
@@ -72,13 +71,14 @@ export class LockfileEntry {
     }
 
     if (kind === LockfileEntryFilter.Project) {
-      const rootPackageJsonFolderPath = new Path(ROOT_PACKAGE_PATH).dirname() || '';
+      const rootPackageJsonFolderPath = new Path(`common/temp/${subspaceName}/package.json`).dirname() || '';
       const packageJsonFolderPath = new Path('.').relative(
         new Path(rootPackageJsonFolderPath).concat(rawEntryId)
       );
       const packageName = new Path(rawEntryId).basename();
 
       if (!packageJsonFolderPath || !packageName) {
+        // eslint-disable-next-line no-console
         console.error('Could not construct path for entry: ', rawEntryId);
         return;
       }
@@ -123,11 +123,11 @@ export class LockfileEntry {
       }
 
       // Example:
-      //   common/temp/node_modules/.pnpm
+      //   common/temp/default/node_modules/.pnpm
       //     /@babel+register@7.17.7_@babel+core@7.17.12
       //     /node_modules/@babel/register
       this.packageJsonFolderPath =
-        'common/temp/node_modules/.pnpm/' +
+        `common/temp/${subspaceName}/node_modules/.pnpm/` +
         this.entryPackageName.replace('/', '+') +
         '@' +
         this.entryPackageVersion +

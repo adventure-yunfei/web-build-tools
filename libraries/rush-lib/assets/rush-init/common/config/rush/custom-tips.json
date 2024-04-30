@@ -7,13 +7,8 @@
   "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/custom-tips.schema.json",
 
   /**
-   * If specified, this prefix will be prepended to any the tip messages when they are displayed.
-   * The default value is an empty string.
-   */
-  /*[LINE "HYPOTHETICAL"]*/ "defaultMessagePrefix": "⭐️ Contoso monorepo tip: ",
-
-  /**
-   * Specifies the custom tips to be displayed by Rush.
+   * Custom tips allow you to annotate Rush's console messages with advice tailored for
+   * your specific monorepo.
    */
   "customTips": [
     /*[BEGIN "DEMO"]*/
@@ -21,20 +16,15 @@
       /**
        * (REQUIRED) An identifier indicating a message that may be printed by Rush.
        * If that message is printed, then this custom tip will be shown.
-       * Consult the Rush documentation for the current list of possible identifiers.
+       * The list of available tip identifiers can be found on this page:
+       * https://rushjs.io/pages/maintainer/custom_tips/
        */
       "tipId": "TIP_RUSH_INCONSISTENT_VERSIONS",
 
       /**
        * (REQUIRED) The message text to be displayed for this tip.
        */
-      "message": "For additional troubleshooting information, refer this wiki article:\n\nhttps://intranet.contoso.com/docs/pnpm-mismatch",
-
-      /**
-       * Overrides the "defaultMessagePrefix" for this tip.
-       * Specify an empty string to omit the "defaultMessagePrefix" entirely.
-       */
-      // "messagePrefix": ""
+      "message": "For additional troubleshooting information, refer this wiki article:\n\nhttps://intranet.contoso.com/docs/pnpm-mismatch"
     }
     /*[END "DEMO"]*/
   ]

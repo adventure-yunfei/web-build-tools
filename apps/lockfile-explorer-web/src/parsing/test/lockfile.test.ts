@@ -3,7 +3,7 @@
 
 import { TEST_LOCKFILE } from './testLockfile';
 import { generateLockfileGraph } from '../readLockfile';
-import { LockfileEntry } from '../LockfileEntry';
+import type { LockfileEntry } from '../LockfileEntry';
 
 describe('LockfileGeneration', () => {
   it('creates a valid bi-directional graph', () => {
@@ -18,7 +18,7 @@ describe('LockfileGeneration', () => {
     const exampleLockfileImporter = resolvedPackagesMap.testApp1;
 
     // Ensure validity of the example lockfile entry
-    expect(exampleLockfileImporter.rawEntryId).toBe('../../apps/testApp1');
+    expect(exampleLockfileImporter.rawEntryId).toBe('../../../apps/testApp1');
     expect(exampleLockfileImporter.entryId).toBe('project:./apps/testApp1');
 
     // Test that dependencies are linked in the importer project

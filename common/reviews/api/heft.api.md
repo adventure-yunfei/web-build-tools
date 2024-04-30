@@ -18,26 +18,8 @@ import { CommandLineStringListParameter } from '@rushstack/ts-command-line';
 import { CommandLineStringParameter } from '@rushstack/ts-command-line';
 import { IPackageJson } from '@rushstack/node-core-library';
 import { IRigConfig } from '@rushstack/rig-package';
-import { ITerminal } from '@rushstack/node-core-library';
-import { ITerminalProvider } from '@rushstack/node-core-library';
-
-// @beta
-export class CancellationToken {
-    // @internal
-    constructor(options?: _ICancellationTokenOptions);
-    get isCancelled(): boolean;
-    get onCancelledPromise(): Promise<void>;
-}
-
-// @beta
-export class CancellationTokenSource {
-    constructor(options?: ICancellationTokenSourceOptions);
-    cancel(): void;
-    get isCancelled(): boolean;
-    // @internal (undocumented)
-    get _onCancelledPromise(): Promise<void>;
-    get token(): CancellationToken;
-}
+import { ITerminal } from '@rushstack/terminal';
+import { ITerminalProvider } from '@rushstack/terminal';
 
 export { CommandLineChoiceListParameter }
 
@@ -73,17 +55,6 @@ export class HeftConfiguration {
     get rigPackageResolver(): IRigPackageResolver;
     get tempFolderPath(): string;
     get terminalProvider(): ITerminalProvider;
-}
-
-// @internal
-export interface _ICancellationTokenOptions {
-    cancellationTokenSource?: CancellationTokenSource;
-    isCancelled?: boolean;
-}
-
-// @beta
-export interface ICancellationTokenSourceOptions {
-    delayMs?: number;
 }
 
 // @public
@@ -214,7 +185,7 @@ export interface IHeftTaskPlugin<TOptions = void> extends IHeftPlugin<IHeftTaskS
 // @public
 export interface IHeftTaskRunHookOptions {
     // @beta
-    readonly cancellationToken: CancellationToken;
+    readonly abortSignal: AbortSignal;
 }
 
 // @public
@@ -241,6 +212,7 @@ export interface IIncrementalCopyOperation extends ICopyOperation {
 
 // @public (undocumented)
 export interface IMetricsData {
+    bootDurationMs: number;
     command: string;
     commandParameters: Record<string, string>;
     encounteredError?: boolean;
@@ -250,6 +222,7 @@ export interface IMetricsData {
     machineProcessor: string;
     machineTotalMemoryMB: number;
     taskTotalExecutionMs: number;
+    totalUptimeMs: number;
 }
 
 // @internal (undocumented)

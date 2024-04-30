@@ -4,34 +4,42 @@
 import * as path from 'path';
 import * as semver from 'semver';
 import crypto from 'crypto';
-import colors from 'colors/safe';
+
 import {
   FileSystem,
   AlreadyReportedError,
   Import,
   Path,
-  IPackageJson,
+  type IPackageJson,
   InternalError
 } from '@rushstack/node-core-library';
+import { Colorize, type ITerminal } from '@rushstack/terminal';
+import * as dependencyPath from '@pnpm/dependency-path';
 
 import { BaseShrinkwrapFile } from '../base/BaseShrinkwrapFile';
 import { DependencySpecifier } from '../DependencySpecifier';
-import { RushConfiguration } from '../../api/RushConfiguration';
-import { IShrinkwrapFilePolicyValidatorOptions } from '../policy/ShrinkwrapFilePolicy';
+import type { RushConfiguration } from '../../api/RushConfiguration';
+import type { IShrinkwrapFilePolicyValidatorOptions } from '../policy/ShrinkwrapFilePolicy';
 import { PNPM_SHRINKWRAP_YAML_FORMAT } from './PnpmYamlCommon';
 import { RushConstants } from '../RushConstants';
-import { IExperimentsJson } from '../../api/ExperimentsConfiguration';
-import { DependencyType, PackageJsonDependency, PackageJsonEditor } from '../../api/PackageJsonEditor';
-import { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import type { IExperimentsJson } from '../../api/ExperimentsConfiguration';
+import { DependencyType, type PackageJsonDependency, PackageJsonEditor } from '../../api/PackageJsonEditor';
+import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import { PnpmfileConfiguration } from './PnpmfileConfiguration';
 import { PnpmProjectShrinkwrapFile } from './PnpmProjectShrinkwrapFile';
-import { PackageManagerOptionsConfigurationBase } from '../base/BasePackageManagerOptionsConfiguration';
+import type { PackageManagerOptionsConfigurationBase } from '../base/BasePackageManagerOptionsConfiguration';
 import { PnpmOptionsConfiguration } from './PnpmOptionsConfiguration';
+import type { IPnpmfile, IPnpmfileContext } from './IPnpmfile';
+import type { Subspace } from '../../api/Subspace';
+import { CustomTipId, type CustomTipsConfiguration } from '../../api/CustomTipsConfiguration';
 
 const yamlModule: typeof import('js-yaml') = Import.lazy('js-yaml', require);
 
 export interface IPeerDependenciesMetaYaml {
   optional?: boolean;
+}
+export interface IDependenciesMetaYaml {
+  injected?: boolean;
 }
 
 export type IPnpmV7VersionSpecifier = string;
@@ -69,6 +77,8 @@ export interface IPnpmShrinkwrapImporterYaml {
   devDependencies?: Record<string, IPnpmVersionSpecifier>;
   /** The list of resolved version numbers for optional dependencies */
   optionalDependencies?: Record<string, IPnpmVersionSpecifier>;
+  /** The list of metadata for dependencies declared inside dependencies, optionalDependencies, and devDependencies. */
+  dependenciesMeta?: Record<string, IDependenciesMetaYaml>;
   /**
    * The list of specifiers used to resolve dependency versions
    *
@@ -124,6 +134,10 @@ export interface IPnpmShrinkwrapYaml {
   specifiers: Record<string, string>;
   /** The list of override version number for dependencies */
   overrides?: { [dependency: string]: string };
+}
+
+export interface ILoadFromFileOptions {
+  withCaching?: boolean;
 }
 
 /**
@@ -236,6 +250,9 @@ export function normalizePnpmVersionSpecifier(versionSpecifier: IPnpmVersionSpec
 }
 
 export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
+  // TODO: Implement cache eviction when a lockfile is copied back
+  private static _cacheByLockfilePath: Map<string, PnpmShrinkwrapFile | undefined> = new Map();
+
   public readonly shrinkwrapFileMajorVersion: number;
   public readonly isWorkspaceCompatible: boolean;
   public readonly registry: string;
@@ -279,16 +296,30 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
     this._integrities = new Map();
   }
 
-  public static loadFromFile(shrinkwrapYamlFilename: string): PnpmShrinkwrapFile | undefined {
-    try {
-      const shrinkwrapContent: string = FileSystem.readFile(shrinkwrapYamlFilename);
-      return PnpmShrinkwrapFile.loadFromString(shrinkwrapContent);
-    } catch (error) {
-      if (FileSystem.isNotExistError(error as Error)) {
-        return undefined; // file does not exist
-      }
-      throw new Error(`Error reading "${shrinkwrapYamlFilename}":\n  ${(error as Error).message}`);
+  public static loadFromFile(
+    shrinkwrapYamlFilePath: string,
+    { withCaching }: ILoadFromFileOptions = {}
+  ): PnpmShrinkwrapFile | undefined {
+    let loaded: PnpmShrinkwrapFile | undefined;
+    if (withCaching) {
+      loaded = PnpmShrinkwrapFile._cacheByLockfilePath.get(shrinkwrapYamlFilePath);
     }
+
+    // TODO: Promisify this
+    loaded ??= (() => {
+      try {
+        const shrinkwrapContent: string = FileSystem.readFile(shrinkwrapYamlFilePath);
+        return PnpmShrinkwrapFile.loadFromString(shrinkwrapContent);
+      } catch (error) {
+        if (FileSystem.isNotExistError(error as Error)) {
+          return undefined; // file does not exist
+        }
+        throw new Error(`Error reading "${shrinkwrapYamlFilePath}":\n  ${(error as Error).message}`);
+      }
+    })();
+
+    PnpmShrinkwrapFile._cacheByLockfilePath.set(shrinkwrapYamlFilePath, loaded);
+    return loaded;
   }
 
   public static loadFromString(shrinkwrapContent: string): PnpmShrinkwrapFile {
@@ -307,6 +338,62 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
     return crypto.createHash('sha1').update(shrinkwrapContent).digest('hex');
   }
 
+  /**
+   * Determine whether `pnpm-lock.yaml` contains insecure sha1 hashes.
+   * @internal
+   */
+  private _disallowInsecureSha1(
+    customTipsConfiguration: CustomTipsConfiguration,
+    exemptPackageVersions: Record<string, string[]>,
+    terminal: ITerminal
+  ): boolean {
+    const exmeptPackageList: Map<string, boolean> = new Map();
+    for (const [pkgName, versions] of Object.entries(exemptPackageVersions)) {
+      for (const version of versions) {
+        exmeptPackageList.set(this._getPackageId(pkgName, version), true);
+      }
+    }
+
+    for (const [pkgName, { resolution }] of this.packages) {
+      if (
+        resolution?.integrity.startsWith('sha1') &&
+        !exmeptPackageList.has(this._parseDependencyPath(pkgName))
+      ) {
+        terminal.writeErrorLine(
+          'Error: An integrity field with "sha1" was found in pnpm-lock.yaml;' +
+            ' this conflicts with the "disallowInsecureSha1" policy from pnpm-config.json.\n'
+        );
+
+        customTipsConfiguration._showErrorTip(terminal, CustomTipId.TIP_RUSH_DISALLOW_INSECURE_SHA1);
+
+        return true; // Indicates an error was found
+      }
+    }
+    return false;
+  }
+
+  /** @override */
+  public validateShrinkwrapAfterUpdate(rushConfiguration: RushConfiguration, terminal: ITerminal): void {
+    const { pnpmLockfilePolicies } = rushConfiguration.pnpmOptions;
+
+    let invalidPoliciesCount: number = 0;
+
+    if (pnpmLockfilePolicies?.disallowInsecureSha1?.enabled) {
+      const isError: boolean = this._disallowInsecureSha1(
+        rushConfiguration.customTipsConfiguration,
+        pnpmLockfilePolicies.disallowInsecureSha1.exemptPackageVersions,
+        terminal
+      );
+      if (isError) {
+        invalidPoliciesCount += 1;
+      }
+    }
+
+    if (invalidPoliciesCount > 0) {
+      throw new AlreadyReportedError();
+    }
+  }
+
   /** @override */
   public validate(
     packageManagerOptionsConfig: PackageManagerOptionsConfigurationBase,
@@ -320,8 +407,9 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
 
     if (!policyOptions.allowShrinkwrapUpdates) {
       if (!policyOptions.repoState.isValid) {
+        // eslint-disable-next-line no-console
         console.log(
-          colors.red(
+          Colorize.red(
             `The ${RushConstants.repoStateFilename} file is invalid. There may be a merge conflict marker ` +
               'in the file. You may need to run "rush update" to refresh its contents.'
           ) + '\n'
@@ -333,8 +421,9 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
       // may have changed and the hash could be invalid.
       if (packageManagerOptionsConfig.preventManualShrinkwrapChanges) {
         if (!policyOptions.repoState.pnpmShrinkwrapHash) {
+          // eslint-disable-next-line no-console
           console.log(
-            colors.red(
+            Colorize.red(
               'The existing shrinkwrap file hash could not be found. You may need to run "rush update" to ' +
                 'populate the hash. See the "preventManualShrinkwrapChanges" setting documentation for details.'
             ) + '\n'
@@ -343,8 +432,9 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
         }
 
         if (this.getShrinkwrapHash(experimentsConfig) !== policyOptions.repoState.pnpmShrinkwrapHash) {
+          // eslint-disable-next-line no-console
           console.log(
-            colors.red(
+            Colorize.red(
               'The shrinkwrap file hash does not match the expected hash. Please run "rush update" to ensure the ' +
                 'shrinkwrap file is up to date. See the "preventManualShrinkwrapChanges" setting documentation for ' +
                 'details.'
@@ -354,6 +444,31 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
         }
       }
     }
+  }
+
+  /**
+   * This operation exactly mirrors the behavior of PNPM's own implementation:
+   * https://github.com/pnpm/pnpm/blob/73ebfc94e06d783449579cda0c30a40694d210e4/lockfile/lockfile-file/src/experiments/inlineSpecifiersLockfileConverters.ts#L162
+   */
+  private _convertLockfileV6DepPathToV5DepPath(newDepPath: string): string {
+    if (!newDepPath.includes('@', 2) || newDepPath.startsWith('file:')) return newDepPath;
+    const index: number = newDepPath.indexOf('@', newDepPath.indexOf('/@') + 2);
+    if (newDepPath.includes('(') && index > dependencyPath.indexOfPeersSuffix(newDepPath)) return newDepPath;
+    return `${newDepPath.substring(0, index)}/${newDepPath.substring(index + 1)}`;
+  }
+
+  /**
+   * Normalize dependency paths for PNPM shrinkwrap files.
+   * Example: "/eslint-utils@3.0.0(eslint@8.23.1)" --> "/eslint-utils@3.0.0"
+   * Example: "/@typescript-eslint/experimental-utils/5.9.1_eslint@8.6.0+typescript@4.4.4" --> "/@typescript-eslint/experimental-utils/5.9.1"
+   */
+  private _parseDependencyPath(packagePath: string): string {
+    let depPath: string = packagePath;
+    if (this.shrinkwrapFileMajorVersion >= 6) {
+      depPath = this._convertLockfileV6DepPathToV5DepPath(packagePath);
+    }
+    const pkgInfo: ReturnType<typeof dependencyPath.parse> = dependencyPath.parse(depPath);
+    return this._getPackageId(pkgInfo.name as string, pkgInfo.version as string);
   }
 
   /** @override */
@@ -577,17 +692,20 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
   }
 
   /** @override */
-  public findOrphanedProjects(rushConfiguration: RushConfiguration): ReadonlyArray<string> {
+  public findOrphanedProjects(
+    rushConfiguration: RushConfiguration,
+    subspace: Subspace
+  ): ReadonlyArray<string> {
     // The base shrinkwrap handles orphaned projects the same across all package managers,
     // but this is only valid for non-workspace installs
     if (!this.isWorkspaceCompatible) {
-      return super.findOrphanedProjects(rushConfiguration);
+      return super.findOrphanedProjects(rushConfiguration, subspace);
     }
 
     const orphanedProjectPaths: string[] = [];
     for (const importerKey of this.getImporterKeys()) {
       // PNPM importer keys are relative paths from the workspace root, which is the common temp folder
-      const rushProjectPath: string = path.resolve(rushConfiguration.commonTempFolder, importerKey);
+      const rushProjectPath: string = path.resolve(subspace.getSubspaceTempFolder(), importerKey);
       if (!rushConfiguration.tryGetProjectForPath(rushProjectPath)) {
         orphanedProjectPaths.push(rushProjectPath);
       }
@@ -665,12 +783,13 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
   /** @override */
   public async isWorkspaceProjectModifiedAsync(
     project: RushConfigurationProject,
-    variant?: string
+    subspace: Subspace
   ): Promise<boolean> {
     const importerKey: string = this.getImporterKeyByPath(
-      project.rushConfiguration.commonTempFolder,
+      subspace.getSubspaceTempFolder(),
       project.projectFolder
     );
+
     const importer: IPnpmShrinkwrapImporterYaml | undefined = this.getImporter(importerKey);
     if (!importer) {
       return true;
@@ -681,15 +800,72 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
 
     // Initialize the pnpmfile if it doesn't exist
     if (!this._pnpmfileConfiguration) {
-      this._pnpmfileConfiguration = await PnpmfileConfiguration.initializeAsync(project.rushConfiguration, {
-        variant
-      });
+      this._pnpmfileConfiguration = await PnpmfileConfiguration.initializeAsync(
+        project.rushConfiguration,
+        subspace
+      );
+    }
+
+    let transformedPackageJson: IPackageJson = packageJson;
+
+    let subspacePnpmfile: IPnpmfile | undefined;
+    if (project.rushConfiguration.subspacesFeatureEnabled) {
+      // Get the pnpmfile
+      const subspacePnpmfilePath: string = path.join(
+        subspace.getSubspaceTempFolder(),
+        RushConstants.pnpmfileGlobalFilename
+      );
+
+      if (await FileSystem.existsAsync(subspacePnpmfilePath)) {
+        try {
+          subspacePnpmfile = require(subspacePnpmfilePath);
+        } catch (err) {
+          if (err instanceof SyntaxError) {
+            // eslint-disable-next-line no-console
+            console.error(
+              Colorize.red(
+                `A syntax error in the ${RushConstants.pnpmfileV6Filename} at ${subspacePnpmfilePath}\n`
+              )
+            );
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(
+              Colorize.red(
+                `Error during pnpmfile execution. pnpmfile: "${subspacePnpmfilePath}". Error: "${err.message}".` +
+                  '\n'
+              )
+            );
+          }
+        }
+      }
+
+      if (subspacePnpmfile) {
+        const individualContext: IPnpmfileContext = {
+          log: (message: string) => {
+            // eslint-disable-next-line no-console
+            console.log(message);
+          }
+        };
+        try {
+          transformedPackageJson =
+            subspacePnpmfile.hooks?.readPackage?.(transformedPackageJson, individualContext) ||
+            transformedPackageJson;
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(
+            Colorize.red(
+              `Error during readPackage hook execution. pnpmfile: "${subspacePnpmfilePath}". Error: "${err.message}".` +
+                '\n'
+            )
+          );
+        }
+      }
     }
 
     // Use a new PackageJsonEditor since it will classify each dependency type, making tracking the
     // found versions much simpler.
     const { dependencyList, devDependencyList } = PackageJsonEditor.fromObject(
-      this._pnpmfileConfiguration.transform(packageJson),
+      this._pnpmfileConfiguration.transform(transformedPackageJson),
       project.packageJsonEditor.filePath
     );
 
@@ -825,7 +1001,9 @@ export class PnpmShrinkwrapFile extends BaseShrinkwrapFile {
           } else {
             // TODO: Emit an error message when someone tries to override a version of something in one of their
             // local repo packages.
-            const resolvedVersion: string = this.overrides.get(name) ?? version;
+            let resolvedVersion: string = this.overrides.get(name) ?? version;
+            // convert path in posix style, otherwise pnpm install will fail in subspace case
+            resolvedVersion = Path.convertToSlashes(resolvedVersion);
             if (specifierFromLockfile.specifier !== resolvedVersion && !isDevDepFallThrough && !isOptional) {
               return true;
             }

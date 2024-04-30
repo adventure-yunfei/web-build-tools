@@ -6,7 +6,7 @@ import * as ts from 'typescript';
 import { AstSymbol } from '../analyzer/AstSymbol';
 import { Collector } from './Collector';
 import { Sort } from '@rushstack/node-core-library';
-import { AstEntity } from '../analyzer/AstEntity';
+import type { AstEntity } from '../analyzer/AstEntity';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 
 /**

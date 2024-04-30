@@ -1,6 +1,248 @@
 # Change Log - @rushstack/heft-jest-plugin
 
-This log was last generated on Tue, 08 Aug 2023 07:10:40 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+
+## 0.11.24
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.11.23
+Tue, 19 Mar 2024 15:10:18 GMT
+
+_Version update only_
+
+## 0.11.22
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 0.11.21
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 0.11.20
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 0.11.19
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 0.11.18
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 0.11.17
+Thu, 29 Feb 2024 07:11:45 GMT
+
+_Version update only_
+
+## 0.11.16
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 0.11.15
+Mon, 26 Feb 2024 16:10:56 GMT
+
+### Patches
+
+- Make `@rushstack/terminal` a dependency because the reporter has a runtime dependency on that package.
+
+## 0.11.14
+Thu, 22 Feb 2024 05:54:17 GMT
+
+### Patches
+
+- Add a missing dependency on `@rushstack/terminal`
+
+## 0.11.13
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 0.11.12
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 0.11.11
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 0.11.10
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 0.11.9
+Tue, 20 Feb 2024 16:10:53 GMT
+
+_Version update only_
+
+## 0.11.8
+Mon, 19 Feb 2024 21:54:26 GMT
+
+_Version update only_
+
+## 0.11.7
+Sat, 17 Feb 2024 06:24:35 GMT
+
+_Version update only_
+
+## 0.11.6
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 0.11.5
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.11.4
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 0.11.3
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.11.2
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 0.11.1
+Tue, 23 Jan 2024 16:15:05 GMT
+
+_Version update only_
+
+## 0.11.0
+Tue, 16 Jan 2024 18:30:10 GMT
+
+### Minor changes
+
+- Add support for TypeScript 5.3
+
+## 0.10.8
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.10.7
+Wed, 20 Dec 2023 01:09:46 GMT
+
+_Version update only_
+
+## 0.10.6
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.10.5
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.10.4
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.10.3
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.10.2
+Mon, 30 Oct 2023 23:36:38 GMT
+
+_Version update only_
+
+## 0.10.1
+Thu, 26 Oct 2023 00:27:48 GMT
+
+### Patches
+
+- Add an option (`enableNodeEnvManagement`) to ensure that the NODE_ENV environment variable is set to `"test"` during test execution.
+
+## 0.10.0
+Mon, 23 Oct 2023 15:18:38 GMT
+
+### Minor changes
+
+- Use Jest verbose logging when `heft --debug test` or `heft test --verbose` is specified
+- Fix an issue where `silent: true` was ignored when specified in `jest.config.json`
+
+## 0.9.9
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 0.9.8
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 0.9.7
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 0.9.6
+Wed, 27 Sep 2023 00:21:38 GMT
+
+_Version update only_
+
+## 0.9.5
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 0.9.4
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 0.9.3
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 0.9.2
+Fri, 22 Sep 2023 00:05:50 GMT
+
+_Version update only_
+
+## 0.9.1
+Tue, 19 Sep 2023 15:21:51 GMT
+
+_Version update only_
+
+## 0.9.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Add a `--log-heap-usage` flag that includes memory usage analysis in each test run.
+- Update @types/node from 14 to 18
+
+### Patches
+
+- Wait for first test run to be scheduled in initial invocation in watch mode.
 
 ## 0.8.1
 Tue, 08 Aug 2023 07:10:40 GMT

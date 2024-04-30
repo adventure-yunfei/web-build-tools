@@ -3,23 +3,22 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { IMinimatch, Minimatch } from 'minimatch';
+import { type IMinimatch, Minimatch } from 'minimatch';
 import semver from 'semver';
 import npmPacklist from 'npm-packlist';
 import pnpmLinkBins from '@pnpm/link-bins';
-import ignore, { Ignore } from 'ignore';
+import ignore, { type Ignore } from 'ignore';
 import {
   Async,
   AsyncQueue,
   Path,
   FileSystem,
   Import,
-  Colors,
   JsonFile,
   AlreadyExistsBehavior,
-  type IPackageJson,
-  type ITerminal
+  type IPackageJson
 } from '@rushstack/node-core-library';
+import { Colorize, type ITerminal } from '@rushstack/terminal';
 
 import { ArchiveManager } from './ArchiveManager';
 import { SymlinkAnalyzer, type ILinkInfo, type PathNode } from './SymlinkAnalyzer';
@@ -71,6 +70,28 @@ export interface IExtractorMetadataJson {
    * A list of all links that are part of the extracted project.
    */
   links: ILinkInfo[];
+}
+
+/**
+ * The extractor subspace configurations
+ *
+ * @public
+ */
+export interface IExtractorSubspace {
+  /**
+   * The subspace name
+   */
+  subspaceName: string;
+  /**
+   * The folder where the PNPM "node_modules" folder is located. This is used to resolve packages linked
+   * to the PNPM virtual store.
+   */
+  pnpmInstallFolder?: string;
+  /**
+   * The pnpmfile configuration if using PNPM, otherwise undefined. The configuration will be used to
+   * transform the package.json prior to extraction.
+   */
+  transformPackageJson?: (packageJson: IPackageJson) => IPackageJson;
 }
 
 interface IExtractorState {
@@ -194,10 +215,15 @@ export interface IExtractorOptions {
   createArchiveOnly?: boolean;
 
   /**
-   * The pnpmfile configuration if using PNPM, otherwise undefined. The configuration will be used to
+   * The pnpmfile configuration if using PNPM, otherwise `undefined`. The configuration will be used to
    * transform the package.json prior to extraction.
+   *
+   * @remarks
+   * When Rush subspaces are enabled, this setting applies to `default` subspace only.  To configure
+   * each subspace, use the {@link IExtractorOptions.subspaces} array instead.  The two approaches
+   * cannot be combined.
    */
-  transformPackageJson?: (packageJson: IPackageJson) => IPackageJson | undefined;
+  transformPackageJson?: (packageJson: IPackageJson) => IPackageJson;
 
   /**
    * If dependencies from the "devDependencies" package.json field should be included in the extraction.
@@ -212,6 +238,11 @@ export interface IExtractorOptions {
   /**
    * The folder where the PNPM "node_modules" folder is located. This is used to resolve packages linked
    * to the PNPM virtual store.
+   *
+   * @remarks
+   * When Rush subspaces are enabled, this setting applies to `default` subspace only.  To configure
+   * each subspace, use the {@link IExtractorOptions.subspaces} array instead.  The two approaches
+   * cannot be combined.
    */
   pnpmInstallFolder?: string;
 
@@ -239,6 +270,16 @@ export interface IExtractorOptions {
    * Configurations for individual dependencies.
    */
   dependencyConfigurations?: IExtractorDependencyConfiguration[];
+
+  /**
+   * When using Rush subspaces, this setting can be used to provide configuration information for each
+   * individual subspace.
+   *
+   * @remarks
+   * To avoid confusion, if this setting is used, then the {@link IExtractorOptions.transformPackageJson} and
+   * {@link IExtractorOptions.pnpmInstallFolder} settings must not be used.
+   */
+  subspaces?: IExtractorSubspace[];
 }
 
 /**
@@ -271,6 +312,7 @@ export class PackageExtractor {
    * Extract a package using the provided options
    */
   public async extractAsync(options: IExtractorOptions): Promise<void> {
+    options = PackageExtractor._normalizeOptions(options);
     const {
       terminal,
       projectConfigurations,
@@ -305,8 +347,8 @@ export class PackageExtractor {
 
     await FileSystem.ensureFolderAsync(targetRootFolder);
 
-    terminal.writeLine(Colors.cyan(`Extracting to target folder:  ${targetRootFolder}`));
-    terminal.writeLine(Colors.cyan(`Main project for extraction: ${mainProjectName}`));
+    terminal.writeLine(Colorize.cyan(`Extracting to target folder:  ${targetRootFolder}`));
+    terminal.writeLine(Colorize.cyan(`Main project for extraction: ${mainProjectName}`));
 
     try {
       const existingExtraction: boolean =
@@ -357,13 +399,43 @@ export class PackageExtractor {
     }
   }
 
+  private static _normalizeOptions(options: IExtractorOptions): IExtractorOptions {
+    if (options.subspaces) {
+      if (options.pnpmInstallFolder !== undefined) {
+        throw new Error(
+          'IExtractorOptions.pnpmInstallFolder cannot be combined with IExtractorOptions.subspaces'
+        );
+      }
+      if (options.transformPackageJson !== undefined) {
+        throw new Error(
+          'IExtractorOptions.transformPackageJson cannot be combined with IExtractorOptions.subspaces'
+        );
+      }
+      return options;
+    }
+
+    const normalizedOptions: IExtractorOptions = { ...options };
+    delete normalizedOptions.pnpmInstallFolder;
+    delete normalizedOptions.transformPackageJson;
+
+    normalizedOptions.subspaces = [
+      {
+        subspaceName: 'default',
+        pnpmInstallFolder: options.pnpmInstallFolder,
+        transformPackageJson: options.transformPackageJson
+      }
+    ];
+
+    return normalizedOptions;
+  }
+
   private async _performExtractionAsync(options: IExtractorOptions, state: IExtractorState): Promise<void> {
     const {
       terminal,
       mainProjectName,
       sourceRootFolder,
       targetRootFolder,
-      folderToCopy: addditionalFolderToCopy,
+      folderToCopy: additionalFolderToCopy,
       linkCreation
     } = options;
     const { projectConfigurationsByName, foldersToCopy, symlinkAnalyzer } = state;
@@ -392,7 +464,7 @@ export class PackageExtractor {
     }
 
     for (const { projectName, projectFolder } of includedProjectsSet) {
-      terminal.writeLine(Colors.cyan(`Analyzing project: ${projectName}`));
+      terminal.writeLine(Colorize.cyan(`Analyzing project: ${projectName}`));
       await this._collectFoldersAsync(projectFolder, options, state);
     }
 
@@ -408,6 +480,18 @@ export class PackageExtractor {
         concurrency: 10
       }
     );
+
+    if (additionalFolderToCopy) {
+      // Copy the additional folder directly into the root of the target folder by setting the sourceRootFolder
+      // to the root of the folderToCopy
+      const additionalFolderPath: string = path.resolve(sourceRootFolder, additionalFolderToCopy);
+      const additionalFolderExtractorOptions: IExtractorOptions = {
+        ...options,
+        sourceRootFolder: additionalFolderPath,
+        targetRootFolder: options.targetRootFolder
+      };
+      await this._extractFolderAsync(additionalFolderPath, additionalFolderExtractorOptions, state);
+    }
 
     switch (linkCreation) {
       case 'script': {
@@ -442,15 +526,6 @@ export class PackageExtractor {
 
     terminal.writeLine('Creating extractor-metadata.json');
     await this._writeExtractorMetadataAsync(options, state);
-
-    if (addditionalFolderToCopy) {
-      const sourceFolderPath: string = path.resolve(sourceRootFolder, addditionalFolderToCopy);
-      await FileSystem.copyFilesAsync({
-        sourcePath: sourceFolderPath,
-        destinationPath: targetRootFolder,
-        alreadyExistsBehavior: AlreadyExistsBehavior.Error
-      });
-    }
   }
 
   /**
@@ -461,7 +536,7 @@ export class PackageExtractor {
     options: IExtractorOptions,
     state: IExtractorState
   ): Promise<void> {
-    const { terminal, pnpmInstallFolder, transformPackageJson } = options;
+    const { terminal, subspaces } = options;
     const { projectConfigurationsByPath } = state;
 
     const packageJsonFolderPathQueue: AsyncQueue<string> = new AsyncQueue([packageJsonFolder]);
@@ -481,8 +556,14 @@ export class PackageExtractor {
           path.join(packageJsonRealFolderPath, 'package.json')
         );
 
+        const targetSubspace: IExtractorSubspace | undefined = subspaces?.find(
+          (subspace) =>
+            subspace.pnpmInstallFolder && Path.isUnder(packageJsonFolderPath, subspace.pnpmInstallFolder)
+        );
+
         // Transform packageJson using the provided transformer, if requested
-        const packageJson: IPackageJson = transformPackageJson?.(originalPackageJson) ?? originalPackageJson;
+        const packageJson: IPackageJson =
+          targetSubspace?.transformPackageJson?.(originalPackageJson) ?? originalPackageJson;
 
         state.packageJsonByPath.set(packageJsonRealFolderPath, packageJson);
         // Union of keys from regular dependencies, peerDependencies, optionalDependencies
@@ -530,7 +611,7 @@ export class PackageExtractor {
               baseFolderPath: packageJsonRealFolderPath,
               getRealPathAsync: async (filePath: string) => {
                 try {
-                  return (await state.symlinkAnalyzer.analyzePathAsync(filePath)).nodePath;
+                  return (await state.symlinkAnalyzer.analyzePathAsync({ inputPath: filePath })).nodePath;
                 } catch (error: unknown) {
                   if (FileSystem.isFileDoesNotExistError(error as Error)) {
                     return filePath;
@@ -552,12 +633,13 @@ export class PackageExtractor {
         // Replicate the links to the virtual store. Note that if the package has not been hoisted by
         // PNPM, the package will not be resolvable from here.
         // Only apply this logic for packages that were actually installed under the common/temp folder.
-        if (pnpmInstallFolder && Path.isUnder(packageJsonFolderPath, pnpmInstallFolder)) {
+        const realPnpmInstallFolder: string | undefined = targetSubspace?.pnpmInstallFolder;
+        if (realPnpmInstallFolder && Path.isUnder(packageJsonFolderPath, realPnpmInstallFolder)) {
           try {
             // The PNPM virtual store links are created in this folder.  We will resolve the current package
             // from that location and collect any additional links encountered along the way.
             // TODO: This can be configured via NPMRC. We should support that.
-            const pnpmDotFolderPath: string = path.join(pnpmInstallFolder, 'node_modules', '.pnpm');
+            const pnpmDotFolderPath: string = path.join(realPnpmInstallFolder, 'node_modules', '.pnpm');
 
             // TODO: Investigate how package aliases are handled by PNPM in this case.  For example:
             //
@@ -569,7 +651,7 @@ export class PackageExtractor {
               baseFolderPath: pnpmDotFolderPath,
               getRealPathAsync: async (filePath: string) => {
                 try {
-                  return (await state.symlinkAnalyzer.analyzePathAsync(filePath)).nodePath;
+                  return (await state.symlinkAnalyzer.analyzePathAsync({ inputPath: filePath })).nodePath;
                 } catch (error: unknown) {
                   if (FileSystem.isFileDoesNotExistError(error as Error)) {
                     return filePath;
@@ -582,6 +664,7 @@ export class PackageExtractor {
           } catch (resolveErr) {
             // The virtual store link isn't guaranteed to exist, so ignore if it's missing
             // NOTE: If you encounter this warning a lot, please report it to the Rush maintainers.
+            // eslint-disable-next-line no-console
             console.log('Ignoring missing PNPM virtual store link for ' + packageJsonFolderPath);
           }
         }
@@ -697,7 +780,6 @@ export class PackageExtractor {
     const isFileExcluded = (filePath: string): boolean => {
       // Encapsulate exclude logic into a function, so it can be reused.
       const excludeFileByPatterns = (
-        filePath: string,
         patternsToInclude: string[] | undefined,
         patternsToExclude: string[] | undefined
       ): boolean => {
@@ -724,7 +806,6 @@ export class PackageExtractor {
 
       if (isLocalProject) {
         return excludeFileByPatterns(
-          filePath,
           sourceProjectConfiguration?.patternsToInclude,
           sourceProjectConfiguration?.patternsToExclude
         );
@@ -742,7 +823,7 @@ export class PackageExtractor {
             semver.satisfies(packagesJson.version, d.dependencyVersionRange)
           );
         return matchedDependenciesConfigurations.some((d) =>
-          excludeFileByPatterns(filePath, d.patternsToInclude, d.patternsToExclude)
+          excludeFileByPatterns(d.patternsToInclude, d.patternsToExclude)
         );
       }
     };
@@ -784,7 +865,9 @@ export class PackageExtractor {
 
           const copyDestinationPath: string = path.join(targetFolderPath, npmPackFile);
 
-          const copySourcePathNode: PathNode = await state.symlinkAnalyzer.analyzePathAsync(copySourcePath);
+          const copySourcePathNode: PathNode = await state.symlinkAnalyzer.analyzePathAsync({
+            inputPath: copySourcePath
+          });
           if (copySourcePathNode.kind !== 'link') {
             if (!options.createArchiveOnly) {
               await FileSystem.ensureFolderAsync(path.dirname(copyDestinationPath));
@@ -831,8 +914,24 @@ export class PackageExtractor {
             return;
           }
 
-          const sourcePathNode: PathNode = await state.symlinkAnalyzer.analyzePathAsync(sourcePath);
-          if (sourcePathNode.kind === 'file') {
+          const sourcePathNode: PathNode | undefined = await state.symlinkAnalyzer.analyzePathAsync({
+            inputPath: sourcePath,
+            // Treat all links to external paths as if they are files for this scenario. In the future, we may
+            // want to explore the target of the external link to see if all files within the target are
+            // excluded, and throw if they are not.
+            shouldIgnoreExternalLink: (linkSourcePath: string) => {
+              // Ignore the provided linkSourcePath since it may not be the first link in the chain. Instead,
+              // we will consider only the relativeSourcePath, since that would be our entrypoint into the
+              // link chain.
+              return isFileExcluded(relativeSourcePath);
+            }
+          });
+
+          if (sourcePathNode === undefined) {
+            // The target was a symlink that is excluded. We don't need to do anything.
+            callback();
+            return;
+          } else if (sourcePathNode.kind === 'file') {
             // Only ignore files and not folders to ensure that we traverse the contents of all folders. This is
             // done so that we can match against subfolder patterns, ex. "src/subfolder/**/*"
             if (relativeSourcePath !== '' && isFileExcluded(relativeSourcePath)) {
@@ -990,7 +1089,7 @@ export class PackageExtractor {
           extractedProjectNodeModulesFolder,
           extractedProjectBinFolder,
           {
-            warn: (msg: string) => terminal.writeLine(Colors.yellow(msg))
+            warn: (msg: string) => terminal.writeLine(Colorize.yellow(msg))
           }
         );
 

@@ -5,7 +5,8 @@ import * as path from 'path';
 
 import type * as TTypescript from 'typescript';
 import { SyncHook } from 'tapable';
-import { FileSystem, Path, type ITerminal } from '@rushstack/node-core-library';
+import { FileSystem, Path } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 import { ConfigurationFile, InheritanceType, PathResolutionMethod } from '@rushstack/heft-config-file';
 import type {
   HeftConfiguration,
@@ -17,7 +18,9 @@ import type {
   IHeftTaskFileOperations
 } from '@rushstack/heft';
 
-import { TypeScriptBuilder, ITypeScriptBuilderConfiguration } from './TypeScriptBuilder';
+import { TypeScriptBuilder, type ITypeScriptBuilderConfiguration } from './TypeScriptBuilder';
+import anythingSchema from './schemas/anything.schema.json';
+import typescriptConfigSchema from './schemas/typescript.schema.json';
 
 /**
  * The name of the plugin, as specified in heft-plugin.json
@@ -140,10 +143,9 @@ export async function loadTypeScriptConfigurationFileAsync(
   if (!typescriptConfigurationFilePromise) {
     // Ensure that the file loader has been initialized.
     if (!_typeScriptConfigurationFileLoader) {
-      const schemaPath: string = `${__dirname}/schemas/typescript.schema.json`;
       _typeScriptConfigurationFileLoader = new ConfigurationFile<ITypeScriptConfigurationJson>({
         projectRelativeFilePath: 'config/typescript.json',
-        jsonSchemaPath: schemaPath,
+        jsonSchemaObject: typescriptConfigSchema,
         propertyInheritance: {
           staticAssetsToCopy: {
             // When merging objects, arrays will be automatically appended
@@ -205,10 +207,9 @@ export async function loadPartialTsconfigFileAsync(
     } else {
       // Ensure that the file loader has been initialized.
       if (!_partialTsconfigFileLoader) {
-        const schemaPath: string = `${__dirname}/schemas/anything.schema.json`;
         _partialTsconfigFileLoader = new ConfigurationFile<IPartialTsconfig>({
           projectRelativeFilePath: typeScriptConfigurationJson?.project || 'tsconfig.json',
-          jsonSchemaPath: schemaPath,
+          jsonSchemaObject: anythingSchema,
           propertyInheritance: {
             compilerOptions: {
               inheritanceType: InheritanceType.merge

@@ -5,7 +5,7 @@ import * as nodeJsPath from 'path';
 import * as fs from 'fs';
 import * as fsx from 'fs-extra';
 
-import { Text, NewlineKind, Encoding } from './Text';
+import { Text, type NewlineKind, Encoding } from './Text';
 import { PosixModeBits } from './PosixModeBits';
 import { LegacyAdapters } from './LegacyAdapters';
 
@@ -31,7 +31,7 @@ export type FolderItem = fs.Dirent;
 /* eslint-disable no-bitwise */
 
 /**
- * The options for {@link FileSystem.readFolder}
+ * The options for {@link FileSystem.readFolderItems} and {@link FileSystem.readFolderItemNames}.
  * @public
  */
 export interface IFileSystemReadFolderOptions {
@@ -43,16 +43,22 @@ export interface IFileSystemReadFolderOptions {
 }
 
 /**
- * The options for {@link FileSystem.writeFile}
+ * The options for {@link FileSystem.writeBuffersToFile}
  * @public
  */
-export interface IFileSystemWriteFileOptions {
+export interface IFileSystemWriteBinaryFileOptions {
   /**
    * If true, will ensure the folder is created before writing the file.
    * @defaultValue false
    */
   ensureFolderExists?: boolean;
+}
 
+/**
+ * The options for {@link FileSystem.writeFile}
+ * @public
+ */
+export interface IFileSystemWriteFileOptions extends IFileSystemWriteBinaryFileOptions {
   /**
    * If specified, will normalize line endings to the specified style of newline.
    * @defaultValue `undefined` which means no conversion will be performed
@@ -447,9 +453,9 @@ export class FileSystem {
    * @param path - The absolute or relative path to the object that should be updated.
    * @param modeBits - POSIX-style file mode bits specified using the {@link PosixModeBits} enum
    */
-  public static changePosixModeBits(path: string, mode: PosixModeBits): void {
+  public static changePosixModeBits(path: string, modeBits: PosixModeBits): void {
     FileSystem._wrapException(() => {
-      fs.chmodSync(path, mode);
+      fs.chmodSync(path, modeBits);
     });
   }
 
@@ -593,25 +599,6 @@ export class FileSystem {
     await FileSystem._wrapExceptionAsync(() => {
       return fsx.ensureDir(folderPath);
     });
-  }
-
-  /**
-   * @deprecated
-   * Use {@link FileSystem.readFolderItemNames} instead.
-   */
-  public static readFolder(folderPath: string, options?: IFileSystemReadFolderOptions): string[] {
-    return FileSystem.readFolderItemNames(folderPath, options);
-  }
-
-  /**
-   * @deprecated
-   * Use {@link FileSystem.readFolderItemNamesAsync} instead.
-   */
-  public static async readFolderAsync(
-    folderPath: string,
-    options?: IFileSystemReadFolderOptions
-  ): Promise<string[]> {
-    return await FileSystem.readFolderItemNamesAsync(folderPath, options);
   }
 
   /**
@@ -805,6 +792,70 @@ export class FileSystem {
   }
 
   /**
+   * Writes the contents of multiple Uint8Arrays to a file on disk, overwriting the file if it already exists.
+   * Behind the scenes it uses `fs.writevSync()`.
+   *
+   * This API is useful for writing large files efficiently, especially if the input is being concatenated from
+   * multiple sources.
+   *
+   * @remarks
+   * Throws an error if the folder doesn't exist, unless ensureFolder=true.
+   * @param filePath - The absolute or relative path of the file.
+   * @param contents - The content that should be written to the file.
+   * @param options - Optional settings that can change the behavior.
+   */
+  public static writeBuffersToFile(
+    filePath: string,
+    contents: ReadonlyArray<Uint8Array>,
+    options?: IFileSystemWriteBinaryFileOptions
+  ): void {
+    FileSystem._wrapException(() => {
+      // Need a mutable copy of the iterable to handle incomplete writes,
+      // since writev() doesn't take an argument for where to start writing.
+      const toCopy: Uint8Array[] = [...contents];
+
+      let fd: number | undefined;
+      try {
+        fd = fsx.openSync(filePath, 'w');
+      } catch (error) {
+        if (!options?.ensureFolderExists || !FileSystem.isNotExistError(error as Error)) {
+          throw error;
+        }
+
+        const folderPath: string = nodeJsPath.dirname(filePath);
+        FileSystem.ensureFolder(folderPath);
+        fd = fsx.openSync(filePath, 'w');
+      }
+
+      try {
+        // In practice this loop will have exactly 1 iteration, but the spec allows
+        // for a writev call to write fewer bytes than requested
+        while (toCopy.length) {
+          let bytesWritten: number = fsx.writevSync(fd, toCopy);
+          let buffersWritten: number = 0;
+          while (buffersWritten < toCopy.length) {
+            const bytesInCurrentBuffer: number = toCopy[buffersWritten].byteLength;
+            if (bytesWritten < bytesInCurrentBuffer) {
+              // This buffer was partially written.
+              toCopy[buffersWritten] = toCopy[buffersWritten].subarray(bytesWritten);
+              break;
+            }
+            bytesWritten -= bytesInCurrentBuffer;
+            buffersWritten++;
+          }
+
+          if (buffersWritten > 0) {
+            // Avoid cost of shifting the array more than needed.
+            toCopy.splice(0, buffersWritten);
+          }
+        }
+      } finally {
+        fsx.closeSync(fd);
+      }
+    });
+  }
+
+  /**
    * An async version of {@link FileSystem.writeFile}.
    */
   public static async writeFileAsync(
@@ -836,6 +887,60 @@ export class FileSystem {
         } else {
           throw error;
         }
+      }
+    });
+  }
+
+  /**
+   * An async version of {@link FileSystem.writeBuffersToFile}.
+   */
+  public static async writeBuffersToFileAsync(
+    filePath: string,
+    contents: ReadonlyArray<Uint8Array>,
+    options?: IFileSystemWriteBinaryFileOptions
+  ): Promise<void> {
+    await FileSystem._wrapExceptionAsync(async () => {
+      // Need a mutable copy of the iterable to handle incomplete writes,
+      // since writev() doesn't take an argument for where to start writing.
+      const toCopy: Uint8Array[] = [...contents];
+
+      let handle: fs.promises.FileHandle | undefined;
+      try {
+        handle = await fs.promises.open(filePath, 'w');
+      } catch (error) {
+        if (!options?.ensureFolderExists || !FileSystem.isNotExistError(error as Error)) {
+          throw error;
+        }
+
+        const folderPath: string = nodeJsPath.dirname(filePath);
+        await FileSystem.ensureFolderAsync(folderPath);
+        handle = await fs.promises.open(filePath, 'w');
+      }
+
+      try {
+        // In practice this loop will have exactly 1 iteration, but the spec allows
+        // for a writev call to write fewer bytes than requested
+        while (toCopy.length) {
+          let bytesWritten: number = (await handle.writev(toCopy)).bytesWritten;
+          let buffersWritten: number = 0;
+          while (buffersWritten < toCopy.length) {
+            const bytesInCurrentBuffer: number = toCopy[buffersWritten].byteLength;
+            if (bytesWritten < bytesInCurrentBuffer) {
+              // This buffer was partially written.
+              toCopy[buffersWritten] = toCopy[buffersWritten].subarray(bytesWritten);
+              break;
+            }
+            bytesWritten -= bytesInCurrentBuffer;
+            buffersWritten++;
+          }
+
+          if (buffersWritten > 0) {
+            // Avoid cost of shifting the array more than needed.
+            toCopy.splice(0, buffersWritten);
+          }
+        }
+      } finally {
+        await handle.close();
       }
     });
   }

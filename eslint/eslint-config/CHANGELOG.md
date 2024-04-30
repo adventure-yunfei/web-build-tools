@@ -1,6 +1,87 @@
 # Change Log - @rushstack/eslint-config
 
-This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 21:59:39 GMT and should not be manually modified.
+
+## 3.6.9
+Wed, 10 Apr 2024 21:59:39 GMT
+
+_Version update only_
+
+## 3.6.8
+Fri, 29 Mar 2024 05:46:41 GMT
+
+_Version update only_
+
+## 3.6.7
+Thu, 28 Mar 2024 18:11:12 GMT
+
+_Version update only_
+
+## 3.6.6
+Wed, 27 Mar 2024 19:47:21 GMT
+
+_Version update only_
+
+## 3.6.5
+Wed, 20 Mar 2024 02:09:14 GMT
+
+_Version update only_
+
+## 3.6.4
+Sat, 17 Feb 2024 06:24:35 GMT
+
+_Version update only_
+
+## 3.6.3
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 3.6.2
+Thu, 25 Jan 2024 23:03:57 GMT
+
+_Version update only_
+
+## 3.6.1
+Wed, 24 Jan 2024 07:38:34 GMT
+
+_Version update only_
+
+## 3.6.0
+Tue, 16 Jan 2024 18:30:10 GMT
+
+### Minor changes
+
+- Add support for TypeScript 5.3 with @typescript-eslint 6.19.x
+
+## 3.5.1
+Fri, 15 Dec 2023 01:10:06 GMT
+
+_Version update only_
+
+## 3.5.0
+Wed, 22 Nov 2023 01:45:18 GMT
+
+### Minor changes
+
+- Added eslint-bulk-suppressions to @rushstack/eslint-config dependencies, allowing it to be used in all projects that use rushstack's eslint-config
+
+## 3.4.1
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 3.4.0
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Minor changes
+
+- Add an optional patch which can be used to allow ESLint to extend configurations from packages that do not have the "eslint-config-" prefix
+
+## 3.3.4
+Fri, 15 Sep 2023 00:36:58 GMT
+
+_Version update only_
 
 ## 3.3.3
 Tue, 08 Aug 2023 07:10:39 GMT

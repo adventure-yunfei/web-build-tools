@@ -15,6 +15,10 @@
       "allowedCategories": [ "tests" ]
     },
     {
+      "name": "@eslint/eslintrc",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "@jest/core",
       "allowedCategories": [ "libraries" ]
     },
@@ -95,12 +99,16 @@
       "allowedCategories": [ "libraries" ]
     },
     {
+      "name": "@rushstack/eslint-bulk",
+      "allowedCategories": [ "tests" ]
+    },
+    {
       "name": "@rushstack/eslint-config",
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
     },
     {
       "name": "@rushstack/eslint-patch",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "tests" ]
     },
     {
       "name": "@rushstack/eslint-plugin",
@@ -191,6 +199,10 @@
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
     },
     {
+      "name": "@rushstack/operation-graph",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "@rushstack/package-deps-hash",
       "allowedCategories": [ "libraries" ]
     },
@@ -232,7 +244,7 @@
     },
     {
       "name": "@rushstack/terminal",
-      "allowedCategories": [ "libraries" ]
+      "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
     },
     {
       "name": "@rushstack/tree-pattern",
@@ -327,16 +339,28 @@
       "allowedCategories": [ "libraries", "vscode-extensions" ]
     },
     {
-      "name": "@typescript-eslint/experimental-utils",
-      "allowedCategories": [ "libraries" ]
-    },
-    {
       "name": "@typescript-eslint/parser",
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
     },
     {
+      "name": "@typescript-eslint/rule-tester",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "@typescript-eslint/types",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "@typescript-eslint/typescript-estree",
       "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "@typescript-eslint/utils",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "@vscode/test-electron",
+      "allowedCategories": [ "vscode-extensions" ]
     },
     {
       "name": "@yarnpkg/lockfile",
@@ -356,6 +380,14 @@
     },
     {
       "name": "api-extractor-lib3-test",
+      "allowedCategories": [ "tests" ]
+    },
+    {
+      "name": "api-extractor-lib4-test",
+      "allowedCategories": [ "tests" ]
+    },
+    {
+      "name": "api-extractor-lib5-test",
       "allowedCategories": [ "tests" ]
     },
     {
@@ -399,20 +431,16 @@
       "allowedCategories": [ "libraries" ]
     },
     {
-      "name": "colors",
-      "allowedCategories": [ "libraries", "tests" ]
-    },
-    {
       "name": "compression",
-      "allowedCategories": [ "libraries" ]
-    },
-    {
-      "name": "cors",
       "allowedCategories": [ "libraries" ]
     },
     {
       "name": "constructs",
       "allowedCategories": [ "tests" ]
+    },
+    {
+      "name": "cors",
+      "allowedCategories": [ "libraries" ]
     },
     {
       "name": "css-loader",
@@ -439,11 +467,31 @@
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
     },
     {
+      "name": "eslint-plugin-deprecation",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "eslint-plugin-header",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "eslint-plugin-import",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "eslint-plugin-jsdoc",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "eslint-plugin-promise",
       "allowedCategories": [ "libraries" ]
     },
     {
       "name": "eslint-plugin-react",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "eslint-plugin-react-hooks",
       "allowedCategories": [ "libraries" ]
     },
     {
@@ -571,6 +619,10 @@
       "allowedCategories": [ "libraries" ]
     },
     {
+      "name": "jest-junit",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "jest-resolve",
       "allowedCategories": [ "libraries" ]
     },
@@ -601,6 +653,14 @@
     {
       "name": "loader-utils",
       "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "local-eslint-config",
+      "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
+    },
+    {
+      "name": "local-node-rig",
+      "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
     },
     {
       "name": "lodash",
@@ -661,6 +721,10 @@
     {
       "name": "package-extractor-test-03",
       "allowedCategories": [ "tests" ]
+    },
+    {
+      "name": "pnpm-sync-lib",
+      "allowedCategories": [ "libraries" ]
     },
     {
       "name": "postcss",
@@ -743,6 +807,10 @@
       "allowedCategories": [ "libraries" ]
     },
     {
+      "name": "supports-color",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "tapable",
       "allowedCategories": [ "libraries", "tests" ]
     },
@@ -781,6 +849,10 @@
     {
       "name": "typescript",
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
+    },
+    {
+      "name": "update-notifier",
+      "allowedCategories": [ "libraries" ]
     },
     {
       "name": "url-loader",
@@ -824,6 +896,10 @@
     },
     {
       "name": "wordwrap",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
+      "name": "ws",
       "allowedCategories": [ "libraries" ]
     },
     {

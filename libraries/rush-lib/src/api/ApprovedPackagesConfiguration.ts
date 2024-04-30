@@ -6,6 +6,7 @@ import { JsonFile, JsonSchema, FileSystem, NewlineKind, InternalError } from '@r
 
 import { JsonSchemaUrls } from '../logic/JsonSchemaUrls';
 import schemaJson from '../schemas/approved-packages.schema.json';
+import { RushConstants } from '../logic/RushConstants';
 
 /**
  * Part of IApprovedPackagesJson.
@@ -112,9 +113,10 @@ export class ApprovedPackagesConfiguration {
     this.loadFromFile();
 
     if (!approvedPackagesPolicyEnabled) {
+      // eslint-disable-next-line no-console
       console.log(
         `Warning: Ignoring "${path.basename(this._jsonFilename)}" because the` +
-          ` "approvedPackagesPolicy" setting was not specified in rush.json`
+          ` "approvedPackagesPolicy" setting was not specified in ${RushConstants.rushJsonFilename}`
       );
     }
 

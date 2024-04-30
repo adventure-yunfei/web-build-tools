@@ -1,12 +1,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import * as argparse from 'argparse';
-import colors from 'colors';
+import type * as argparse from 'argparse';
+import { Colorize } from '@rushstack/terminal';
 
 import type { CommandLineAction } from './CommandLineAction';
 import type { AliasCommandLineAction } from './AliasCommandLineAction';
-import { CommandLineParameterProvider, type ICommandLineParserData } from './CommandLineParameterProvider';
+import {
+  CommandLineParameterProvider,
+  type IRegisterDefinedParametersState,
+  type ICommandLineParserData
+} from './CommandLineParameterProvider';
 import { CommandLineParserExitError, CustomArgumentParser } from './CommandLineParserExitError';
 import { TabCompleteAction } from './TabCompletionAction';
 
@@ -74,7 +78,7 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
       addHelp: true,
       prog: this._options.toolFilename,
       description: this._options.toolDescription,
-      epilog: colors.bold(
+      epilog: Colorize.bold(
         this._options.toolEpilog ??
           `For detailed help about a specific command, use: ${this._options.toolFilename} <command> -h`
       )
@@ -157,6 +161,7 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
         // executeWithoutErrorHandling() handles the successful cases,
         // so here we can assume err has a nonzero exit code
         if (err.message) {
+          // eslint-disable-next-line no-console
           console.error(err.message);
         }
         if (!process.exitCode) {
@@ -170,8 +175,10 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
           message = 'Error: ' + message;
         }
 
+        // eslint-disable-next-line no-console
         console.error();
-        console.error(colors.red(message));
+        // eslint-disable-next-line no-console
+        console.error(Colorize.red(message));
 
         if (!process.exitCode) {
           process.exitCode = 1;
@@ -199,7 +206,10 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
       this._validateDefinitions();
 
       // Register the parameters before we print help or parse the CLI
-      this._registerDefinedParameters();
+      const initialState: IRegisterDefinedParametersState = {
+        parentParameterNames: new Set()
+      };
+      this._registerDefinedParameters(initialState);
 
       if (!args) {
         // 0=node.exe, 1=script name
@@ -229,8 +239,31 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
         }
       }
 
+      const postParse: () => void = () => {
+        this._postParse();
+        for (const action of this.actions) {
+          action._postParse();
+        }
+      };
+
+      function patchFormatUsageForArgumentParser(argumentParser: argparse.ArgumentParser): void {
+        const originalFormatUsage: () => string = argumentParser.formatUsage.bind(argumentParser);
+        argumentParser.formatUsage = () => {
+          postParse();
+          return originalFormatUsage();
+        };
+      }
+
+      this._preParse();
+      patchFormatUsageForArgumentParser(this._argumentParser);
+      for (const action of this.actions) {
+        action._preParse();
+        patchFormatUsageForArgumentParser(action._getArgumentParser());
+      }
+
       const data: ICommandLineParserData = this._argumentParser.parseArgs(args);
 
+      postParse();
       this._processParsedData(this._options, data);
 
       this.selectedAction = this.tryGetAction(data.action);
@@ -240,12 +273,13 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
       }
 
       this.selectedAction?._processParsedData(this._options, data);
-      return this.onExecute();
+      await this.onExecute();
     } catch (err) {
       if (err instanceof CommandLineParserExitError) {
         if (!err.exitCode) {
           // non-error exit modeled using exception handling
           if (err.message) {
+            // eslint-disable-next-line no-console
             console.log(err.message);
           }
 
@@ -258,10 +292,21 @@ export abstract class CommandLineParser extends CommandLineParameterProvider {
   }
 
   /** @internal */
-  public _registerDefinedParameters(): void {
-    super._registerDefinedParameters();
+  public _registerDefinedParameters(state: IRegisterDefinedParametersState): void {
+    super._registerDefinedParameters(state);
+
+    const { parentParameterNames } = state;
+    const updatedParentParameterNames: Set<string> = new Set([
+      ...parentParameterNames,
+      ...this._registeredParameterParserKeysByName.keys()
+    ]);
+
+    const parentState: IRegisterDefinedParametersState = {
+      ...state,
+      parentParameterNames: updatedParentParameterNames
+    };
     for (const action of this._actions) {
-      action._registerDefinedParameters();
+      action._registerDefinedParameters(parentState);
     }
   }
 
