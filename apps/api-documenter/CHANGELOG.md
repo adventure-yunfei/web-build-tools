@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.24.2-rc.0
+- 合并 7.24.2
+
 ## 7.22.33-rc.2
 - 提取 `_getApiItemPageTitle` 方法
 
