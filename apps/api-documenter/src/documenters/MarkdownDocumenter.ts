@@ -45,7 +45,8 @@ import {
   ApiInitializerMixin,
   ApiProtectedMixin,
   ApiReadonlyMixin,
-  type IFindApiItemsResult
+  type IFindApiItemsResult,
+  ApiExportedMixin
 } from '@microsoft/api-extractor-model';
 
 import { CustomDocNodes } from '../nodes/CustomDocNodeKind';
@@ -569,49 +570,61 @@ export class MarkdownDocumenter {
         ? (apiContainer as ApiPackage).entryPoints[0].members
         : (apiContainer as ApiNamespace).members;
 
-    for (const apiMember of apiMembers) {
-      const row: DocTableRow = new DocTableRow({ configuration }, [
-        this._createTitleCell(apiMember),
-        this._createDescriptionCell(apiMember)
-      ]);
+    const tryAddApiRow = (table: DocTable, apiMember: ApiItem): void => {
+      if (
+        apiContainer.kind === ApiItemKind.Package &&
+        ApiExportedMixin.isBaseClassOf(apiMember) &&
+        !apiMember.isExported
+      ) {
+        // ignore non-exported items in packages
+        return;
+      }
+      table.addRow(
+        new DocTableRow({ configuration }, [
+          this._createTitleCell(apiMember),
+          this._createDescriptionCell(apiMember)
+        ])
+      );
+    };
 
+    for (const apiMember of apiMembers) {
       switch (apiMember.kind) {
         case ApiItemKind.Class:
           if (ApiAbstractMixin.isBaseClassOf(apiMember) && apiMember.isAbstract) {
-            abstractClassesTable.addRow(row);
+            tryAddApiRow(abstractClassesTable, apiMember);
           } else {
-            classesTable.addRow(row);
+            tryAddApiRow(classesTable, apiMember);
           }
           this._writeApiItemPage(apiMember);
           break;
 
         case ApiItemKind.Enum:
-          enumerationsTable.addRow(row);
+          tryAddApiRow(enumerationsTable, apiMember);
           this._writeApiItemPage(apiMember);
           break;
 
         case ApiItemKind.Interface:
-          interfacesTable.addRow(row);
+          tryAddApiRow(interfacesTable, apiMember);
           this._writeApiItemPage(apiMember);
           break;
 
         case ApiItemKind.Namespace:
-          namespacesTable.addRow(row);
+          tryAddApiRow(namespacesTable, apiMember);
           this._writeApiItemPage(apiMember);
           break;
 
         case ApiItemKind.Function:
-          functionsTable.addRow(row);
+          tryAddApiRow(functionsTable, apiMember);
           this._writeApiItemPage(apiMember);
           break;
 
         case ApiItemKind.TypeAlias:
-          typeAliasesTable.addRow(row);
+          tryAddApiRow(typeAliasesTable, apiMember);
           this._writeApiItemPage(apiMember);
           break;
 
         case ApiItemKind.Variable:
-          variablesTable.addRow(row);
+          tryAddApiRow(variablesTable, apiMember);
           this._writeApiItemPage(apiMember);
           break;
       }
