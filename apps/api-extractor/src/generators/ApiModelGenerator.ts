@@ -61,29 +61,8 @@ export class ApiModelGenerator {
   private readonly _referenceGenerator: DeclarationReferenceGenerator;
   private readonly _apiModelTrimming: ReleaseTag;
 
-  public constructor(collector: Collector) {
+  public constructor(collector: Collector, apiModelTrimming: ReleaseTag) {
     this._collector = collector;
-
-    let apiModelTrimming: ReleaseTag;
-    switch (process.env.API_MODEL_TRIMMING) {
-      case 'internal':
-        apiModelTrimming = ReleaseTag.Internal;
-        break;
-      case 'alpha':
-        apiModelTrimming = ReleaseTag.Alpha;
-        break;
-      case 'beta':
-        apiModelTrimming = ReleaseTag.Beta;
-        break;
-      case 'public':
-        apiModelTrimming = ReleaseTag.Public;
-        break;
-      case undefined:
-        apiModelTrimming = ReleaseTag.Beta;
-        break;
-      default:
-        throw new Error(`invalid API_MODEL_TRIMMING: ${process.env.API_MODEL_TRIMMING}`);
-    }
     this._apiModelTrimming = apiModelTrimming;
 
     this._apiModel = new ApiModel();

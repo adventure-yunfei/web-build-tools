@@ -18,7 +18,7 @@ import { ExtractorConfig } from './ExtractorConfig';
 import { Collector } from '../collector/Collector';
 import { DtsRollupGenerator, DtsRollupKind } from '../generators/DtsRollupGenerator';
 import { ApiModelGenerator } from '../generators/ApiModelGenerator';
-import type { ApiPackage } from '@microsoft/api-extractor-model';
+import { ApiPackage, ReleaseTag } from '@microsoft/api-extractor-model';
 import { ApiReportGenerator } from '../generators/ApiReportGenerator';
 import { PackageMetadataManager } from '../analyzer/PackageMetadataManager';
 import { ValidationEnhancer } from '../enhancers/ValidationEnhancer';
@@ -151,6 +151,23 @@ export class ExtractorResult {
   }
 }
 
+function parseReleaseTag(releaseDescription: string | undefined): ReleaseTag {
+  switch (releaseDescription) {
+    case 'internal':
+      return ReleaseTag.Internal;
+    case 'alpha':
+      return ReleaseTag.Alpha;
+    case 'beta':
+      return ReleaseTag.Beta;
+    case 'public':
+      return ReleaseTag.Public;
+    case undefined:
+      return ReleaseTag.Beta;
+    default:
+      throw new Error(`invalid release tag: ${releaseDescription}`);
+  }
+}
+
 /**
  * The starting point for invoking the API Extractor tool.
  * @public
@@ -263,7 +280,10 @@ export class Extractor {
     DocCommentEnhancer.analyze(collector);
     ValidationEnhancer.analyze(collector);
 
-    const modelBuilder: ApiModelGenerator = new ApiModelGenerator(collector);
+    const modelBuilder: ApiModelGenerator = new ApiModelGenerator(
+      collector,
+      parseReleaseTag(process.env.API_MODEL_TRIMMING)
+    );
     const apiPackage: ApiPackage = modelBuilder.buildApiPackage();
 
     if (messageRouter.showDiagnostics) {
@@ -298,7 +318,11 @@ export class Extractor {
         extractorConfig.reportFilePath
       );
 
-      const actualApiReportContent: string = ApiReportGenerator.generateReviewFileContent(collector);
+      const actualApiReportContent: string = ApiReportGenerator.generateReviewFileContent(
+        collector,
+        parseReleaseTag(process.env.API_REPORT_TRIMMING),
+        new Set(process.env.API_REPORT_EXPORT_TRIMMINGS?.split(',') || [])
+      );
 
       // Write the actual file
       FileSystem.writeFile(actualApiReportPath, actualApiReportContent, {

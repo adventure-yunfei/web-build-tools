@@ -44,11 +44,9 @@ export class ApiReportGenerator {
 
   public static generateReviewFileContent(
     collector: Collector,
-    apiReportTimming: ReleaseTag = ReleaseTag.Beta,
+    apiReportTimming: ReleaseTag,
     // Remove some root-export that are not needed in the report (by export name)
-    rootExportTrimmings: ReadonlySet<string> = new Set(
-      process.env.API_REPORT_EXPORT_TRIMMINGS?.split(',') || []
-    )
+    rootExportTrimmings: ReadonlySet<string>
   ): string {
     const writer: IndentedWriter = new IndentedWriter();
     writer.trimLeadingSpaces = true;
