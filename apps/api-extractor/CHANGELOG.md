@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.43.1-rc.1
+- api report: 导出 `env.API_REPORT_TRIMMING` 环境变量配置
+
 ## 7.43.1-rc.0
 - 合并 7.43.1
 
