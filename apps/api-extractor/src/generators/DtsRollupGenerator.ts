@@ -4,6 +4,7 @@
 /* eslint-disable no-bitwise */
 
 import * as ts from 'typescript';
+import { last } from 'lodash';
 import { FileSystem, type NewlineKind, InternalError } from '@rushstack/node-core-library';
 import { ReleaseTag } from '@microsoft/api-extractor-model';
 
@@ -428,6 +429,38 @@ export class DtsRollupGenerator {
               modification.prefix = `/* Excluded from this release type: ${name} */`;
             } else {
               modification.prefix = '';
+            }
+            // Keep trimmed class property/method declaration placeholder to avoid override
+            if (
+              nodeToTrim.parent?.kind === ts.SyntaxKind.ClassDeclaration ||
+              (nodeToTrim.parent?.kind === ts.SyntaxKind.SyntaxList &&
+                nodeToTrim.parent.parent?.kind === ts.SyntaxKind.ClassDeclaration)
+            ) {
+              if (
+                nodeToTrim.kind === ts.SyntaxKind.PropertyDeclaration ||
+                nodeToTrim.kind === ts.SyntaxKind.MethodDeclaration ||
+                nodeToTrim.kind === ts.SyntaxKind.GetAccessor ||
+                nodeToTrim.kind === ts.SyntaxKind.SetAccessor
+              ) {
+                const declarartionsWithSameName: readonly AstDeclaration[] =
+                  astDeclaration.findChildrenWithName(name);
+                if (
+                  // emit placeholder only if all declarations are excluded
+                  declarartionsWithSameName.every(
+                    (d) =>
+                      !this._shouldIncludeReleaseTag(
+                        collector.fetchApiItemMetadata(d).effectiveReleaseTag,
+                        dtsKind
+                      )
+                  ) &&
+                  // emit only once (only for the last declaration)
+                  last(declarartionsWithSameName) === childAstDeclaration
+                ) {
+                  modification.prefix += `protected ${
+                    childAstDeclaration.modifierFlags & ts.ModifierFlags.Static ? 'static ' : ''
+                  }${name}: never;`;
+                }
+              }
             }
             modification.suffix = '';
 
