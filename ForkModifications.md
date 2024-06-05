@@ -128,6 +128,28 @@
   - 默认开启 `@beta` release 裁剪，移除 `@internal` 变更（可通过 `env.API_REPORT_TRIMMING` 环境变量修改）
   - 新增 entity 有效引用分析，`includeForgottenExports` 下仅导出实际被引用的 entity
   - 新增 rootExportTrimmings 选项，裁剪根节点导出内容 (通过 `env.API_REPORT_EXPORT_TRIMMINGS` 环境变量设置)
+- 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723)
+  <details>
+
+    dts 输入：
+    ```ts
+    declare class Foo {
+      /** @internal */
+      trimmed_property: number;
+      /** @internal */
+      trimmed_func(param: string): boolean;
+    }
+    ```
+
+    dts rollup 输出 (beta 裁剪):
+    ```ts
+    declare class Foo {
+      protected trimmed_property: never;
+      protected trimmed_func: never;
+    }
+    ```
+
+  </details>
 
 ## `api-documenter`
 

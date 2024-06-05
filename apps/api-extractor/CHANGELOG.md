@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.43.1-rc.2
+- dts rollup: 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法
+
 ## 7.43.1-rc.1
 - api report: 导出 `env.API_REPORT_TRIMMING` 环境变量配置
 
