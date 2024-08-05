@@ -5,7 +5,7 @@ jest.disableAutomock();
 import { resolve } from 'path';
 import { promisify } from 'util';
 
-import webpack, { Compiler, Stats } from 'webpack';
+import webpack, { type Compiler, type Stats } from 'webpack';
 import { Volume } from 'memfs/lib/volume';
 
 import { LocalizationPlugin } from '../LocalizationPlugin';
@@ -31,11 +31,11 @@ async function testLocalizedNoAsyncInner(minimize: boolean): Promise<void> {
   const options: ILocalizationPluginOptions = {
     localizedData: {
       defaultLocale: {
-        localeName: 'en-us',
+        localeName: 'LOCALE1',
         fillMissingTranslationStrings: true
       },
       translatedStrings: {
-        foo: {
+        LOCALE2: {
           '/a/strings1.resjson': {
             test: `return:\r,newline:\n,tab:\t,backslash:\\,apos:',quote:"`
           }
@@ -54,18 +54,25 @@ async function testLocalizedNoAsyncInner(minimize: boolean): Promise<void> {
     },
     localizationStats: {
       dropPath: 'localization-stats.json'
-    }
+    },
+    realContentHash: true
   };
 
   const localizationPlugin: LocalizationPlugin = new LocalizationPlugin(options);
 
   const compiler: Compiler = webpack({
+    devtool: 'hidden-source-map',
     entry: {
       main: '/a/entry.js'
     },
     output: {
       path: '/release',
-      filename: '[name]-[locale].js'
+      filename: '[name]-[locale]-[contenthash].js',
+      devtoolModuleFilenameTemplate: (info: { resourcePath: string }) => {
+        // On Windows the path contains backslashes because webpack doesn't normalize to platform agnostic paths.
+        // Also strangely we get `/` instead of `./` at the start of the path.
+        return `source:///${info.resourcePath?.replace(/\\/g, '/').replace(/^\//, './')}`;
+      }
     },
     module: {
       rules: [
@@ -99,6 +106,9 @@ async function testLocalizedNoAsyncInner(minimize: boolean): Promise<void> {
 
   const results: {} = memoryFileSystem.toJSON('/release');
   expect(results).toMatchSnapshot('Content');
+
+  expect(errors).toHaveLength(0);
+  expect(warnings).toHaveLength(0);
 }
 
 describe(LocalizationPlugin.name, () => {

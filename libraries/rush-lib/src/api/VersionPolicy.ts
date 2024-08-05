@@ -2,24 +2,31 @@
 // See LICENSE in the project root for license information.
 
 import * as semver from 'semver';
-import { IPackageJson, Enum } from '@rushstack/node-core-library';
+import { type IPackageJson, Enum } from '@rushstack/node-core-library';
 
 import {
-  IVersionPolicyJson,
-  ILockStepVersionJson,
-  IIndividualVersionJson,
+  type IVersionPolicyJson,
+  type ILockStepVersionJson,
+  type IIndividualVersionJson,
   VersionFormatForCommit,
   VersionFormatForPublish,
-  IVersionPolicyDependencyJson
+  type IVersionPolicyDependencyJson
 } from './VersionPolicyConfiguration';
-import { PackageJsonEditor } from './PackageJsonEditor';
-import { RushConfiguration } from './RushConfiguration';
-import { RushConfigurationProject } from './RushConfigurationProject';
+import type { PackageJsonEditor } from './PackageJsonEditor';
+import type { RushConfiguration } from './RushConfiguration';
+import type { RushConfigurationProject } from './RushConfigurationProject';
 import { cloneDeep } from '../utilities/objectUtilities';
 
 /**
  * Type of version bumps
  * @public
+ *
+ * @internalRemarks
+ * This is a copy of the semver ReleaseType enum, but with the `none` value added and
+ * the `premajor` and `prepatch` omitted.
+ * See {@link LockStepVersionPolicy._getReleaseType}.
+ *
+ * TODO: Consider supporting `premajor` and `prepatch` in the future.
  */
 export enum BumpType {
   // No version bump
@@ -28,6 +35,8 @@ export enum BumpType {
   'prerelease' = 1,
   // Patch version bump
   'patch' = 2,
+  // Preminor version bump
+  'preminor' = 3,
   // Minor version bump
   'minor' = 4,
   // Major version bump

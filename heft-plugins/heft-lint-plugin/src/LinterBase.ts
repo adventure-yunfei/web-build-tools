@@ -3,8 +3,9 @@
 
 import * as path from 'path';
 import { performance } from 'perf_hooks';
-import { createHash, Hash } from 'crypto';
-import { type ITerminal, FileSystem, JsonFile, Path } from '@rushstack/node-core-library';
+import { createHash, type Hash } from 'crypto';
+import { FileSystem, JsonFile, Path } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 import type { IScopedLogger } from '@rushstack/heft';
 
 import type { IExtendedProgram, IExtendedSourceFile } from './internalTypings/TypeScriptInternals';

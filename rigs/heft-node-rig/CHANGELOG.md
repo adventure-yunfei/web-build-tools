@@ -1,6 +1,291 @@
 # Change Log - @rushstack/heft-node-rig
 
-This log was last generated on Tue, 08 Aug 2023 07:10:40 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 21:59:39 GMT and should not be manually modified.
+
+## 2.6.0
+Wed, 10 Apr 2024 21:59:39 GMT
+
+### Minor changes
+
+- Bump ESLint to ~8.57.0.
+
+## 2.5.6
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 2.5.5
+Fri, 29 Mar 2024 05:46:41 GMT
+
+_Version update only_
+
+## 2.5.4
+Thu, 28 Mar 2024 22:42:23 GMT
+
+_Version update only_
+
+## 2.5.3
+Thu, 28 Mar 2024 18:11:12 GMT
+
+_Version update only_
+
+## 2.5.2
+Wed, 27 Mar 2024 19:47:21 GMT
+
+_Version update only_
+
+## 2.5.1
+Wed, 20 Mar 2024 02:09:14 GMT
+
+_Version update only_
+
+## 2.5.0
+Tue, 19 Mar 2024 15:10:18 GMT
+
+### Minor changes
+
+- Upgrade to TypeScript 5.4
+
+## 2.4.25
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 2.4.24
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 2.4.23
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 2.4.22
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 2.4.21
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 2.4.20
+Thu, 29 Feb 2024 07:11:45 GMT
+
+_Version update only_
+
+## 2.4.19
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 2.4.18
+Mon, 26 Feb 2024 16:10:56 GMT
+
+_Version update only_
+
+## 2.4.17
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 2.4.16
+Thu, 22 Feb 2024 05:54:17 GMT
+
+_Version update only_
+
+## 2.4.15
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 2.4.14
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 2.4.13
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 2.4.12
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 2.4.11
+Tue, 20 Feb 2024 16:10:53 GMT
+
+_Version update only_
+
+## 2.4.10
+Mon, 19 Feb 2024 21:54:27 GMT
+
+_Version update only_
+
+## 2.4.9
+Sat, 17 Feb 2024 06:24:35 GMT
+
+_Version update only_
+
+## 2.4.8
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 2.4.7
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 2.4.6
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 2.4.5
+Thu, 25 Jan 2024 23:03:57 GMT
+
+_Version update only_
+
+## 2.4.4
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 2.4.3
+Wed, 24 Jan 2024 07:38:34 GMT
+
+_Version update only_
+
+## 2.4.2
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 2.4.1
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 2.4.0
+Tue, 16 Jan 2024 18:30:10 GMT
+
+### Minor changes
+
+- Upgrade to TypeScript 5.3
+
+## 2.3.16
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 2.3.15
+Wed, 20 Dec 2023 01:09:46 GMT
+
+_Version update only_
+
+## 2.3.14
+Fri, 15 Dec 2023 01:10:06 GMT
+
+_Version update only_
+
+## 2.3.13
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 2.3.12
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 2.3.11
+Wed, 22 Nov 2023 01:45:18 GMT
+
+_Version update only_
+
+## 2.3.10
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 2.3.9
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 2.3.8
+Mon, 30 Oct 2023 23:36:37 GMT
+
+_Version update only_
+
+## 2.3.7
+Thu, 26 Oct 2023 00:27:48 GMT
+
+_Version update only_
+
+## 2.3.6
+Mon, 23 Oct 2023 15:18:38 GMT
+
+_Version update only_
+
+## 2.3.5
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 2.3.4
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 2.3.3
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 2.3.2
+Wed, 27 Sep 2023 00:21:38 GMT
+
+_Version update only_
+
+## 2.3.1
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 2.3.0
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Minor changes
+
+- Add an optional patch which can be used to allow ESLint to extend configurations from packages that do not have the "eslint-config-" prefix. This change also includes the ESLint configurations sourced from "@rushstack/eslint-config"
+
+## 2.2.26
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 2.2.25
+Fri, 22 Sep 2023 00:05:51 GMT
+
+_Version update only_
+
+## 2.2.24
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 2.2.23
+Fri, 15 Sep 2023 00:36:58 GMT
+
+_Version update only_
 
 ## 2.2.22
 Tue, 08 Aug 2023 07:10:40 GMT

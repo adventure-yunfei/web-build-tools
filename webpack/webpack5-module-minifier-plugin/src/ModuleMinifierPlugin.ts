@@ -15,7 +15,7 @@ import type {
   sources,
   Chunk
 } from 'webpack';
-import { AsyncSeriesWaterfallHook, SyncWaterfallHook, Tap } from 'tapable';
+import { AsyncSeriesWaterfallHook, SyncWaterfallHook, type Tap } from 'tapable';
 
 import {
   CHUNK_MODULE_TOKEN,
@@ -446,7 +446,14 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
             if (isJSAsset.test(assetName)) {
               ++pendingMinificationRequests;
 
-              const rawCode: string = asset.source() as string;
+              const { source: wrappedCodeRaw, map } = useSourceMaps
+                ? asset.sourceAndMap()
+                : {
+                    source: asset.source(),
+                    map: undefined
+                  };
+
+              const rawCode: string = wrappedCodeRaw.toString();
               const nameForMap: string = `(chunks)/${assetName}`;
 
               const hash: string = hashCodeFragment(rawCode);
@@ -461,6 +468,7 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
                 (result: IModuleMinificationResult) => {
                   if (isMinificationResultError(result)) {
                     compilation.errors.push(result.error as WebpackError);
+                    // eslint-disable-next-line no-console
                     console.error(result.error);
                   } else {
                     try {
@@ -472,7 +480,7 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
                             nameForMap, // File
                             minifierMap!, // Base source map
                             rawCode, // Source from before transform
-                            undefined, // Source Map from before transform
+                            map, // Source Map from before transform
                             true // Remove original source
                           )
                         : new RawSource(minified);

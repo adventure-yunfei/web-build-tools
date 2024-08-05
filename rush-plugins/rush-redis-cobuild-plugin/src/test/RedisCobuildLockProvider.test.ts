@@ -1,12 +1,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { ConsoleTerminalProvider } from '@rushstack/node-core-library';
+import { ConsoleTerminalProvider } from '@rushstack/terminal';
 import * as redisAPI from '@redis/client';
 import type { RedisClientType } from '@redis/client';
 
-import { ICobuildCompletedState, ICobuildContext, OperationStatus, RushSession } from '@rushstack/rush-sdk';
-import { IRedisCobuildLockProviderOptions, RedisCobuildLockProvider } from '../RedisCobuildLockProvider';
+import {
+  type ICobuildCompletedState,
+  type ICobuildContext,
+  OperationStatus,
+  RushSession
+} from '@rushstack/rush-sdk';
+import { type IRedisCobuildLockProviderOptions, RedisCobuildLockProvider } from '../RedisCobuildLockProvider';
 
 const rushSession: RushSession = new RushSession({
   terminalProvider: new ConsoleTerminalProvider(),
@@ -80,7 +85,7 @@ describe(RedisCobuildLockProvider.name, () => {
 
   it('expands options with environment variables', () => {
     const expectedOptions = {
-      password: 'redis123'
+      password: 'redis123' // [SuppressMessage("Microsoft.Security", "CS001:SecretInline", Justification="Password used in unit test.")]
     };
     const actualOptions = RedisCobuildLockProvider.expandOptionsWithEnvironmentVariables(
       {

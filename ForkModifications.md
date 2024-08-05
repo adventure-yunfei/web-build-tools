@@ -61,7 +61,7 @@
     - 问题2: 解析 DeclarationReference 时，没有考虑 `AstNamespaceImport`, 导致在 `Foo.fooProp` 中生成了无效的 `FooModule.OriginClass` 引用路径
 
   </details>
-- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1)
+- 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1, bfbfe5610f65ff908ec0ec843335bab9bdb5c9f4, d38122b09c990aac3946fee936b184f2757aa38f)
   <details>
 
     输入类型：
@@ -90,10 +90,10 @@
 
     优化后的 dts 输出：
     ```ts
-    interface Prop {}
+    interface Prop__propA {}
     interface Prop__propB {}
     export declare class Foo {
-      prop: Prop | Prop__propB;
+      prop: Prop__propA | Prop__propB;
     }
     export {};
     ```
@@ -124,9 +124,36 @@
     某些情况下 ts 会自动编译产出一些 string union 类型（比如 `Omit` 类型），这些 string 类型有时候会变更顺序，导致不必要的 api review 变更；排序可以消除这类变更。
 
   </details>
+- 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a)
+  - 默认开启 `@beta` release 裁剪，移除 `@internal` 变更（可通过 `env.API_REPORT_TRIMMING` 环境变量修改）
+  - 新增 entity 有效引用分析，`includeForgottenExports` 下仅导出实际被引用的 entity
+  - 新增 rootExportTrimmings 选项，裁剪根节点导出内容 (通过 `env.API_REPORT_EXPORT_TRIMMINGS` 环境变量设置)
+- 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723)
+  <details>
+
+    dts 输入：
+    ```ts
+    declare class Foo {
+      /** @internal */
+      trimmed_property: number;
+      /** @internal */
+      trimmed_func(param: string): boolean;
+    }
+    ```
+
+    dts rollup 输出 (beta 裁剪):
+    ```ts
+    declare class Foo {
+      protected trimmed_property: never;
+      protected trimmed_func: never;
+    }
+    ```
+
+  </details>
 
 ## `api-documenter`
 
 - 新增完整的引用类型链接支持, 包括未导出的类型 (59e634c68baa4cac277bec171f4c6f404c9d384b)
 - markdown 输出结果兼容 mdx@1.x，以支持 Docusaurus 文档工具 (73be47af637970a5a54240a752e8fc579bbbde1f)
 - 支持移除 Home 导航链接 (59afa81a5545a93449e3a22a60a22a78054188b1)
+- `ApiPackage` 页面仅生成导出接口内容 (90c1a4efb1ca60b2347163432710fe957f2ce6db)

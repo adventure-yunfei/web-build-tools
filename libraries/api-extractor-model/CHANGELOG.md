@@ -1,6 +1,89 @@
 # Change Log - @microsoft/api-extractor-model
 
-This log was last generated on Tue, 08 Aug 2023 07:10:40 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:08 GMT and should not be manually modified.
+
+## 7.28.14
+Wed, 10 Apr 2024 15:10:08 GMT
+
+_Version update only_
+
+## 7.28.13
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 7.28.12
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 7.28.11
+Mon, 19 Feb 2024 21:54:26 GMT
+
+### Patches
+
+- Fix a formatting issue with the LICENSE.
+
+## 7.28.10
+Sat, 17 Feb 2024 06:24:34 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 7.28.9
+Thu, 08 Feb 2024 01:09:22 GMT
+
+_Version update only_
+
+## 7.28.8
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 7.28.7
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 7.28.6
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 7.28.5
+Tue, 23 Jan 2024 16:15:05 GMT
+
+_Version update only_
+
+## 7.28.4
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 7.28.3
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 7.28.2
+Thu, 28 Sep 2023 20:53:16 GMT
+
+_Version update only_
+
+## 7.28.1
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 7.28.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 7.27.6
 Tue, 08 Aug 2023 07:10:40 GMT

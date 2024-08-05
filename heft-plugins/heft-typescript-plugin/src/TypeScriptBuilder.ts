@@ -7,7 +7,8 @@ import { Worker } from 'worker_threads';
 
 import * as semver from 'semver';
 import type * as TTypescript from 'typescript';
-import { type ITerminal, JsonFile, type IPackageJson, Path, FileError } from '@rushstack/node-core-library';
+import { JsonFile, type IPackageJson, Path, FileError } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 import type { IScopedLogger } from '@rushstack/heft';
 
 import type { ExtendedTypeScript, IExtendedSolutionBuilder } from './internalTypings/TypeScriptInternals';
@@ -110,10 +111,11 @@ const OLDEST_SUPPORTED_TS_MAJOR_VERSION: number = 2;
 const OLDEST_SUPPORTED_TS_MINOR_VERSION: number = 9;
 
 const NEWEST_SUPPORTED_TS_MAJOR_VERSION: number = 5;
-const NEWEST_SUPPORTED_TS_MINOR_VERSION: number = 0;
+const NEWEST_SUPPORTED_TS_MINOR_VERSION: number = 4;
 
 interface ITypeScriptTool {
   ts: ExtendedTypeScript;
+  system: TTypescript.System;
   measureSync: PerformanceMeasurer;
 
   sourceFileCache: Map<string, TTypescript.SourceFile>;
@@ -132,8 +134,6 @@ interface ITypeScriptTool {
   pendingTranspileSignals: Map<number, ITranspileSignal>;
 
   reportDiagnostic: TTypescript.DiagnosticReporter;
-  clearTimeout: (timeout: IPendingWork) => void;
-  setTimeout: <T extends unknown[]>(timeout: (...args: T) => void, ms: number, ...args: T) => IPendingWork;
 }
 
 export class TypeScriptBuilder {
@@ -291,8 +291,36 @@ export class TypeScriptBuilder {
 
       const pendingOperations: Set<IPendingWork> = new Set();
 
+      const clearTimeout = (timeout: IPendingWork): void => {
+        pendingOperations.delete(timeout);
+      };
+
+      const setTimeout = <T extends unknown[]>(
+        fn: (...args: T) => void,
+        ms: number,
+        ...args: T
+      ): IPendingWork => {
+        const timeout: IPendingWork = () => {
+          fn(...args);
+        };
+        pendingOperations.add(timeout);
+        if (!this._tool?.executing && onChangeDetected) {
+          onChangeDetected();
+        }
+        return timeout;
+      };
+
+      // Need to also update watchFile and watchDirectory
+      const system: TTypescript.System = {
+        ...ts.sys,
+        getCurrentDirectory: () => this._configuration.buildFolderPath,
+        clearTimeout,
+        setTimeout
+      };
+
       this._tool = {
         ts,
+        system,
 
         measureSync: measureTsPerformance,
 
@@ -309,21 +337,6 @@ export class TypeScriptBuilder {
 
         reportDiagnostic: (diagnostic: TTypescript.Diagnostic) => {
           rawDiagnostics.push(diagnostic);
-        },
-
-        clearTimeout(timeout: IPendingWork): void {
-          pendingOperations.delete(timeout);
-        },
-
-        setTimeout<T extends unknown[]>(fn: (...args: T) => void, ms: number, ...args: T): IPendingWork {
-          const timeout: IPendingWork = () => {
-            fn(...args);
-          };
-          pendingOperations.add(timeout);
-          if (!this.executing && onChangeDetected) {
-            onChangeDetected();
-          }
-          return timeout;
         },
 
         worker: undefined,
@@ -1066,14 +1079,14 @@ export class TypeScriptBuilder {
     tool: ITypeScriptTool,
     tsconfig: TTypescript.ParsedCommandLine
   ): TTypescript.CompilerHost {
-    const { ts } = tool;
+    const { ts, system } = tool;
 
     let compilerHost: TTypescript.CompilerHost | undefined;
 
     if (tsconfig.options.incremental) {
-      compilerHost = ts.createIncrementalCompilerHost(tsconfig.options, ts.sys);
+      compilerHost = ts.createIncrementalCompilerHost(tsconfig.options, system);
     } else {
-      compilerHost = ts.createCompilerHost(tsconfig.options);
+      compilerHost = ts.createCompilerHost(tsconfig.options, undefined, system);
     }
 
     this._changeCompilerHostToUseCache(compilerHost, tool);
@@ -1085,7 +1098,7 @@ export class TypeScriptBuilder {
     tool: ITypeScriptTool,
     tsconfig: TTypescript.ParsedCommandLine
   ): TWatchCompilerHost {
-    const { ts } = tool;
+    const { ts, system } = tool;
 
     const reportWatchStatus: TTypescript.DiagnosticReporter = (diagnostic: TTypescript.Diagnostic): void => {
       this._printDiagnosticMessage(ts, diagnostic);
@@ -1094,16 +1107,13 @@ export class TypeScriptBuilder {
     const compilerHost: TWatchCompilerHost = ts.createWatchCompilerHost(
       tsconfig.fileNames,
       tsconfig.options,
-      ts.sys,
+      system,
       this._getCreateBuilderProgram(ts),
       tool.reportDiagnostic,
       reportWatchStatus,
       tsconfig.projectReferences,
       tsconfig.watchOptions
     );
-
-    compilerHost.clearTimeout = tool.clearTimeout;
-    compilerHost.setTimeout = tool.setTimeout;
 
     return compilerHost;
   }
@@ -1115,6 +1125,8 @@ export class TypeScriptBuilder {
     if ((innerGetSourceFile as { cache?: typeof sourceFileCache }).cache === sourceFileCache) {
       return;
     }
+
+    compilerHost.getCurrentDirectory = () => this._configuration.buildFolderPath;
 
     // Enable source file persistence
     const getSourceFile: typeof innerGetSourceFile & {
@@ -1152,18 +1164,15 @@ export class TypeScriptBuilder {
   }
 
   private _buildWatchSolutionBuilderHost(tool: ITypeScriptTool): TWatchSolutionHost {
-    const { reportDiagnostic, ts } = tool;
+    const { reportDiagnostic, ts, system } = tool;
 
     const host: TWatchSolutionHost = ts.createSolutionBuilderWithWatchHost(
-      ts.sys,
+      system,
       this._getCreateBuilderProgram(ts),
       reportDiagnostic,
       reportDiagnostic,
       reportDiagnostic
     );
-
-    host.clearTimeout = tool.clearTimeout;
-    host.setTimeout = tool.setTimeout;
 
     return host;
   }

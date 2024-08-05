@@ -1,6 +1,248 @@
 # Change Log - @rushstack/heft
 
-This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+
+## 0.66.3
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.66.2
+Tue, 19 Mar 2024 15:10:18 GMT
+
+_Version update only_
+
+## 0.66.1
+Fri, 15 Mar 2024 00:12:40 GMT
+
+### Patches
+
+- Fix internal error when run 'heft clean'
+
+## 0.66.0
+Tue, 05 Mar 2024 01:19:24 GMT
+
+### Minor changes
+
+- Add new metrics value `bootDurationMs` to track the boot overhead of Heft before the action starts executing the subtasks. Update the start time used to compute `taskTotalExecutionMs` to be the beginning of operation graph execution. Fix the value of `taskTotalExecutionMs` field to be in milliseconds instead of seconds. Add new metrics value `totalUptimeMs` to track how long watch mode sessions are kept alive.
+
+## 0.65.10
+Sun, 03 Mar 2024 20:58:12 GMT
+
+_Version update only_
+
+## 0.65.9
+Sat, 02 Mar 2024 02:22:23 GMT
+
+_Version update only_
+
+## 0.65.8
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 0.65.7
+Thu, 29 Feb 2024 07:11:45 GMT
+
+_Version update only_
+
+## 0.65.6
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 0.65.5
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 0.65.4
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 0.65.3
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 0.65.2
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 0.65.1
+Tue, 20 Feb 2024 21:45:10 GMT
+
+### Patches
+
+- Fix a recent regression causing `Error: Cannot find module 'colors/safe'` (GitHub #4525)
+- Remove a no longer needed dependency on the `chokidar` package
+
+## 0.65.0
+Tue, 20 Feb 2024 16:10:52 GMT
+
+### Minor changes
+
+- Add a built-in `set-environment-variables-plugin` task plugin to set environment variables.
+
+## 0.64.8
+Mon, 19 Feb 2024 21:54:26 GMT
+
+_Version update only_
+
+## 0.64.7
+Sat, 17 Feb 2024 06:24:34 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 0.64.6
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 0.64.5
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.64.4
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 0.64.3
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.64.2
+Tue, 23 Jan 2024 20:12:57 GMT
+
+_Version update only_
+
+## 0.64.1
+Tue, 23 Jan 2024 16:15:05 GMT
+
+_Version update only_
+
+## 0.64.0
+Tue, 16 Jan 2024 18:30:10 GMT
+
+### Minor changes
+
+- Add support for TypeScript 5.3
+
+## 0.63.6
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.63.5
+Wed, 20 Dec 2023 01:09:45 GMT
+
+_Version update only_
+
+## 0.63.4
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.63.3
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.63.2
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.63.1
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.63.0
+Mon, 30 Oct 2023 23:36:37 GMT
+
+### Minor changes
+
+- [BREAKING CHANGE] Remove "heft run" short-parameters for "--to" ("-t"), "--to-except" ("-T"), and "--only" ("-o").
+
+### Patches
+
+- Fix an issue with parsing of the "--debug" and "--unmanaged" flags for Heft
+
+## 0.62.3
+Sun, 01 Oct 2023 02:56:29 GMT
+
+_Version update only_
+
+## 0.62.2
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 0.62.1
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 0.62.0
+Wed, 27 Sep 2023 00:21:38 GMT
+
+### Minor changes
+
+- (BREAKING API CHANGE) Remove the deprecated `cancellationToken` property of `IHeftTaskRunHookOptions`. Use `abortSignal` on that object instead.
+
+## 0.61.3
+Tue, 26 Sep 2023 21:02:30 GMT
+
+### Patches
+
+- Fix an issue where `heft clean` would crash with `ERR_ILLEGAL_CONSTRUCTOR`.
+
+## 0.61.2
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 0.61.1
+Mon, 25 Sep 2023 23:38:27 GMT
+
+_Version update only_
+
+## 0.61.0
+Fri, 22 Sep 2023 00:05:50 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE): Rename task temp folder from "<phase>.<task>" to "<phase>/<task>" to simplify caching phase outputs.
+
+## 0.60.0
+Tue, 19 Sep 2023 15:21:51 GMT
+
+### Minor changes
+
+- Allow Heft to communicate via IPC with a host process when running in watch mode. The host controls scheduling of incremental re-runs.
+
+## 0.59.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
+
+### Patches
+
+- Migrate plugin name collision detection to the InternalHeftSession instance to allow multiple Heft sessions in the same process.
 
 ## 0.58.2
 Tue, 08 Aug 2023 07:10:39 GMT

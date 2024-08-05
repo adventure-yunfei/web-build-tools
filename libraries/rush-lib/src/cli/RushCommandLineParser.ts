@@ -1,25 +1,29 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors/safe';
 import * as path from 'path';
 
-import { CommandLineParser, CommandLineFlagParameter, CommandLineHelper } from '@rushstack/ts-command-line';
 import {
-  InternalError,
-  AlreadyReportedError,
+  CommandLineParser,
+  type CommandLineFlagParameter,
+  CommandLineHelper
+} from '@rushstack/ts-command-line';
+import { InternalError, AlreadyReportedError } from '@rushstack/node-core-library';
+import {
   ConsoleTerminalProvider,
-  Terminal
-} from '@rushstack/node-core-library';
-import { PrintUtilities } from '@rushstack/terminal';
+  Terminal,
+  PrintUtilities,
+  Colorize,
+  type ITerminal
+} from '@rushstack/terminal';
 
 import { RushConfiguration } from '../api/RushConfiguration';
 import { RushConstants } from '../logic/RushConstants';
 import {
-  Command,
+  type Command,
   CommandLineConfiguration,
-  IGlobalCommandConfig,
-  IPhasedCommandConfig
+  type IGlobalCommandConfig,
+  type IPhasedCommandConfig
 } from '../api/CommandLineConfiguration';
 
 import { AddAction } from './actions/AddAction';
@@ -44,16 +48,16 @@ import { UpdateCloudCredentialsAction } from './actions/UpdateCloudCredentialsAc
 import { UpgradeInteractiveAction } from './actions/UpgradeInteractiveAction';
 
 import { GlobalScriptAction } from './scriptActions/GlobalScriptAction';
-import { IBaseScriptActionOptions } from './scriptActions/BaseScriptAction';
+import type { IBaseScriptActionOptions } from './scriptActions/BaseScriptAction';
 
 import { Telemetry } from '../logic/Telemetry';
 import { RushGlobalFolder } from '../api/RushGlobalFolder';
 import { NodeJsCompatibility } from '../logic/NodeJsCompatibility';
 import { SetupAction } from './actions/SetupAction';
-import { ICustomCommandLineConfigurationInfo, PluginManager } from '../pluginFramework/PluginManager';
+import { type ICustomCommandLineConfigurationInfo, PluginManager } from '../pluginFramework/PluginManager';
 import { RushSession } from '../pluginFramework/RushSession';
 import { PhasedScriptAction } from './scriptActions/PhasedScriptAction';
-import { IBuiltInPluginConfiguration } from '../pluginFramework/PluginLoader/BuiltInPluginLoader';
+import type { IBuiltInPluginConfiguration } from '../pluginFramework/PluginLoader/BuiltInPluginLoader';
 
 /**
  * Options for `RushCommandLineParser`.
@@ -167,6 +171,10 @@ export class RushCommandLineParser extends CommandLineParser {
     return this._quietParameter.value;
   }
 
+  public get terminal(): ITerminal {
+    return this._terminal;
+  }
+
   /**
    * Utility to determine if the app should restrict writing to the console.
    */
@@ -191,7 +199,8 @@ export class RushCommandLineParser extends CommandLineParser {
 
   public async execute(args?: string[]): Promise<boolean> {
     // debugParameter will be correctly parsed during super.execute(), so manually parse here.
-    this._terminalProvider.verboseEnabled = this._terminalProvider.debugEnabled = process.argv.indexOf('--debug') >= 0;
+    this._terminalProvider.verboseEnabled = this._terminalProvider.debugEnabled =
+      process.argv.indexOf('--debug') >= 0;
 
     await this.pluginManager.tryInitializeUnassociatedPluginsAsync();
 
@@ -416,14 +425,16 @@ export class RushCommandLineParser extends CommandLineParser {
       // line individually.
       const message: string = PrintUtilities.wrapWords(prefix + error.message)
         .split(/\r?\n/)
-        .map((line) => colors.red(line))
+        .map((line) => Colorize.red(line))
         .join('\n');
+      // eslint-disable-next-line no-console
       console.error(`\n${message}`);
     }
 
     if (this._debugParameter.value) {
       // If catchSyncErrors() called this, then show a call stack similar to what Node.js
       // would show for an uncaught error
+      // eslint-disable-next-line no-console
       console.error(`\n${error.stack}`);
     }
 

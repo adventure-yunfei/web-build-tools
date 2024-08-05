@@ -7,10 +7,10 @@ import * as ts from 'typescript';
 import * as resolve from 'resolve';
 import {
   FileSystem,
-  NewlineKind,
+  type NewlineKind,
   PackageJsonLookup,
-  IPackageJson,
-  INodePackageJson,
+  type IPackageJson,
+  type INodePackageJson,
   Path
 } from '@rushstack/node-core-library';
 
@@ -24,7 +24,7 @@ import { PackageMetadataManager } from '../analyzer/PackageMetadataManager';
 import { ValidationEnhancer } from '../enhancers/ValidationEnhancer';
 import { DocCommentEnhancer } from '../enhancers/DocCommentEnhancer';
 import { CompilerState } from './CompilerState';
-import { ExtractorMessage } from './ExtractorMessage';
+import type { ExtractorMessage } from './ExtractorMessage';
 import { MessageRouter } from '../collector/MessageRouter';
 import { ConsoleMessageId } from './ConsoleMessageId';
 import { TSDocConfigFile } from '@microsoft/tsdoc-config';

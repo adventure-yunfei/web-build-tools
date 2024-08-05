@@ -1,13 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors/safe';
 import * as path from 'path';
 import builtinPackageNames from 'builtin-modules';
-
+import { Colorize } from '@rushstack/terminal';
+import type { CommandLineFlagParameter } from '@rushstack/ts-command-line';
 import { FileSystem } from '@rushstack/node-core-library';
-import { RushCommandLineParser } from '../RushCommandLineParser';
-import { CommandLineFlagParameter } from '@rushstack/ts-command-line';
+
+import type { RushCommandLineParser } from '../RushCommandLineParser';
 import { BaseConfiglessRushAction } from './BaseRushAction';
 
 export interface IJsonOutput {
@@ -67,20 +67,24 @@ export class ScanAction extends BaseConfiglessRushAction {
 
     const requireRegExps: RegExp[] = [
       // Example: require('something')
-      /\brequire\s*\(\s*[']([^']+\s*)[']\)/,
-      /\brequire\s*\(\s*["]([^"]+)["]\s*\)/,
+      /\brequire\s*\(\s*[']([^']+\s*)[']\s*\)/,
+      /\brequire\s*\(\s*["]([^"]+\s*)["]\s*\)/,
 
       // Example: require.ensure('something')
-      /\brequire.ensure\s*\(\s*[']([^']+\s*)[']\)/,
-      /\brequire.ensure\s*\(\s*["]([^"]+)["]\s*\)/,
+      /\brequire\.ensure\s*\(\s*[']([^']+\s*)[']\s*\)/,
+      /\brequire\.ensure\s*\(\s*["]([^"]+\s*)["]\s*\)/,
 
       // Example: require.resolve('something')
-      /\brequire.resolve\s*\(\s*[']([^']+\s*)[']\)/,
-      /\brequire.resolve\s*\(\s*["]([^"]+)["]\s*\)/,
+      /\brequire\.resolve\s*\(\s*[']([^']+\s*)[']\s*\)/,
+      /\brequire\.resolve\s*\(\s*["]([^"]+\s*)["]\s*\)/,
 
       // Example: System.import('something')
-      /\bSystem.import\s*\(\s*[']([^']+\s*)[']\)/,
-      /\bSystem.import\s*\(\s*["]([^"]+)["]\s*\)/,
+      /\bSystem\.import\s*\(\s*[']([^']+\s*)[']\s*\)/,
+      /\bSystem\.import\s*\(\s*["]([^"]+\s*)["]\s*\)/,
+
+      // Example: Import.lazy('something', require);
+      /\bImport\.lazy\s*\(\s*[']([^']+\s*)[']/,
+      /\bImport\.lazy\s*\(\s*["]([^"]+\s*)["]/,
 
       // Example:
       //
@@ -93,6 +97,10 @@ export class ScanAction extends BaseConfiglessRushAction {
       // Example:  import 'something';
       /\bimport\s*[']([^']+)[']\s*\;/,
       /\bimport\s*["]([^"]+)["]\s*\;/,
+
+      // Example: await import('fast-glob')
+      /\bimport\s*\(\s*[']([^']+)[']\s*\)/,
+      /\bimport\s*\(\s*["]([^"]+)["]\s*\)/,
 
       // Example:
       // /// <reference types="something" />
@@ -122,7 +130,8 @@ export class ScanAction extends BaseConfiglessRushAction {
           }
         }
       } catch (error) {
-        console.log(colors.bold('Skipping file due to error: ' + filename));
+        // eslint-disable-next-line no-console
+        console.log(Colorize.bold('Skipping file due to error: ' + filename));
       }
     }
 
@@ -166,6 +175,7 @@ export class ScanAction extends BaseConfiglessRushAction {
         }
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error(`JSON.parse ${packageJsonFilename} error`);
     }
 
@@ -197,25 +207,31 @@ export class ScanAction extends BaseConfiglessRushAction {
     };
 
     if (this._jsonFlag.value) {
+      // eslint-disable-next-line no-console
       console.log(JSON.stringify(output, undefined, 2));
     } else if (this._allFlag.value) {
       if (detectedPackageNames.length !== 0) {
+        // eslint-disable-next-line no-console
         console.log('Dependencies that seem to be imported by this project:');
         for (const packageName of detectedPackageNames) {
+          // eslint-disable-next-line no-console
           console.log('  ' + packageName);
         }
       } else {
+        // eslint-disable-next-line no-console
         console.log('This project does not seem to import any NPM packages.');
       }
     } else {
       let wroteAnything: boolean = false;
 
       if (missingDependencies.length > 0) {
+        // eslint-disable-next-line no-console
         console.log(
-          colors.yellow('Possible phantom dependencies') +
+          Colorize.yellow('Possible phantom dependencies') +
             " - these seem to be imported but aren't listed in package.json:"
         );
         for (const packageName of missingDependencies) {
+          // eslint-disable-next-line no-console
           console.log('  ' + packageName);
         }
         wroteAnything = true;
@@ -223,21 +239,25 @@ export class ScanAction extends BaseConfiglessRushAction {
 
       if (unusedDependencies.length > 0) {
         if (wroteAnything) {
+          // eslint-disable-next-line no-console
           console.log('');
         }
+        // eslint-disable-next-line no-console
         console.log(
-          colors.yellow('Possible unused dependencies') +
+          Colorize.yellow('Possible unused dependencies') +
             " - these are listed in package.json but don't seem to be imported:"
         );
         for (const packageName of unusedDependencies) {
+          // eslint-disable-next-line no-console
           console.log('  ' + packageName);
         }
         wroteAnything = true;
       }
 
       if (!wroteAnything) {
+        // eslint-disable-next-line no-console
         console.log(
-          colors.green('Everything looks good.') + '  No missing or unused dependencies were found.'
+          Colorize.green('Everything looks good.') + '  No missing or unused dependencies were found.'
         );
       }
     }

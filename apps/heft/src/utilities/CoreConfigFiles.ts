@@ -8,7 +8,8 @@ import {
   PathResolutionMethod,
   type IJsonPathMetadataResolverOptions
 } from '@rushstack/heft-config-file';
-import { Import, PackageJsonLookup, type ITerminal, InternalError } from '@rushstack/node-core-library';
+import { Import, PackageJsonLookup, InternalError } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 import type { IRigConfig } from '@rushstack/rig-package';
 
 import type { IDeleteOperation } from '../plugins/DeleteFilesPlugin';
@@ -76,23 +77,28 @@ export class CoreConfigFiles {
     rigConfig?: IRigConfig | undefined
   ): Promise<IHeftConfigurationJson> {
     if (!CoreConfigFiles._heftConfigFileLoader) {
+      let heftPluginPackageFolder: string | undefined;
+
       const pluginPackageResolver: (
         options: IJsonPathMetadataResolverOptions<IHeftConfigurationJson>
       ) => string = (options: IJsonPathMetadataResolverOptions<IHeftConfigurationJson>) => {
         const { propertyValue, configurationFilePath } = options;
-        if (propertyValue === '@rushstack/heft') {
+        if (propertyValue === Constants.heftPackageName) {
           // If the value is "@rushstack/heft", then resolve to the Heft package that is
           // installed in the project folder. This avoids issues with mismatched versions
           // between the project and the globally installed Heft. Use the PackageJsonLookup
           // class to find the package folder to avoid hardcoding the path for compatibility
           // with bundling.
-          const pluginPackageFolder: string | undefined =
-            PackageJsonLookup.instance.tryGetPackageFolderFor(__dirname);
-          if (!pluginPackageFolder) {
+          if (!heftPluginPackageFolder) {
+            heftPluginPackageFolder = PackageJsonLookup.instance.tryGetPackageFolderFor(__dirname);
+          }
+
+          if (!heftPluginPackageFolder) {
             // This should never happen
             throw new InternalError('Unable to find the @rushstack/heft package folder');
           }
-          return pluginPackageFolder;
+
+          return heftPluginPackageFolder;
         } else {
           const configurationFileDirectory: string = path.dirname(configurationFilePath);
           return Import.resolvePackage({
@@ -128,9 +134,12 @@ export class CoreConfigFiles {
       });
     }
 
+    const heftConfigFileLoader: ConfigurationFile<IHeftConfigurationJson> =
+      CoreConfigFiles._heftConfigFileLoader;
+
     let configurationFile: IHeftConfigurationJson;
     try {
-      configurationFile = await CoreConfigFiles._heftConfigFileLoader.loadConfigurationFileForProjectAsync(
+      configurationFile = await heftConfigFileLoader.loadConfigurationFileForProjectAsync(
         terminal,
         projectPath,
         rigConfig
@@ -169,29 +178,50 @@ export class CoreConfigFiles {
     }
 
     // The pluginPackage field was resolved to the root of the package, but we also want to have
-    // the original plugin package name in the config file. Gather all the plugin specifiers so we can
-    // add the original data ourselves.
-    const pluginSpecifiers: IHeftConfigurationJsonPluginSpecifier[] = [
-      ...(configurationFile.heftPlugins || [])
-    ];
-    for (const { tasksByName } of Object.values(configurationFile.phasesByName || {})) {
-      for (const { taskPlugin } of Object.values(tasksByName || {})) {
-        if (taskPlugin) {
-          pluginSpecifiers.push(taskPlugin);
+    // the original plugin package name in the config file.
+    function getUpdatedPluginSpecifier(
+      rawSpecifier: IHeftConfigurationJsonPluginSpecifier
+    ): IHeftConfigurationJsonPluginSpecifier {
+      const pluginPackageName: string = heftConfigFileLoader.getPropertyOriginalValue({
+        parentObject: rawSpecifier,
+        propertyName: 'pluginPackage'
+      })!;
+      const newSpecifier: IHeftConfigurationJsonPluginSpecifier = {
+        ...rawSpecifier,
+        pluginPackageRoot: rawSpecifier.pluginPackage,
+        pluginPackage: pluginPackageName
+      };
+      return newSpecifier;
+    }
+
+    const phasesByName: IHeftConfigurationJsonPhases = {};
+
+    const normalizedConfigurationFile: IHeftConfigurationJson = {
+      ...configurationFile,
+      heftPlugins: configurationFile.heftPlugins?.map(getUpdatedPluginSpecifier) ?? [],
+      phasesByName
+    };
+
+    for (const [phaseName, phase] of Object.entries(configurationFile.phasesByName || {})) {
+      const tasksByName: IHeftConfigurationJsonTasks = {};
+      phasesByName[phaseName] = {
+        ...phase,
+        tasksByName
+      };
+
+      for (const [taskName, task] of Object.entries(phase.tasksByName || {})) {
+        if (task.taskPlugin) {
+          tasksByName[taskName] = {
+            ...task,
+            taskPlugin: getUpdatedPluginSpecifier(task.taskPlugin)
+          };
+        } else {
+          tasksByName[taskName] = task;
         }
       }
     }
 
-    for (const pluginSpecifier of pluginSpecifiers) {
-      const pluginPackageName: string = CoreConfigFiles._heftConfigFileLoader.getPropertyOriginalValue({
-        parentObject: pluginSpecifier,
-        propertyName: 'pluginPackage'
-      })!;
-      pluginSpecifier.pluginPackageRoot = pluginSpecifier.pluginPackage;
-      pluginSpecifier.pluginPackage = pluginPackageName;
-    }
-
-    return configurationFile;
+    return normalizedConfigurationFile;
   }
 
   public static async tryLoadNodeServiceConfigurationFileAsync(

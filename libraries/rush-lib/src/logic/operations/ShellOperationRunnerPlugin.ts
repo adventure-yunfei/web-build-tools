@@ -12,9 +12,9 @@ import type {
   IPhasedCommandPlugin,
   PhasedCommandHooks
 } from '../../pluginFramework/PhasedCommandHooks';
-import { Operation } from './Operation';
+import type { Operation } from './Operation';
 
-const PLUGIN_NAME: 'ShellOperationRunnerPlugin' = 'ShellOperationRunnerPlugin';
+export const PLUGIN_NAME: 'ShellOperationRunnerPlugin' = 'ShellOperationRunnerPlugin';
 
 /**
  * Core phased command plugin that provides the functionality for executing an operation via shell command.
@@ -29,23 +29,10 @@ function createShellOperations(
   operations: Set<Operation>,
   context: ICreateOperationsContext
 ): Set<Operation> {
-  const { phaseSelection: selectedPhases, projectChangeAnalyzer, rushConfiguration } = context;
+  const { rushConfiguration } = context;
 
-  const customParametersByPhase: Map<IPhase, string[]> = new Map();
-
-  function getCustomParameterValuesForPhase(phase: IPhase): ReadonlyArray<string> {
-    let customParameterValues: string[] | undefined = customParametersByPhase.get(phase);
-    if (!customParameterValues) {
-      customParameterValues = [];
-      for (const tsCommandLineParameter of phase.associatedParameters) {
-        tsCommandLineParameter.appendToArgList(customParameterValues);
-      }
-
-      customParametersByPhase.set(phase, customParameterValues);
-    }
-
-    return customParameterValues;
-  }
+  const getCustomParameterValuesForPhase: (phase: IPhase) => ReadonlyArray<string> =
+    getCustomParameterValuesByPhase();
 
   for (const operation of operations) {
     const { associatedPhase: phase, associatedProject: project } = operation;
@@ -75,10 +62,8 @@ function createShellOperations(
           commandToRun: commandToRun || '',
           displayName,
           phase,
-          projectChangeAnalyzer,
           rushConfiguration,
-          rushProject: project,
-          selectedPhases
+          rushProject: project
         });
         operation.runner = shellOperationRunner;
       } else {
@@ -109,15 +94,43 @@ function getScriptToRun(
     return undefined;
   }
 
+  return formatCommand(rawCommand, customParameterValues);
+}
+
+/**
+ * Memoizer for custom parameter values by phase
+ * @returns A function that returns the custom parameter values for a given phase
+ */
+export function getCustomParameterValuesByPhase(): (phase: IPhase) => ReadonlyArray<string> {
+  const customParametersByPhase: Map<IPhase, string[]> = new Map();
+
+  function getCustomParameterValuesForPhase(phase: IPhase): ReadonlyArray<string> {
+    let customParameterValues: string[] | undefined = customParametersByPhase.get(phase);
+    if (!customParameterValues) {
+      customParameterValues = [];
+      for (const tsCommandLineParameter of phase.associatedParameters) {
+        tsCommandLineParameter.appendToArgList(customParameterValues);
+      }
+
+      customParametersByPhase.set(phase, customParameterValues);
+    }
+
+    return customParameterValues;
+  }
+
+  return getCustomParameterValuesForPhase;
+}
+
+export function formatCommand(rawCommand: string, customParameterValues: ReadonlyArray<string>): string {
   if (!rawCommand) {
     return '';
   } else {
-    const shellCommand: string = `${rawCommand} ${customParameterValues.join(' ')}`;
-    return process.platform === 'win32' ? convertSlashesForWindows(shellCommand) : shellCommand;
+    const fullCommand: string = `${rawCommand} ${customParameterValues.join(' ')}`;
+    return process.platform === 'win32' ? convertSlashesForWindows(fullCommand) : fullCommand;
   }
 }
 
-function getDisplayName(phase: IPhase, project: RushConfigurationProject): string {
+export function getDisplayName(phase: IPhase, project: RushConfigurationProject): string {
   if (phase.isSynthetic) {
     // Because this is a synthetic phase, just use the project name because there aren't any other phases
     return project.packageName;

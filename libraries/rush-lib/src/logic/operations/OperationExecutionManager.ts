@@ -1,21 +1,26 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import colors from 'colors/safe';
-import { TerminalWritable, StdioWritable, TextRewriterTransform } from '@rushstack/terminal';
-import { StreamCollator, CollatedTerminal, CollatedWriter } from '@rushstack/stream-collator';
-import { NewlineKind, Async } from '@rushstack/node-core-library';
+import {
+  type TerminalWritable,
+  StdioWritable,
+  TextRewriterTransform,
+  Colorize,
+  ConsoleTerminalProvider
+} from '@rushstack/terminal';
+import { StreamCollator, type CollatedTerminal, type CollatedWriter } from '@rushstack/stream-collator';
+import { NewlineKind, Async, InternalError } from '@rushstack/node-core-library';
 
 import {
   AsyncOperationQueue,
-  IOperationIteratorResult,
-  IOperationSortFunction,
+  type IOperationIteratorResult,
+  type IOperationSortFunction,
   UNASSIGNED_OPERATION
 } from './AsyncOperationQueue';
-import { Operation } from './Operation';
+import type { Operation } from './Operation';
 import { OperationStatus } from './OperationStatus';
-import { IOperationExecutionRecordContext, OperationExecutionRecord } from './OperationExecutionRecord';
-import { IExecutionResult } from './IOperationExecutionResult';
+import { type IOperationExecutionRecordContext, OperationExecutionRecord } from './OperationExecutionRecord';
+import type { IExecutionResult } from './IOperationExecutionResult';
 
 export interface IOperationExecutionManagerOptions {
   quietMode: boolean;
@@ -107,7 +112,7 @@ export class OperationExecutionManager {
     this._colorsNewlinesTransform = new TextRewriterTransform({
       destination: this._outputWritable,
       normalizeNewlines: NewlineKind.OsDefault,
-      removeColors: !colors.enabled
+      removeColors: !ConsoleTerminalProvider.supportsColor
     });
     this._streamCollator = new StreamCollator({
       destination: this._colorsNewlinesTransform,
@@ -120,8 +125,7 @@ export class OperationExecutionManager {
       streamCollator: this._streamCollator,
       onOperationStatusChanged,
       debugMode,
-      quietMode,
-      changedProjectsOnly
+      quietMode
     };
 
     let totalOperations: number = 0;
@@ -169,12 +173,12 @@ export class OperationExecutionManager {
       // ==[ @rushstack/the-long-thing ]=================[ 1 of 1000 ]==
 
       // leftPart: "==[ @rushstack/the-long-thing "
-      const leftPart: string = colors.gray('==[') + ' ' + colors.cyan(writer.taskName) + ' ';
+      const leftPart: string = Colorize.gray('==[') + ' ' + Colorize.cyan(writer.taskName) + ' ';
       const leftPartLength: number = 4 + writer.taskName.length + 1;
 
       // rightPart: " 1 of 1000 ]=="
       const completedOfTotal: string = `${this._completedOperations} of ${this._totalOperations}`;
-      const rightPart: string = ' ' + colors.white(completedOfTotal) + ' ' + colors.gray(']==');
+      const rightPart: string = ' ' + Colorize.white(completedOfTotal) + ' ' + Colorize.gray(']==');
       const rightPartLength: number = 1 + completedOfTotal.length + 4;
 
       // middlePart: "]=================["
@@ -184,7 +188,7 @@ export class OperationExecutionManager {
         0
       );
 
-      const middlePart: string = colors.gray(']' + '='.repeat(middlePartLengthMinusTwoBrackets) + '[');
+      const middlePart: string = Colorize.gray(']' + '='.repeat(middlePartLengthMinusTwoBrackets) + '[');
 
       this._terminal.writeStdoutLine('\n' + leftPart + middlePart + rightPart);
 
@@ -314,13 +318,11 @@ export class OperationExecutionManager {
         if (message) {
           terminal.writeStderrLine(message);
         }
-        terminal.writeStderrLine(colors.red(`"${name}" failed to build.`));
+        terminal.writeStderrLine(Colorize.red(`"${name}" failed to build.`));
         const blockedQueue: Set<OperationExecutionRecord> = new Set(record.consumers);
-        for (const blockedRecord of blockedQueue) {
-          if (blockedRecord.status === OperationStatus.Ready) {
-            this._executionQueue.complete(blockedRecord);
-            this._completedOperations++;
 
+        for (const blockedRecord of blockedQueue) {
+          if (blockedRecord.status === OperationStatus.Waiting) {
             // Now that we have the concept of architectural no-ops, we could implement this by replacing
             // {blockedRecord.runner} with a no-op that sets status to Blocked and logs the blocking
             // operations. However, the existing behavior is a bit simpler, so keeping that for now.
@@ -328,11 +330,18 @@ export class OperationExecutionManager {
               terminal.writeStdoutLine(`"${blockedRecord.name}" is blocked by "${name}".`);
             }
             blockedRecord.status = OperationStatus.Blocked;
-            this._onOperationStatusChanged?.(blockedRecord);
+
+            this._executionQueue.complete(blockedRecord);
+            this._completedOperations++;
 
             for (const dependent of blockedRecord.consumers) {
               blockedQueue.add(dependent);
             }
+          } else if (blockedRecord.status !== OperationStatus.Blocked) {
+            // It shouldn't be possible for operations to be in any state other than Waiting or Blocked
+            throw new InternalError(
+              `Blocked operation ${blockedRecord.name} is in an unexpected state: ${blockedRecord.status}`
+            );
           }
         }
         this._hasAnyFailures = true;
@@ -345,7 +354,7 @@ export class OperationExecutionManager {
       case OperationStatus.FromCache: {
         if (!silent) {
           record.collatedWriter.terminal.writeStdoutLine(
-            colors.green(`"${name}" was restored from the build cache.`)
+            Colorize.green(`"${name}" was restored from the build cache.`)
           );
         }
         break;
@@ -356,7 +365,7 @@ export class OperationExecutionManager {
        */
       case OperationStatus.Skipped: {
         if (!silent) {
-          record.collatedWriter.terminal.writeStdoutLine(colors.green(`"${name}" was skipped.`));
+          record.collatedWriter.terminal.writeStdoutLine(Colorize.green(`"${name}" was skipped.`));
         }
         break;
       }
@@ -366,7 +375,7 @@ export class OperationExecutionManager {
        */
       case OperationStatus.NoOp: {
         if (!silent) {
-          record.collatedWriter.terminal.writeStdoutLine(colors.gray(`"${name}" did not define any work.`));
+          record.collatedWriter.terminal.writeStdoutLine(Colorize.gray(`"${name}" did not define any work.`));
         }
         break;
       }
@@ -374,7 +383,7 @@ export class OperationExecutionManager {
       case OperationStatus.Success: {
         if (!silent) {
           record.collatedWriter.terminal.writeStdoutLine(
-            colors.green(`"${name}" completed successfully in ${record.stopwatch.toString()}.`)
+            Colorize.green(`"${name}" completed successfully in ${record.stopwatch.toString()}.`)
           );
         }
         break;
@@ -383,7 +392,7 @@ export class OperationExecutionManager {
       case OperationStatus.SuccessWithWarning: {
         if (!silent) {
           record.collatedWriter.terminal.writeStderrLine(
-            colors.yellow(`"${name}" completed with warnings in ${record.stopwatch.toString()}.`)
+            Colorize.yellow(`"${name}" completed with warnings in ${record.stopwatch.toString()}.`)
           );
         }
         this._hasAnyNonAllowedWarnings = this._hasAnyNonAllowedWarnings || !runner.warningsAreAllowed;
@@ -394,12 +403,6 @@ export class OperationExecutionManager {
     if (record.status !== OperationStatus.RemoteExecuting) {
       // If the operation was not remote, then we can notify queue that it is complete
       this._executionQueue.complete(record);
-
-      // Apply status changes to direct dependents
-      for (const item of record.consumers) {
-        // Remove this operation from the dependencies, to unblock the scheduler
-        item.dependencies.delete(record);
-      }
     }
   }
 }

@@ -3,38 +3,32 @@
 
 import * as path from 'path';
 import * as child_process from 'child_process';
-import colors from 'colors/safe';
 
-import {
+import type {
   CommandLineFlagParameter,
   CommandLineStringParameter,
   CommandLineChoiceParameter
 } from '@rushstack/ts-command-line';
-import {
-  FileSystem,
-  AlreadyReportedError,
-  Terminal,
-  ITerminal,
-  ConsoleTerminalProvider
-} from '@rushstack/node-core-library';
+import { FileSystem, AlreadyReportedError } from '@rushstack/node-core-library';
+import { Terminal, type ITerminal, ConsoleTerminalProvider, Colorize } from '@rushstack/terminal';
 import { getRepoRoot } from '@rushstack/package-deps-hash';
+import type * as InquirerType from 'inquirer';
 
-import { RushConfigurationProject } from '../../api/RushConfigurationProject';
-import { IChangeFile, IChangeInfo, ChangeType } from '../../api/ChangeManagement';
+import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
+import { type IChangeFile, type IChangeInfo, ChangeType } from '../../api/ChangeManagement';
 import { ChangeFile } from '../../api/ChangeFile';
 import { BaseRushAction } from './BaseRushAction';
-import { RushCommandLineParser } from '../RushCommandLineParser';
+import type { RushCommandLineParser } from '../RushCommandLineParser';
 import { ChangeFiles } from '../../logic/ChangeFiles';
 import {
-  VersionPolicy,
-  IndividualVersionPolicy,
-  LockStepVersionPolicy,
+  type VersionPolicy,
+  type IndividualVersionPolicy,
+  type LockStepVersionPolicy,
   VersionPolicyDefinitionName
 } from '../../api/VersionPolicy';
 import { ProjectChangeAnalyzer } from '../../logic/ProjectChangeAnalyzer';
 import { Git } from '../../logic/Git';
-
-import type * as InquirerType from 'inquirer';
+import { RushConstants } from '../../logic/RushConstants';
 import { Utilities } from '../../utilities/Utilities';
 
 const BULK_LONG_NAME: string = '--bulk';
@@ -84,7 +78,7 @@ export class ChangeAction extends BaseRushAction {
       'HOTFIX (EXPERIMENTAL) - these are changes that are hotfixes targeting a ' +
         'specific older version of the package. When a hotfix change is added, ' +
         'other changes will not be able to increment the version number. ' +
-        "Enable this feature by setting 'hotfixChangeEnabled' in your rush.json.",
+        `Enable this feature by setting 'hotfixChangeEnabled' in your ${RushConstants.rushJsonFilename}.`,
       ''
     ].join('\n');
     super({
@@ -170,6 +164,7 @@ export class ChangeAction extends BaseRushAction {
   }
 
   public async runAsync(): Promise<void> {
+    // eslint-disable-next-line no-console
     console.log(`The target branch is ${this._targetBranch}`);
 
     if (this._verifyParameter.value) {
@@ -188,7 +183,10 @@ export class ChangeAction extends BaseRushAction {
         })
         .filter((error) => error !== '');
       if (errors.length > 0) {
-        errors.forEach((error) => console.error(error));
+        errors.forEach((error) => {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        });
         throw new AlreadyReportedError();
       }
 
@@ -264,6 +262,7 @@ export class ChangeAction extends BaseRushAction {
 
       if (errors.length > 0) {
         for (const error of errors) {
+          // eslint-disable-next-line no-console
           console.error(error);
         }
 
@@ -441,11 +440,14 @@ export class ChangeAction extends BaseRushAction {
     packageName: string,
     existingChangeComments: Map<string, string[]>
   ): Promise<IChangeInfo | undefined> {
+    // eslint-disable-next-line no-console
     console.log(`\n${packageName}`);
     const comments: string[] | undefined = existingChangeComments.get(packageName);
     if (comments) {
+      // eslint-disable-next-line no-console
       console.log(`Found existing comments:`);
       comments.forEach((comment) => {
+        // eslint-disable-next-line no-console
         console.log(`    > ${comment}`);
       });
       const { appendComment }: { appendComment: 'skip' | 'append' } = await promptModule({
@@ -578,6 +580,7 @@ export class ChangeAction extends BaseRushAction {
         .toString()
         .replace(/(\r\n|\n|\r)/gm, '');
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log('There was an issue detecting your Git email...');
       return undefined;
     }
@@ -625,15 +628,17 @@ export class ChangeAction extends BaseRushAction {
   private _warnUnstagedChanges(): void {
     try {
       if (this._git.hasUnstagedChanges()) {
+        // eslint-disable-next-line no-console
         console.log(
           '\n' +
-            colors.yellow(
+            Colorize.yellow(
               'Warning: You have unstaged changes, which do not trigger prompting for change ' +
                 'descriptions.'
             )
         );
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(`An error occurred when detecting unstaged changes: ${error}`);
     }
   }
@@ -703,6 +708,7 @@ export class ChangeAction extends BaseRushAction {
     if (overwrite) {
       return true;
     } else {
+      // eslint-disable-next-line no-console
       console.log(`Not overwriting ${filePath}`);
       return false;
     }
@@ -714,13 +720,16 @@ export class ChangeAction extends BaseRushAction {
   private _writeFile(fileName: string, output: string, isOverwrite: boolean): void {
     FileSystem.writeFile(fileName, output, { ensureFolderExists: true });
     if (isOverwrite) {
+      // eslint-disable-next-line no-console
       console.log(`Overwrote file: ${fileName}`);
     } else {
+      // eslint-disable-next-line no-console
       console.log(`Created file: ${fileName}`);
     }
   }
 
   private _logNoChangeFileRequired(): void {
+    // eslint-disable-next-line no-console
     console.log('No changes were detected to relevant packages on this branch. Nothing to do.');
   }
 

@@ -3,9 +3,9 @@
 
 import type * as child_process from 'child_process';
 import { once } from 'events';
-import { Readable } from 'stream';
+import { Readable, pipeline } from 'stream';
 
-import { Executable, FileSystem, IExecutableSpawnOptions } from '@rushstack/node-core-library';
+import { Executable, FileSystem, type IExecutableSpawnOptions } from '@rushstack/node-core-library';
 
 export interface IGitVersion {
   major: number;
@@ -282,7 +282,12 @@ async function spawnGitAsync(
   });
 
   if (stdin) {
-    stdin.pipe(proc.stdin!);
+    /**
+     * For `git hash-object` data is piped in asynchronously. In the event that one of the
+     * passed filenames cannot be hashed, subsequent writes to `proc.stdin` will error.
+     * Silence this error since it will be handled by the non-zero exit code of the process.
+     */
+    pipeline(stdin, proc.stdin!, (err) => {});
   }
 
   const [status] = await once(proc, 'exit');

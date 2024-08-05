@@ -5,26 +5,30 @@ import express from 'express';
 import yaml from 'js-yaml';
 import cors from 'cors';
 import process from 'process';
-import colors from 'colors/safe';
 import open from 'open';
 import updateNotifier from 'update-notifier';
+import { AlreadyReportedError } from '@rushstack/node-core-library';
 import { FileSystem, type IPackageJson, JsonFile, PackageJsonLookup } from '@rushstack/node-core-library';
 import type { IAppContext } from '@rushstack/lockfile-explorer-web/lib/AppContext';
-import packageJSON from '../package.json';
+import { Colorize } from '@rushstack/terminal';
+
 import { init } from './init';
 import type { IAppState } from './state';
-import { AlreadyReportedError } from '@rushstack/node-core-library';
+import { type ICommandLine, parseCommandLine } from './commandLine';
 
 function startApp(debugMode: boolean): void {
   const lockfileExplorerProjectRoot: string = PackageJsonLookup.instance.tryGetPackageFolderFor(__dirname)!;
-  const appVersion: string = JsonFile.load(`${lockfileExplorerProjectRoot}/package.json`).version;
+  const lockfileExplorerPackageJson: IPackageJson = JsonFile.load(
+    `${lockfileExplorerProjectRoot}/package.json`
+  );
+  const appVersion: string = lockfileExplorerPackageJson.version;
 
   console.log(
-    colors.bold(`\nRush Lockfile Explorer ${appVersion}`) + colors.cyan(' - https://lfx.rushstack.io/\n')
+    Colorize.bold(`\nRush Lockfile Explorer ${appVersion}`) + Colorize.cyan(' - https://lfx.rushstack.io/\n')
   );
 
   updateNotifier({
-    pkg: packageJSON,
+    pkg: lockfileExplorerPackageJson,
     // Normally update-notifier waits a day or so before it starts displaying upgrade notices.
     // In debug mode, show the notice right away.
     updateCheckInterval: debugMode ? 0 : undefined
@@ -39,16 +43,22 @@ function startApp(debugMode: boolean): void {
   // Must not have a trailing slash
   const SERVICE_URL: string = `http://localhost:${PORT}`;
 
-  // TODO: Later if we introduce more CLI parameters, switch to a proper CLI parser
-  const args: string[] = process.argv.slice(2);
-  if (args.length > 0 && args[0] !== '--debug') {
-    console.log('Usage: lockfile-explorer [--debug]\n');
-    console.log('The "lfx" command is a shorthand alias for "lockfile-explorer".');
-    console.log('See the project website for documentation and support.\n');
-    throw new AlreadyReportedError();
+  const result: ICommandLine = parseCommandLine(process.argv.slice(2));
+  if (result.showedHelp) {
+    console.error('\nFor help, use:  ' + Colorize.yellow('lockfile-explorer --help'));
+    process.exitCode = 1;
+    return;
   }
 
-  const appState: IAppState = init({ lockfileExplorerProjectRoot, appVersion, debugMode });
+  if (result.error) {
+    console.error('\n' + Colorize.red('ERROR: ' + result.error));
+    process.exitCode = 1;
+    return;
+  }
+
+  const subspaceName: string = result.subspace ?? 'default';
+
+  const appState: IAppState = init({ lockfileExplorerProjectRoot, appVersion, debugMode, subspaceName });
 
   // Important: This must happen after init() reads the current working directory
   process.chdir(appState.lockfileExplorerProjectRoot);
@@ -64,7 +74,7 @@ function startApp(debugMode: boolean): void {
   let disconnected: boolean = false;
   setInterval(() => {
     if (!isClientConnected && !awaitingFirstConnect && !disconnected) {
-      console.log(colors.red('The client has disconnected!'));
+      console.log(Colorize.red('The client has disconnected!'));
       console.log(`Please open a browser window at http://localhost:${PORT}/app`);
       disconnected = true;
     } else if (!awaitingFirstConnect) {
@@ -94,7 +104,10 @@ function startApp(debugMode: boolean): void {
   app.get('/api/lockfile', async (req: express.Request, res: express.Response) => {
     const pnpmLockfileText: string = await FileSystem.readFileAsync(appState.pnpmLockfileLocation);
     const doc = yaml.load(pnpmLockfileText);
-    res.send(doc);
+    res.send({
+      doc,
+      subspaceName
+    });
   });
 
   app.get('/api/health', (req: express.Request, res: express.Response) => {
@@ -102,7 +115,7 @@ function startApp(debugMode: boolean): void {
     isClientConnected = true;
     if (disconnected) {
       disconnected = false;
-      console.log(colors.green('The client has reconnected!'));
+      console.log(Colorize.green('The client has reconnected!'));
     }
     res.status(200).send();
   });
@@ -199,7 +212,7 @@ if (debugMode) {
   } catch (error) {
     if (!(error instanceof AlreadyReportedError)) {
       console.error();
-      console.error(colors.red('ERROR: ' + error.message));
+      console.error(Colorize.red('ERROR: ' + error.message));
     }
   }
 }

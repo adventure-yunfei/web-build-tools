@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { JsonFile, JsonObject, JsonSchema } from '@rushstack/node-core-library';
+import { JsonFile, type JsonObject, JsonSchema } from '@rushstack/node-core-library';
 
 import {
-  IPackageManagerOptionsJsonBase,
+  type IPackageManagerOptionsJsonBase,
   PackageManagerOptionsConfigurationBase
 } from '../base/BasePackageManagerOptionsConfiguration';
 import { EnvironmentConfiguration } from '../../api/EnvironmentConfiguration';
@@ -23,7 +23,31 @@ export type PnpmStoreLocation = 'local' | 'global';
 export type PnpmStoreOptions = PnpmStoreLocation;
 
 /**
- * @beta
+ * Possible values for the `resolutionMode` setting in Rush's pnpm-config.json file.
+ * @remarks
+ * These modes correspond to PNPM's `resolution-mode` values, which are documented here:
+ * {@link https://pnpm.io/npmrc#resolution-mode}
+ *
+ * @public
+ */
+export type PnpmResolutionMode = 'highest' | 'time-based' | 'lowest-direct';
+
+/**
+ * Possible values for the `pnpmLockfilePolicies` setting in Rush's pnpm-config.json file.
+ * @public
+ */
+export interface IPnpmLockfilePolicies {
+  /**
+   * Forbid sha1 hashes in `pnpm-lock.yaml`
+   */
+  disallowInsecureSha1?: {
+    enabled: boolean;
+    exemptPackageVersions: Record<string, string[]>;
+  };
+}
+
+/**
+ * @public
  */
 export interface IPnpmPeerDependencyRules {
   ignoreMissing?: string[];
@@ -31,12 +55,18 @@ export interface IPnpmPeerDependencyRules {
   allowedVersions?: Record<string, string>;
 }
 
+/**
+ * @public
+ */
 export interface IPnpmPeerDependenciesMeta {
   [packageName: string]: {
     optional?: boolean;
   };
 }
 
+/**
+ * @public
+ */
 export interface IPnpmPackageExtension {
   dependencies?: Record<string, string>;
   optionalDependencies?: Record<string, string>;
@@ -93,6 +123,22 @@ export interface IPnpmOptionsJson extends IPackageManagerOptionsJsonBase {
    * {@inheritDoc PnpmOptionsConfiguration.unsupportedPackageJsonSettings}
    */
   unsupportedPackageJsonSettings?: unknown;
+  /**
+   * {@inheritDoc PnpmOptionsConfiguration.resolutionMode}
+   */
+  resolutionMode?: PnpmResolutionMode;
+  /**
+   * {@inheritDoc PnpmOptionsConfiguration.autoInstallPeers}
+   */
+  autoInstallPeers?: boolean;
+  /**
+   * {@inheritDoc PnpmOptionsConfiguration.alwaysFullInstall}
+   */
+  alwaysFullInstall?: boolean;
+  /**
+   * {@inheritDoc PnpmOptionsConfiguration.pnpmLockfilePolicies}
+   */
+  pnpmLockfilePolicies?: IPnpmLockfilePolicies;
 }
 
 /**
@@ -121,6 +167,32 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
    *  - global: Use PNPM's global store path
    */
   public readonly pnpmStore: PnpmStoreLocation;
+
+  /**
+   * This setting determines how PNPM chooses version numbers during `rush update`.
+   *
+   * @remarks
+   * For example, suppose `lib-x@3.0.0` depends on `"lib-y": "^1.2.3"` whose latest major
+   * releases are `1.8.9` and `2.3.4`.  The resolution mode `lowest-direct` might choose
+   * `lib-y@1.2.3`, wheres `highest` will choose 1.8.9, and `time-based` will pick the
+   * highest compatible version at the time when `lib-x@3.0.0` itself was published (ensuring
+   * that the version could have been tested by the maintainer of "lib-x").  For local workspace
+   * projects, `time-based` instead works like `lowest-direct`, avoiding upgrades unless
+   * they are explicitly requested. Although `time-based` is the most robust option, it may be
+   * slightly slower with registries such as npmjs.com that have not implemented an optimization.
+   *
+   * IMPORTANT: Be aware that PNPM 8.0.0 initially defaulted to `lowest-direct` instead of
+   * `highest`, but PNPM reverted this decision in 8.6.12 because it caused confusion for users.
+   * Rush version 5.106.0 and newer avoids this confusion by consistently defaulting to
+   * `highest` when `resolutionMode` is not explicitly set in pnpm-config.json or .npmrc,
+   * regardless of your PNPM version.
+   *
+   * PNPM documentation: https://pnpm.io/npmrc#resolution-mode
+   *
+   * Possible values are: `highest`, `time-based`, and `lowest-direct`.
+   * The default is `highest`.
+   */
+  public readonly resolutionMode: PnpmResolutionMode | undefined;
 
   /**
    * The path for PNPM to use as the store directory.
@@ -168,6 +240,14 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
    * The default value is true.  (For now.)
    */
   public readonly useWorkspaces: boolean;
+
+  /**
+   * When true, any missing non-optional peer dependencies are automatically installed.
+   *
+   * @remarks
+   * The default value is same as PNPM default value.  (In PNPM 8.x, this value is true)
+   */
+  public readonly autoInstallPeers: boolean | undefined;
 
   /**
    * The "globalOverrides" setting provides a simple mechanism for overriding version selections
@@ -256,6 +336,22 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
   public readonly jsonFilename: string | undefined;
 
   /**
+   * The `pnpmLockfilePolicies` setting defines the policies that govern the `pnpm-lock.yaml` file.
+   */
+  public readonly pnpmLockfilePolicies: IPnpmLockfilePolicies | undefined;
+
+  /**
+   * (EXPERIMENTAL) If "true", then filtered installs ("rush install --to my-project")
+   * will be disregarded, instead always performing a full installation of the lockfile.
+   * This setting is primarily useful with Rush subspaces which enable filtering across
+   * multiple lockfiles, if filtering may be inefficient or undesirable for certain lockfiles.
+   *
+   * The default value is false.
+   */
+  /*[LINE "DEMO"]*/
+  public readonly alwaysFullInstall: boolean | undefined;
+
+  /**
    * (GENERATED BY RUSH-PNPM PATCH-COMMIT) When modifying this property, make sure you know what you are doing.
    *
    * The `globalPatchedDependencies` is added/updated automatically when you run pnpm patch-commit
@@ -291,6 +387,10 @@ export class PnpmOptionsConfiguration extends PackageManagerOptionsConfiguration
     this.globalAllowedDeprecatedVersions = json.globalAllowedDeprecatedVersions;
     this.unsupportedPackageJsonSettings = json.unsupportedPackageJsonSettings;
     this._globalPatchedDependencies = json.globalPatchedDependencies;
+    this.resolutionMode = json.resolutionMode;
+    this.autoInstallPeers = json.autoInstallPeers;
+    this.alwaysFullInstall = json.alwaysFullInstall;
+    this.pnpmLockfilePolicies = json.pnpmLockfilePolicies;
   }
 
   /** @internal */

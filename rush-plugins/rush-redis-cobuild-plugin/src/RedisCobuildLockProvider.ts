@@ -3,7 +3,7 @@
 
 import { createClient } from '@redis/client';
 
-import {
+import type {
   ICobuildLockProvider,
   ICobuildContext,
   ICobuildCompletedState,
@@ -16,7 +16,7 @@ import type {
   RedisModules,
   RedisScripts
 } from '@redis/client';
-import type { ITerminal } from '@rushstack/node-core-library';
+import type { ITerminal } from '@rushstack/terminal';
 
 /**
  * The redis client options

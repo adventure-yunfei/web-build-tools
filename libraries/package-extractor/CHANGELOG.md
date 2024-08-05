@@ -1,6 +1,252 @@
 # Change Log - @rushstack/package-extractor
 
-This log was last generated on Wed, 06 Sep 2023 19:00:39 GMT and should not be manually modified.
+This log was last generated on Thu, 18 Apr 2024 23:19:43 GMT and should not be manually modified.
+
+## 0.7.0
+Thu, 18 Apr 2024 23:19:43 GMT
+
+### Minor changes
+
+- Add support for Rush subspaces
+
+## 0.6.43
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.6.42
+Tue, 19 Mar 2024 15:10:18 GMT
+
+_Version update only_
+
+## 0.6.41
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 0.6.40
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 0.6.39
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 0.6.38
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 0.6.37
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 0.6.36
+Thu, 29 Feb 2024 07:11:45 GMT
+
+_Version update only_
+
+## 0.6.35
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 0.6.34
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 0.6.33
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 0.6.32
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 0.6.31
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 0.6.30
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 0.6.29
+Tue, 20 Feb 2024 16:10:53 GMT
+
+_Version update only_
+
+## 0.6.28
+Mon, 19 Feb 2024 21:54:27 GMT
+
+_Version update only_
+
+## 0.6.27
+Sat, 17 Feb 2024 06:24:35 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 0.6.26
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 0.6.25
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.6.24
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 0.6.23
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.6.22
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 0.6.21
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 0.6.20
+Tue, 16 Jan 2024 18:30:11 GMT
+
+_Version update only_
+
+## 0.6.19
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.6.18
+Wed, 20 Dec 2023 01:09:45 GMT
+
+_Version update only_
+
+## 0.6.17
+Tue, 12 Dec 2023 00:20:33 GMT
+
+### Patches
+
+- Fix an issue with the `folderToCopy` option, where the folder contents would be copied into a subfolder instead of into the target folder root.
+
+## 0.6.16
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.6.15
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.6.14
+Thu, 16 Nov 2023 01:09:56 GMT
+
+### Patches
+
+- Links that target a path outside of the source directory can now be ignored using "patternsToInclude" and "patternsToExclude" options
+
+## 0.6.13
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.6.12
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.6.11
+Mon, 30 Oct 2023 23:36:37 GMT
+
+_Version update only_
+
+## 0.6.10
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 0.6.9
+Sat, 30 Sep 2023 00:20:51 GMT
+
+### Patches
+
+- Ensure the "folderToCopy" field is included in generated archives
+
+## 0.6.8
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 0.6.7
+Wed, 27 Sep 2023 00:21:38 GMT
+
+_Version update only_
+
+## 0.6.6
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 0.6.5
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 0.6.4
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 0.6.3
+Fri, 22 Sep 2023 00:05:50 GMT
+
+_Version update only_
+
+## 0.6.2
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 0.6.1
+Tue, 19 Sep 2023 00:36:30 GMT
+
+_Version update only_
+
+## 0.6.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
+
+## 0.5.3
+Wed, 13 Sep 2023 00:32:29 GMT
+
+_Version update only_
 
 ## 0.5.2
 Wed, 06 Sep 2023 19:00:39 GMT

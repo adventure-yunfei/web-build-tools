@@ -2,14 +2,14 @@
 // See LICENSE in the project root for license information.
 
 import * as semver from 'semver';
-import { IPackageJson, FileConstants, Enum } from '@rushstack/node-core-library';
-import { CommandLineFlagParameter, CommandLineStringParameter } from '@rushstack/ts-command-line';
+import { type IPackageJson, FileConstants, Enum } from '@rushstack/node-core-library';
+import type { CommandLineFlagParameter, CommandLineStringParameter } from '@rushstack/ts-command-line';
 
-import { BumpType, LockStepVersionPolicy } from '../../api/VersionPolicy';
-import { VersionPolicyConfiguration } from '../../api/VersionPolicyConfiguration';
+import { BumpType, type LockStepVersionPolicy } from '../../api/VersionPolicy';
+import type { VersionPolicyConfiguration } from '../../api/VersionPolicyConfiguration';
 import { RushConfiguration } from '../../api/RushConfiguration';
 import { VersionMismatchFinder } from '../../logic/versionMismatch/VersionMismatchFinder';
-import { RushCommandLineParser } from '../RushCommandLineParser';
+import type { RushCommandLineParser } from '../RushCommandLineParser';
 import * as PolicyValidator from '../../logic/policy/PolicyValidator';
 import { BaseRushAction } from './BaseRushAction';
 import { PublishGit } from '../../logic/PublishGit';
@@ -75,7 +75,7 @@ export class VersionAction extends BaseRushAction {
       argumentName: 'BUMPTYPE',
       description:
         'Overrides the bump type in the version-policy.json for the specified version policy. ' +
-        'Valid BUMPTYPE values include: prerelease, patch, minor, major. ' +
+        'Valid BUMPTYPE values include: prerelease, patch, preminor, minor, major. ' +
         'This setting only works for lock-step version policy in bump action.'
     });
     this._prereleaseIdentifier = this.defineStringParameter({
@@ -95,10 +95,14 @@ export class VersionAction extends BaseRushAction {
   }
 
   protected async runAsync(): Promise<void> {
-    await PolicyValidator.validatePolicyAsync(this.rushConfiguration, {
-      bypassPolicyAllowed: true,
-      bypassPolicy: this._bypassPolicy.value
-    });
+    await PolicyValidator.validatePolicyAsync(
+      this.rushConfiguration,
+      this.rushConfiguration.defaultSubspace,
+      {
+        bypassPolicyAllowed: true,
+        bypassPolicy: this._bypassPolicy.value
+      }
+    );
     const git: Git = new Git(this.rushConfiguration);
     const userEmail: string = git.getGitEmail();
 
@@ -124,6 +128,7 @@ export class VersionAction extends BaseRushAction {
 
       const updatedPackages: Map<string, IPackageJson> = versionManager.updatedProjects;
       if (updatedPackages.size > 0) {
+        // eslint-disable-next-line no-console
         console.log(`${updatedPackages.size} packages are getting updated.`);
         this._gitProcess(tempBranch, this._targetBranch.value);
       }
@@ -197,7 +202,7 @@ export class VersionAction extends BaseRushAction {
     if (this._overwriteBump.value && !Enum.tryGetValueByKey(BumpType, this._overwriteBump.value)) {
       throw new Error(
         'The value of override-bump is not valid.  ' +
-          'Valid values include prerelease, patch, minor, and major'
+          'Valid values include prerelease, patch, preminor, minor, and major'
       );
     }
   }

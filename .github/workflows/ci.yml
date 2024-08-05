@@ -11,15 +11,19 @@ jobs:
     strategy:
       matrix:
         include:
-          - NodeVersion: 14
+          - NodeVersion: 16.20.x
+            NodeVersionDisplayName: 16
             OS: ubuntu-latest
-          - NodeVersion: 18
+          - NodeVersion: 18.18.x
+            NodeVersionDisplayName: 18
             OS: ubuntu-latest
-          - NodeVersion: 16
+          - NodeVersion: 20.9.x
+            NodeVersionDisplayName: 20
+            OS: ubuntu-latest
+          - NodeVersion: 18.18.x
+            NodeVersionDisplayName: 18
             OS: windows-latest
-          - NodeVersion: 18
-            OS: windows-latest
-    name: Node.js v${{ matrix.NodeVersion }} (${{ matrix.OS }})
+    name: Node.js v${{ matrix.NodeVersionDisplayName }} (${{ matrix.OS }})
     runs-on: ${{ matrix.OS }}
     steps:
       - uses: actions/checkout@v3
@@ -47,17 +51,9 @@ jobs:
 
       - name: Rush retest (install-run-rush)
         run: node common/scripts/install-run-rush.js retest --verbose --production
-        env:
-          # Prevent time-based browserslist update warning
-          # See https://github.com/microsoft/rushstack/issues/2981
-          BROWSERSLIST_IGNORE_OLD_DATA: 1
 
       - name: Ensure repo README is up-to-date
         run: node repo-scripts/repo-toolbox/lib/start.js readme --verify
 
       - name: Rush test (rush-lib)
         run: node apps/rush/lib/start-dev.js test --verbose --production --timeline
-        env:
-          # Prevent time-based browserslist update warning
-          # See https://github.com/microsoft/rushstack/issues/2981
-          BROWSERSLIST_IGNORE_OLD_DATA: 1

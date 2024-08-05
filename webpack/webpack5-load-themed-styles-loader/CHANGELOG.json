@@ -2,6 +2,833 @@
   "name": "@microsoft/webpack5-load-themed-styles-loader",
   "entries": [
     {
+      "version": "0.2.40",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.40",
+      "date": "Wed, 10 Apr 2024 15:10:08 GMT",
+      "comments": {
+        "none": [
+          {
+            "comment": "Update test snapshots for subspace"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.116`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.66.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `4.1.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.115` to `2.0.116`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.39",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.39",
+      "date": "Tue, 19 Mar 2024 15:10:18 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.115`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.66.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.114` to `2.0.115`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.38",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.38",
+      "date": "Fri, 15 Mar 2024 00:12:40 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.114`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.66.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.113` to `2.0.114`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.37",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.37",
+      "date": "Tue, 05 Mar 2024 01:19:24 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.113`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.66.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.112` to `2.0.113`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.36",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.36",
+      "date": "Sun, 03 Mar 2024 20:58:13 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.112`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.10`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.111` to `2.0.112`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.35",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.35",
+      "date": "Sat, 02 Mar 2024 02:22:24 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.111`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.9`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.110` to `2.0.111`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.34",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.34",
+      "date": "Fri, 01 Mar 2024 01:10:08 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.110`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.8`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.109` to `2.0.110`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.33",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.33",
+      "date": "Thu, 29 Feb 2024 07:11:45 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.109`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.7`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.108` to `2.0.109`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.32",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.32",
+      "date": "Wed, 28 Feb 2024 16:09:27 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.108`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.6`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.107` to `2.0.108`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.31",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.31",
+      "date": "Sat, 24 Feb 2024 23:02:51 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.107`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.5`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.106` to `^2.0.107`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.30",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.30",
+      "date": "Thu, 22 Feb 2024 01:36:09 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.106`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.4`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.105` to `^2.0.106`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.29",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.29",
+      "date": "Wed, 21 Feb 2024 21:45:28 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.105`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `4.0.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.104` to `^2.0.105`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.28",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.28",
+      "date": "Wed, 21 Feb 2024 08:55:47 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.104`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.103` to `^2.0.104`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.27",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.27",
+      "date": "Tue, 20 Feb 2024 21:45:10 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.103`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `4.0.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.102` to `^2.0.103`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.26",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.26",
+      "date": "Tue, 20 Feb 2024 16:10:52 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.102`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.65.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.101` to `^2.0.102`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.25",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.25",
+      "date": "Mon, 19 Feb 2024 21:54:27 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.101`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.8`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `4.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.100` to `^2.0.101`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.24",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.24",
+      "date": "Sat, 17 Feb 2024 06:24:35 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.100`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.7`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.66.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.99` to `^2.0.100`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.23",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.23",
+      "date": "Thu, 08 Feb 2024 01:09:21 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.99`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.6`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.66.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.98` to `^2.0.99`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.22",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.22",
+      "date": "Wed, 07 Feb 2024 01:11:18 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.98`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.5`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.97` to `^2.0.98`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.21",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.21",
+      "date": "Mon, 05 Feb 2024 23:46:52 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.97`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.65.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.96` to `^2.0.97`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.20",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.20",
+      "date": "Thu, 25 Jan 2024 01:09:30 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.96`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.64.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.95` to `^2.0.96`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.19",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.19",
+      "date": "Tue, 23 Jan 2024 20:12:57 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.95`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.64.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.94` to `^2.0.95`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.18",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.18",
+      "date": "Tue, 23 Jan 2024 16:15:05 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.94`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.64.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.93` to `^2.0.94`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.17",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.17",
+      "date": "Tue, 16 Jan 2024 18:30:11 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.93`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.64.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.92` to `^2.0.93`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.16",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.16",
+      "date": "Wed, 03 Jan 2024 00:31:18 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.92`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.6`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.63.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.91` to `^2.0.92`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.15",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.15",
+      "date": "Wed, 20 Dec 2023 01:09:45 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.91`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.5`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.90` to `^2.0.91`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.14",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.14",
+      "date": "Thu, 07 Dec 2023 03:44:13 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.90`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.62.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.89` to `^2.0.90`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.13",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.13",
+      "date": "Tue, 05 Dec 2023 01:10:16 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.89`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.3`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.88` to `^2.0.89`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.12",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.12",
+      "date": "Fri, 10 Nov 2023 18:02:04 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.88`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.87` to `^2.0.88`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.11",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.11",
+      "date": "Wed, 01 Nov 2023 23:11:35 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix line endings in published package."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.87`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.86` to `^2.0.87`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.10",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.10",
+      "date": "Mon, 30 Oct 2023 23:36:37 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.86`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.63.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.85` to `^2.0.86`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.9",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.9",
+      "date": "Sun, 01 Oct 2023 02:56:29 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.85`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.62.3`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.84` to `^2.0.85`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.8",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.8",
+      "date": "Sat, 30 Sep 2023 00:20:51 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.84`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.62.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.83` to `^2.0.84`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.7",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.7",
+      "date": "Thu, 28 Sep 2023 20:53:17 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.83`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.62.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.61.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.82` to `^2.0.83`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.6",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.6",
+      "date": "Wed, 27 Sep 2023 00:21:38 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.82`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.62.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.81` to `^2.0.82`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.5",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.5",
+      "date": "Tue, 26 Sep 2023 21:02:30 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.81`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.61.3`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.80` to `^2.0.81`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.4",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.4",
+      "date": "Tue, 26 Sep 2023 09:30:33 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update type-only imports to include the type modifier."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.80`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.61.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.60.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.79` to `^2.0.80`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.3",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.3",
+      "date": "Mon, 25 Sep 2023 23:38:28 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.79`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.61.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.78` to `^2.0.79`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.2",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.2",
+      "date": "Fri, 22 Sep 2023 00:05:50 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.78`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.61.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.77` to `^2.0.78`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.1",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.1",
+      "date": "Tue, 19 Sep 2023 15:21:52 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.77`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `2.2.24`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.60.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.76` to `^2.0.77`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.2.0",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.2.0",
+      "date": "Fri, 15 Sep 2023 00:36:58 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Update @types/node from 14 to 18"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.76`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/eslint-config\" to `3.3.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft-node-rig\" to `2.2.23`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/heft\" to `0.59.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `3.60.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.75` to `^2.0.76`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.1.57",
+      "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.1.57",
+      "date": "Wed, 13 Sep 2023 00:32:29 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" to `2.0.75`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/load-themed-styles\" from `^2.0.74` to `^2.0.75`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.1.56",
       "tag": "@microsoft/webpack5-load-themed-styles-loader_v0.1.56",
       "date": "Fri, 01 Sep 2023 04:53:58 GMT",

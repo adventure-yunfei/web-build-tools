@@ -1,6 +1,184 @@
 # Change Log - @rushstack/terminal
 
-This log was last generated on Thu, 24 Aug 2023 15:20:46 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:08 GMT and should not be manually modified.
+
+## 0.10.1
+Wed, 10 Apr 2024 15:10:08 GMT
+
+_Version update only_
+
+## 0.10.0
+Sat, 24 Feb 2024 23:02:51 GMT
+
+### Minor changes
+
+- Replace the `colors` dependency with `supports-color` for detecting if STDOUT and STDERR support color.
+- Add a `Colorize.rainbow` API.
+
+## 0.9.0
+Wed, 21 Feb 2024 21:45:28 GMT
+
+### Minor changes
+
+- Expose a `supportsColor` property on `ConsoleTerminalProvider`.
+
+## 0.8.1
+Tue, 20 Feb 2024 21:45:10 GMT
+
+### Patches
+
+- Fix a recent regression causing `Error: Cannot find module 'colors/safe'` (GitHub #4525)
+
+## 0.8.0
+Mon, 19 Feb 2024 21:54:27 GMT
+
+### Minor changes
+
+- Introduce a Terminal, Colors, AsciEscape, and some related APIs. These APIs were previously in the @rushstack/node-core-library package. See https://github.com/microsoft/rushstack/pull/3176 for details.
+
+## 0.7.24
+Sat, 17 Feb 2024 06:24:35 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 0.7.23
+Thu, 08 Feb 2024 01:09:22 GMT
+
+_Version update only_
+
+## 0.7.22
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.7.21
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 0.7.20
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.7.19
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 0.7.18
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 0.7.17
+Tue, 16 Jan 2024 18:30:11 GMT
+
+_Version update only_
+
+## 0.7.16
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.7.15
+Wed, 20 Dec 2023 01:09:46 GMT
+
+_Version update only_
+
+## 0.7.14
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.7.13
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.7.12
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.7.11
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.7.10
+Mon, 30 Oct 2023 23:36:38 GMT
+
+_Version update only_
+
+## 0.7.9
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 0.7.8
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 0.7.7
+Thu, 28 Sep 2023 20:53:17 GMT
+
+### Patches
+
+- Fix an issue where `PrintUtilities.printMessageInBox` would throw if the message contains a word that is longer than the box width. In this case, `printMessageInBox` will print bars above and below the message, and then print the message lines, allowing the console to wrap them.
+
+## 0.7.6
+Wed, 27 Sep 2023 00:21:39 GMT
+
+_Version update only_
+
+## 0.7.5
+Tue, 26 Sep 2023 21:02:31 GMT
+
+_Version update only_
+
+## 0.7.4
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 0.7.3
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 0.7.2
+Fri, 22 Sep 2023 00:05:50 GMT
+
+_Version update only_
+
+## 0.7.1
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 0.7.0
+Tue, 19 Sep 2023 00:36:30 GMT
+
+### Minor changes
+
+- Remove the dependency on `wordwrap`.
+- Add support for a custom line prefix in `PrintUtilities.wrapWords`.
+- Add a `PrintUtilities.wrapWordsToLines` function that is functionally identical to `PrintUtilities.wrapWords`, except that it returns an array of lines instead of a joined string with line breaks.
+
+## 0.6.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 0.5.38
 Thu, 24 Aug 2023 15:20:46 GMT

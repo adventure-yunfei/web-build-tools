@@ -6,12 +6,13 @@ import * as os from 'os';
 import * as readline from 'readline';
 import { once } from 'events';
 import { getRepoRoot } from '@rushstack/package-deps-hash';
-import { Colors, Path, ITerminal, FileSystemStats, FileSystem } from '@rushstack/node-core-library';
+import { Path, type FileSystemStats, FileSystem } from '@rushstack/node-core-library';
+import { Colorize, type ITerminal } from '@rushstack/terminal';
 
 import { Git } from './Git';
 import { ProjectChangeAnalyzer } from './ProjectChangeAnalyzer';
-import { RushConfiguration } from '../api/RushConfiguration';
-import { RushConfigurationProject } from '../api/RushConfigurationProject';
+import type { RushConfiguration } from '../api/RushConfiguration';
+import type { RushConfigurationProject } from '../api/RushConfigurationProject';
 
 export interface IProjectWatcherOptions {
   debounceMs?: number;
@@ -30,6 +31,10 @@ export interface IProjectChangeResult {
    * Contains the git hashes for all tracked files in the repo
    */
   state: ProjectChangeAnalyzer;
+}
+
+export interface IPromptGeneratorFunction {
+  (isPaused: boolean): Iterable<string>;
 }
 
 interface IPathWatchOptions {
@@ -55,8 +60,13 @@ export class ProjectWatcher {
 
   private _initialState: ProjectChangeAnalyzer | undefined;
   private _previousState: ProjectChangeAnalyzer | undefined;
+  private _forceChangedProjects: Map<RushConfigurationProject, string> = new Map();
+  private _resolveIfChanged: undefined | (() => Promise<void>);
+  private _getPromptLines: undefined | IPromptGeneratorFunction;
 
-  private _hasRenderedStatus: boolean;
+  private _renderedStatusLines: number;
+
+  public isPaused: boolean = false;
 
   public constructor(options: IProjectWatcherOptions) {
     const { debounceMs = 1000, rushConfiguration, projectsToWatch, terminal, initialState } = options;
@@ -72,19 +82,66 @@ export class ProjectWatcher {
     this._initialState = initialState;
     this._previousState = initialState;
 
-    this._hasRenderedStatus = false;
+    this._renderedStatusLines = 0;
+    this._getPromptLines = undefined;
+  }
+
+  public pause(): void {
+    this.isPaused = true;
+    this._setStatus('Project watcher paused.');
+  }
+
+  public resume(): void {
+    this.isPaused = false;
+    this._setStatus('Project watcher resuming...');
+    if (this._resolveIfChanged) {
+      this._resolveIfChanged().catch(() => {
+        // Suppress unhandled promise rejection error
+      });
+    }
+  }
+
+  public invalidateProject(project: RushConfigurationProject, reason: string): boolean {
+    if (this._forceChangedProjects.has(project)) {
+      return false;
+    }
+
+    this._forceChangedProjects.set(project, reason);
+    return true;
+  }
+
+  public invalidateAll(reason: string): void {
+    for (const project of this._projectsToWatch) {
+      this.invalidateProject(project, reason);
+    }
+  }
+
+  public clearStatus(): void {
+    this._renderedStatusLines = 0;
+  }
+
+  public setPromptGenerator(promptGenerator: IPromptGeneratorFunction): void {
+    this._getPromptLines = promptGenerator;
   }
 
   /**
    * Waits for a change to the package-deps of one or more of the selected projects, since the previous invocation.
    * Will return immediately the first time it is invoked, since no state has been recorded.
    * If no change is currently present, watches the source tree of all selected projects for file changes.
+   * `waitForChange` is not allowed to be called multiple times concurrently.
    */
   public async waitForChange(onWatchingFiles?: () => void): Promise<IProjectChangeResult> {
     const initialChangeResult: IProjectChangeResult = await this._computeChanged();
     // Ensure that the new state is recorded so that we don't loop infinitely
     this._commitChanges(initialChangeResult.state);
     if (initialChangeResult.changedProjects.size) {
+      // We can't call `clear()` here due to the async tick in the end of _computeChanged
+      for (const project of initialChangeResult.changedProjects) {
+        this._forceChangedProjects.delete(project);
+      }
+      // TODO: _forceChangedProjects might be non-empty here, which will result in an immediate rerun after the next
+      // run finishes. This is suboptimal, but the latency of _computeChanged is probably high enough that in practice
+      // all invalidations will have been picked up already.
       return initialChangeResult;
     }
 
@@ -137,15 +194,20 @@ export class ProjectWatcher {
 
         const debounceMs: number = this._debounceMs;
 
-        this._hasRenderedStatus = false;
+        this.clearStatus();
 
-        const resolveIfChanged = async (): Promise<void> => {
+        const resolveIfChanged: () => Promise<void> = (this._resolveIfChanged = async (): Promise<void> => {
           timeout = undefined;
           if (terminated) {
             return;
           }
 
           try {
+            if (this.isPaused) {
+              this._setStatus(`Project watcher paused.`);
+              return;
+            }
+
             this._setStatus(`Evaluating changes to tracked files...`);
             const result: IProjectChangeResult = await this._computeChanged();
             this._setStatus(`Finished analyzing.`);
@@ -158,7 +220,28 @@ export class ProjectWatcher {
                 return;
               }
 
+              // Since there are multiple async ticks since the projects were enumerated in _computeChanged,
+              // more could have been added in the interaval. Check and debounce.
+              for (const project of this._forceChangedProjects.keys()) {
+                if (!result.changedProjects.has(project)) {
+                  this._setStatus(`More invalidations occurred, aborting.`);
+                  timeout = setTimeout(resolveIfChanged, debounceMs);
+                  return;
+                }
+              }
+
               this._commitChanges(result.state);
+
+              const hasForcedChanges: boolean = this._forceChangedProjects.size > 0;
+              if (hasForcedChanges) {
+                this._setStatus(
+                  `Projects were invalidated: ${Array.from(new Set(this._forceChangedProjects.values())).join(
+                    ', '
+                  )}`
+                );
+                this.clearStatus();
+              }
+              this._forceChangedProjects.clear();
 
               if (result.changedProjects.size) {
                 terminated = true;
@@ -174,7 +257,7 @@ export class ProjectWatcher {
             terminal.writeLine();
             reject(err as NodeJS.ErrnoException);
           }
-        };
+        });
 
         for (const [pathToWatch, { recurse }] of pathsToWatch) {
           addWatcher(pathToWatch, recurse);
@@ -183,6 +266,8 @@ export class ProjectWatcher {
         if (onWatchingFiles) {
           onWatchingFiles();
         }
+
+        this._setStatus(`Waiting for changes...`);
 
         function onError(err: Error): void {
           if (terminated) {
@@ -198,7 +283,7 @@ export class ProjectWatcher {
           if (watchers.has(watchedPath)) {
             return;
           }
-          const listener: (event: string, fileName: string) => void = changeListener(watchedPath, recursive);
+          const listener: fs.WatchListener<string> = changeListener(watchedPath, recursive);
           const watcher: fs.FSWatcher = fs.watch(
             watchedPath,
             {
@@ -214,7 +299,12 @@ export class ProjectWatcher {
           });
         }
 
-        function innerListener(root: string, recursive: boolean, event: string, fileName: string): void {
+        function innerListener(
+          root: string,
+          recursive: boolean,
+          event: string,
+          fileName: string | null
+        ): void {
           try {
             if (terminated) {
               return;
@@ -226,7 +316,7 @@ export class ProjectWatcher {
 
             // Handling for added directories
             if (recursive && !useNativeRecursiveWatch) {
-              const decodedName: string = fileName && fileName.toString();
+              const decodedName: string = fileName ? fileName.toString() : '';
               const normalizedName: string = decodedName && Path.convertToSlashes(decodedName);
               const fullName: string = normalizedName && `${root}/${normalizedName}`;
 
@@ -259,11 +349,13 @@ export class ProjectWatcher {
           }
         }
 
-        function changeListener(root: string, recursive: boolean): (event: string, fileName: string) => void {
+        function changeListener(root: string, recursive: boolean): fs.WatchListener<string> {
           return innerListener.bind(0, root, recursive);
         }
       }
-    );
+    ).finally(() => {
+      this._resolveIfChanged = undefined;
+    });
 
     const closePromises: Promise<void>[] = [];
     for (const [watchedPath, watcher] of watchers) {
@@ -281,13 +373,19 @@ export class ProjectWatcher {
   }
 
   private _setStatus(status: string): void {
-    if (this._hasRenderedStatus) {
-      readline.clearLine(process.stdout, 0);
+    const statusLines: string[] = [
+      `[${this.isPaused ? 'PAUSED' : 'WATCHING'}] Watch Status: ${status}`,
+      ...(this._getPromptLines?.(this.isPaused) ?? [])
+    ];
+
+    if (this._renderedStatusLines > 0) {
       readline.cursorTo(process.stdout, 0);
-    } else {
-      this._hasRenderedStatus = true;
+      readline.moveCursor(process.stdout, 0, -this._renderedStatusLines);
+      readline.clearScreenDown(process.stdout);
     }
-    this._terminal.write(Colors.bold(Colors.cyan(`Watch Status: ${status}`)));
+    this._renderedStatusLines = statusLines.length;
+
+    this._terminal.writeLine(Colorize.bold(Colorize.cyan(statusLines.join('\n'))));
   }
 
   /**
@@ -316,6 +414,10 @@ export class ProjectWatcher {
         // May need to detect if the nature of the change will break the process, e.g. changes to package.json
         changedProjects.add(project);
       }
+    }
+
+    for (const project of this._forceChangedProjects.keys()) {
+      changedProjects.add(project);
     }
 
     return {

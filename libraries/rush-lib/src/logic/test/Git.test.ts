@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-import { RushConfiguration } from '../../api/RushConfiguration';
+import type { RushConfiguration } from '../../api/RushConfiguration';
 import { Git } from '../Git';
-import { IGitStatusEntry } from '../GitStatusParser';
+import type { IGitStatusEntry } from '../GitStatusParser';
 
 describe(Git.name, () => {
   describe(Git.normalizeGitUrlForComparison.name, () => {
@@ -187,6 +187,35 @@ describe(Git.name, () => {
       expect(() =>
         getGitStatusEntriesForCommandOutput(['1 A. N... 000000 100644 100644 000000000000000000'])
       ).toThrowErrorMatchingInlineSnapshot(`"Unexpected end of git status output after position 31"`);
+    });
+  });
+
+  describe(Git.prototype.isRefACommit.name, () => {
+    const commit = `d9bc1881959b9e44d846655521cd055fcf713f4d`;
+    function getMockedGitIsRefACommit(ref: string): boolean {
+      const gitInstance: Git = new Git({ rushJsonFolder: '/repo/root' } as RushConfiguration);
+      jest.spyOn(gitInstance, 'getGitPathOrThrow').mockReturnValue('/git/bin/path');
+      jest
+        .spyOn(gitInstance, '_executeGitCommandAndCaptureOutput')
+        .mockImplementation((gitPath: string, args: string[]) => {
+          expect(gitPath).toEqual('/git/bin/path');
+          expect(args).toEqual(['rev-parse', '--verify', ref]);
+          return commit;
+        });
+      return gitInstance.isRefACommit(ref);
+    }
+
+    it('Returns true for commit ref', () => {
+      expect(getMockedGitIsRefACommit(commit)).toBe(true);
+    });
+    it('Returns false for branch ref', () => {
+      expect(getMockedGitIsRefACommit('kenrick/skip-merge-base')).toBe(false);
+    });
+    it('Returns false for ref that is a tag', () => {
+      expect(getMockedGitIsRefACommit('testing-tag-v1.2.3')).toBe(false);
+    });
+    it('Returns false for ref that is other string', () => {
+      expect(getMockedGitIsRefACommit('HEAD')).toBe(false);
     });
   });
 });

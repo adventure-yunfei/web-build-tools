@@ -10,6 +10,9 @@ export { ApprovedPackagesPolicy } from './api/ApprovedPackagesPolicy';
 
 export { RushConfiguration, ITryFindRushJsonLocationOptions } from './api/RushConfiguration';
 
+export { Subspace } from './api/Subspace';
+export { SubspacesConfiguration } from './api/SubspacesConfiguration';
+
 export {
   IPackageManagerOptionsJsonBase,
   IConfigurationEnvironment,
@@ -27,8 +30,13 @@ export {
 export {
   IPnpmOptionsJson as _IPnpmOptionsJson,
   PnpmStoreLocation,
+  IPnpmLockfilePolicies,
+  IPnpmPackageExtension,
+  IPnpmPeerDependencyRules,
+  IPnpmPeerDependenciesMeta,
   PnpmStoreOptions,
-  PnpmOptionsConfiguration
+  PnpmOptionsConfiguration,
+  PnpmResolutionMode
 } from './logic/pnpm/PnpmOptionsConfiguration';
 
 export { BuildCacheConfiguration } from './api/BuildCacheConfiguration';
@@ -70,7 +78,12 @@ export { ApprovedPackagesItem, ApprovedPackagesConfiguration } from './api/Appro
 
 export { CommonVersionsConfiguration } from './api/CommonVersionsConfiguration';
 
-export { PackageJsonEditor, PackageJsonDependency, DependencyType } from './api/PackageJsonEditor';
+export {
+  PackageJsonEditor,
+  PackageJsonDependency,
+  DependencyType,
+  PackageJsonDependencyMeta
+} from './api/PackageJsonEditor';
 
 export { RepoStateFile } from './logic/RepoStateFile';
 
@@ -102,7 +115,10 @@ export {
   CustomTipsConfiguration,
   CustomTipId,
   ICustomTipsJson,
-  ICustomTipItemJson
+  ICustomTipInfo,
+  ICustomTipItemJson,
+  CustomTipSeverity,
+  CustomTipType
 } from './api/CustomTipsConfiguration';
 
 export {
@@ -130,7 +146,11 @@ export {
   RushLifecycleHooks
 } from './pluginFramework/RushLifeCycle';
 
-export { ICreateOperationsContext, PhasedCommandHooks } from './pluginFramework/PhasedCommandHooks';
+export {
+  ICreateOperationsContext,
+  IExecuteOperationsContext,
+  PhasedCommandHooks
+} from './pluginFramework/PhasedCommandHooks';
 
 export { IRushPlugin } from './pluginFramework/IRushPlugin';
 export { IBuiltInPluginConfiguration as _IBuiltInPluginConfiguration } from './pluginFramework/PluginLoader/BuiltInPluginLoader';
@@ -159,3 +179,10 @@ export {
   IOperationMetadataManagerOptions as _IOperationMetadataManagerOptions,
   IOperationMetaData as _IOperationMetadata
 } from './logic/operations/OperationMetadataManager';
+
+export {
+  RushCommandLine,
+  type IRushCommandLineSpec,
+  type IRushCommandLineParameter,
+  type IRushCommandLineAction
+} from './api/RushCommandLine';

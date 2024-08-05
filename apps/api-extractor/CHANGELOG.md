@@ -1,5 +1,22 @@
 # Change Log - api-extractor custom version
 
+## 7.43.1-rc.2
+- dts rollup: 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法
+
+## 7.43.1-rc.1
+- api report: 导出 `env.API_REPORT_TRIMMING` 环境变量配置
+
+## 7.43.1-rc.0
+- 合并 7.43.1
+
+## 7.36.4-rc.8
+- 优化 `nameForEmit` 在冲突时的命名策略，同样应用到首个声明
+- 优化&裁剪 api-review 导出，仅导出有效引用的、非 `@internal` 标记的类型，并支持裁剪部分导出类型
+
+## ~~7.36.4-rc.7~~
+
+## ~~7.36.4-rc.6~~
+
 ## 7.36.4-rc.5
 - 新增 api-review string union type 结果排序
 
@@ -48,7 +65,196 @@
 
 # Change Log - @microsoft/api-extractor
 
-This log was last generated on Tue, 08 Aug 2023 07:10:39 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+
+## 7.43.1
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 7.43.0
+Tue, 19 Mar 2024 15:10:18 GMT
+
+### Minor changes
+
+- Upgrade the bundled compiler engine to TypeScript 5.4.2
+
+## 7.42.3
+Sun, 03 Mar 2024 20:58:12 GMT
+
+_Version update only_
+
+## 7.42.2
+Sat, 02 Mar 2024 02:22:23 GMT
+
+_Version update only_
+
+## 7.42.1
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 7.42.0
+Thu, 29 Feb 2024 07:11:45 GMT
+
+### Minor changes
+
+- Add glob support in `bundledPackages`
+
+### Patches
+
+- Don't mark items documented with {@inheritDoc} references to package-external items as "undocumented"
+
+## 7.41.1
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 7.41.0
+Sat, 24 Feb 2024 23:02:51 GMT
+
+### Minor changes
+
+- Replace const enums with conventional enums to allow for compatibility with JavaScript consumers.
+
+## 7.40.6
+Wed, 21 Feb 2024 21:45:28 GMT
+
+### Patches
+
+- Replace the dependency on the `colors` package with `Colorize` from `@rushstack/terminal`.
+
+## 7.40.5
+Wed, 21 Feb 2024 08:55:47 GMT
+
+### Patches
+
+- Fix an issue where imports were trimmed from external packages based when generating .d.ts rollups
+
+## 7.40.4
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 7.40.3
+Mon, 19 Feb 2024 21:54:27 GMT
+
+_Version update only_
+
+## 7.40.2
+Sat, 17 Feb 2024 06:24:34 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 7.40.1
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 7.40.0
+Wed, 07 Feb 2024 01:11:18 GMT
+
+### Minor changes
+
+- Classify arrow functions as `function` kind in the doc model export.
+
+## 7.39.5
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 7.39.4
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 7.39.3
+Tue, 23 Jan 2024 20:12:57 GMT
+
+_Version update only_
+
+## 7.39.2
+Tue, 23 Jan 2024 16:15:05 GMT
+
+_Version update only_
+
+## 7.39.1
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 7.39.0
+Wed, 20 Dec 2023 01:09:45 GMT
+
+### Minor changes
+
+- Update API Extractor to support TypeScript 5.3.3
+
+## 7.38.5
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 7.38.4
+Tue, 05 Dec 2023 01:10:16 GMT
+
+### Patches
+
+- Don't export trimmed namespace members during rollup (#2791)
+
+## 7.38.3
+Fri, 10 Nov 2023 18:02:04 GMT
+
+### Patches
+
+- Fix an issue where "ae-undocumented" was incorrectly reported for private members
+
+## 7.38.2
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 7.38.1
+Mon, 30 Oct 2023 23:36:38 GMT
+
+_Version update only_
+
+## 7.38.0
+Sun, 01 Oct 2023 02:56:29 GMT
+
+### Minor changes
+
+- Add a new message "ae-undocumented" to support logging of undocumented API items
+
+## 7.37.3
+Sat, 30 Sep 2023 00:20:51 GMT
+
+### Patches
+
+- Don't strip out @alpha items when generating API reports.
+
+## 7.37.2
+Thu, 28 Sep 2023 20:53:16 GMT
+
+_Version update only_
+
+## 7.37.1
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 7.37.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 7.36.4
 Tue, 08 Aug 2023 07:10:39 GMT

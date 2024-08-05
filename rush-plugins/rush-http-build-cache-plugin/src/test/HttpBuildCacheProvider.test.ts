@@ -6,12 +6,12 @@ jest.mock('node-fetch', function () {
 });
 
 import fetch, { Response } from 'node-fetch';
-import { RushSession, EnvironmentConfiguration } from '@rushstack/rush-sdk';
-import { StringBufferTerminalProvider, Terminal } from '@rushstack/node-core-library';
+import { type RushSession, EnvironmentConfiguration } from '@rushstack/rush-sdk';
+import { StringBufferTerminalProvider, Terminal } from '@rushstack/terminal';
 
-import { HttpBuildCacheProvider } from '../HttpBuildCacheProvider';
+import { HttpBuildCacheProvider, type IHttpBuildCacheProviderOptions } from '../HttpBuildCacheProvider';
 
-const EXAMPLE_OPTIONS = {
+const EXAMPLE_OPTIONS: IHttpBuildCacheProviderOptions = {
   url: 'https://buildcache.example.acme.com',
   tokenHandler: {
     exec: 'node',
@@ -20,7 +20,7 @@ const EXAMPLE_OPTIONS = {
   uploadMethod: 'POST',
   isCacheWriteAllowed: false,
   pluginName: 'example-plugin',
-  rushProjectRoot: '/repo',
+  rushJsonFolder: '/repo',
   minHttpRetryDelayMs: 1
 };
 

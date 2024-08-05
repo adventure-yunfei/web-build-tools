@@ -1,6 +1,233 @@
 # Change Log - @rushstack/module-minifier
 
-This log was last generated on Tue, 08 Aug 2023 07:10:40 GMT and should not be manually modified.
+This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+
+## 0.5.1
+Wed, 10 Apr 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.5.0
+Thu, 28 Mar 2024 22:42:23 GMT
+
+### Minor changes
+
+- Gracefully exit minifier worker instead of using `process.exit(0)`.
+
+## 0.4.40
+Tue, 19 Mar 2024 15:10:18 GMT
+
+_Version update only_
+
+## 0.4.39
+Sat, 16 Mar 2024 00:11:37 GMT
+
+### Patches
+
+- Fix an issue where the assets listed in sourcemaps were incomplete or missing.
+
+## 0.4.38
+Fri, 15 Mar 2024 00:12:40 GMT
+
+_Version update only_
+
+## 0.4.37
+Tue, 05 Mar 2024 01:19:24 GMT
+
+_Version update only_
+
+## 0.4.36
+Sun, 03 Mar 2024 20:58:13 GMT
+
+_Version update only_
+
+## 0.4.35
+Sat, 02 Mar 2024 02:22:24 GMT
+
+_Version update only_
+
+## 0.4.34
+Fri, 01 Mar 2024 01:10:08 GMT
+
+_Version update only_
+
+## 0.4.33
+Thu, 29 Feb 2024 07:11:46 GMT
+
+_Version update only_
+
+## 0.4.32
+Wed, 28 Feb 2024 16:09:27 GMT
+
+_Version update only_
+
+## 0.4.31
+Sat, 24 Feb 2024 23:02:51 GMT
+
+_Version update only_
+
+## 0.4.30
+Thu, 22 Feb 2024 01:36:09 GMT
+
+_Version update only_
+
+## 0.4.29
+Wed, 21 Feb 2024 21:45:28 GMT
+
+_Version update only_
+
+## 0.4.28
+Wed, 21 Feb 2024 08:55:47 GMT
+
+_Version update only_
+
+## 0.4.27
+Tue, 20 Feb 2024 21:45:10 GMT
+
+_Version update only_
+
+## 0.4.26
+Tue, 20 Feb 2024 16:10:53 GMT
+
+_Version update only_
+
+## 0.4.25
+Mon, 19 Feb 2024 21:54:27 GMT
+
+_Version update only_
+
+## 0.4.24
+Sat, 17 Feb 2024 06:24:34 GMT
+
+### Patches
+
+- Fix broken link to API documentation
+
+## 0.4.23
+Thu, 08 Feb 2024 01:09:21 GMT
+
+_Version update only_
+
+## 0.4.22
+Wed, 07 Feb 2024 01:11:18 GMT
+
+_Version update only_
+
+## 0.4.21
+Mon, 05 Feb 2024 23:46:52 GMT
+
+_Version update only_
+
+## 0.4.20
+Thu, 25 Jan 2024 01:09:30 GMT
+
+_Version update only_
+
+## 0.4.19
+Tue, 23 Jan 2024 20:12:58 GMT
+
+_Version update only_
+
+## 0.4.18
+Tue, 23 Jan 2024 16:15:06 GMT
+
+_Version update only_
+
+## 0.4.17
+Tue, 16 Jan 2024 18:30:11 GMT
+
+_Version update only_
+
+## 0.4.16
+Wed, 03 Jan 2024 00:31:18 GMT
+
+_Version update only_
+
+## 0.4.15
+Wed, 20 Dec 2023 01:09:46 GMT
+
+_Version update only_
+
+## 0.4.14
+Thu, 07 Dec 2023 03:44:13 GMT
+
+_Version update only_
+
+## 0.4.13
+Tue, 05 Dec 2023 01:10:16 GMT
+
+_Version update only_
+
+## 0.4.12
+Fri, 10 Nov 2023 18:02:04 GMT
+
+_Version update only_
+
+## 0.4.11
+Wed, 01 Nov 2023 23:11:35 GMT
+
+### Patches
+
+- Fix line endings in published package.
+
+## 0.4.10
+Mon, 30 Oct 2023 23:36:38 GMT
+
+_Version update only_
+
+## 0.4.9
+Sun, 01 Oct 2023 02:56:30 GMT
+
+_Version update only_
+
+## 0.4.8
+Sat, 30 Sep 2023 00:20:51 GMT
+
+_Version update only_
+
+## 0.4.7
+Thu, 28 Sep 2023 20:53:17 GMT
+
+_Version update only_
+
+## 0.4.6
+Wed, 27 Sep 2023 00:21:38 GMT
+
+_Version update only_
+
+## 0.4.5
+Tue, 26 Sep 2023 21:02:30 GMT
+
+_Version update only_
+
+## 0.4.4
+Tue, 26 Sep 2023 09:30:33 GMT
+
+### Patches
+
+- Update type-only imports to include the type modifier.
+
+## 0.4.3
+Mon, 25 Sep 2023 23:38:28 GMT
+
+_Version update only_
+
+## 0.4.2
+Fri, 22 Sep 2023 00:05:50 GMT
+
+_Version update only_
+
+## 0.4.1
+Tue, 19 Sep 2023 15:21:52 GMT
+
+_Version update only_
+
+## 0.4.0
+Fri, 15 Sep 2023 00:36:58 GMT
+
+### Minor changes
+
+- Update @types/node from 14 to 18
 
 ## 0.3.38
 Tue, 08 Aug 2023 07:10:40 GMT
