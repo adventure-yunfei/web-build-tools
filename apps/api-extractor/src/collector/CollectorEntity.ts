@@ -191,6 +191,16 @@ export class CollectorEntity {
     return undefined;
   }
 
+  public getExportingParents(): ReadonlyArray<CollectorEntity> {
+    const parents: CollectorEntity[] = [];
+    for (const [parent, localExportNames] of this._localExportNamesByParent) {
+      if (localExportNames.size > 0) {
+        parents.push(parent);
+      }
+    }
+    return parents;
+  }
+
   /**
    * Adds a new export name to the entity.
    */

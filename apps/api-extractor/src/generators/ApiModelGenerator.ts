@@ -48,11 +48,15 @@ import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { AstEntity } from '../analyzer/AstEntity';
 import type { AstModule } from '../analyzer/AstModule';
 import { TypeScriptInternals } from '../analyzer/TypeScriptInternals';
+import type { CollectorEntity } from '../collector/CollectorEntity';
+import { collectAllReferencedEntities } from './utils';
 
 interface IProcessAstEntityContext {
   name: string;
   isExported: boolean;
   parentApiItem: ApiItemContainerMixin;
+  referencedEntities: ReadonlySet<CollectorEntity>;
+  ancestorsOfReferencesEntities: ReadonlySet<CollectorEntity>;
 }
 
 export class ApiModelGenerator {
@@ -60,10 +64,16 @@ export class ApiModelGenerator {
   private readonly _apiModel: ApiModel;
   private readonly _referenceGenerator: DeclarationReferenceGenerator;
   private readonly _apiModelTrimming: ReleaseTag;
+  private readonly _rootExportTrimmings: ReadonlySet<string>;
 
-  public constructor(collector: Collector, apiModelTrimming: ReleaseTag) {
+  public constructor(
+    collector: Collector,
+    apiModelTrimming: ReleaseTag,
+    rootExportTrimmings: ReadonlySet<string>
+  ) {
     this._collector = collector;
     this._apiModelTrimming = apiModelTrimming;
+    this._rootExportTrimmings = rootExportTrimmings;
 
     this._apiModel = new ApiModel();
     this._referenceGenerator = new DeclarationReferenceGenerator(collector);
@@ -87,24 +97,48 @@ export class ApiModelGenerator {
     const apiEntryPoint: ApiEntryPoint = new ApiEntryPoint({ name: '' });
     apiPackage.addMember(apiEntryPoint);
 
+    const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
+      this._collector,
+      this._apiModelTrimming,
+      this._rootExportTrimmings
+    );
+    const ancestorsOfReferencesEntities: ReadonlySet<CollectorEntity> =
+      ApiModelGenerator._collectAncestors(referencedEntities);
     for (const entity of this._collector.entities) {
       // Only process entities that are exported from the entry point. Entities that are exported from
       // `AstNamespaceImport` entities will be processed by `_processAstNamespaceImport`. However, if
       // we are including forgotten exports, then process everything (except `AstNamespaceImport` members).
       if (
-        entity.exportedFromEntryPoint ||
-        (this._collector.extractorConfig.docModelIncludeForgottenExports && !entity.exported)
+        (referencedEntities.has(entity) || ancestorsOfReferencesEntities.has(entity)) &&
+        (entity.exportedFromEntryPoint ||
+          (this._collector.extractorConfig.docModelIncludeForgottenExports && !entity.exported))
       ) {
-        const exportedName: string | undefined = Array.from(entity.exportNames)[0] || entity.nameForEmit;
+        const firstExportedName: string | undefined = Array.from(entity.exportNames).find(
+          (n) => !this._rootExportTrimmings.has(n)
+        );
         this._processAstEntity(entity.astEntity, {
-          name: exportedName!,
-          isExported: entity.exportedFromEntryPoint,
-          parentApiItem: apiEntryPoint
+          name: firstExportedName || entity.nameForEmit!,
+          isExported: entity.exportedFromEntryPoint && firstExportedName !== undefined,
+          parentApiItem: apiEntryPoint,
+          referencedEntities,
+          ancestorsOfReferencesEntities
         });
       }
     }
 
     return apiPackage;
+  }
+
+  private static _collectAncestors(entities: ReadonlySet<CollectorEntity>): ReadonlySet<CollectorEntity> {
+    const ancestors: Set<CollectorEntity> = new Set();
+    for (const entity of entities) {
+      let parent: CollectorEntity | undefined = entity.getFirstExportingConsumableParent()?.entity;
+      while (parent) {
+        ancestors.add(parent);
+        parent = parent.getFirstExportingConsumableParent()?.entity;
+      }
+    }
+    return ancestors;
   }
 
   private _processAstEntity(astEntity: AstEntity, context: IProcessAstEntityContext): void {
@@ -145,7 +179,7 @@ export class ApiModelGenerator {
     context: IProcessAstEntityContext
   ): void {
     const astModule: AstModule = astNamespaceImport.astModule;
-    const { name, isExported, parentApiItem } = context;
+    const { name, isExported, parentApiItem, referencedEntities, ancestorsOfReferencesEntities } = context;
     const containerKey: string = ApiNamespace.getContainerKey(name);
     const fileUrlPath: string = this._getFileUrlPath(astNamespaceImport.declaration);
 
@@ -167,9 +201,20 @@ export class ApiModelGenerator {
 
     astModule.astModuleExportInfo!.exportedLocalEntities.forEach(
       (exportedEntity: AstEntity, exportedName: string) => {
+        const exportedCollectorEntity: CollectorEntity | undefined =
+          this._collector.tryGetCollectorEntity(exportedEntity);
+        if (
+          exportedCollectorEntity &&
+          !referencedEntities.has(exportedCollectorEntity) &&
+          !ancestorsOfReferencesEntities.has(exportedCollectorEntity)
+        ) {
+          // Exclude entities that are not referenced
+          return;
+        }
         this._processAstEntity(exportedEntity, {
+          ...context,
           name: exportedName,
-          isExported: true,
+          isExported: exportedCollectorEntity ? referencedEntities.has(exportedCollectorEntity) : true,
           parentApiItem: apiNamespace!
         });
       }
