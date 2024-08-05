@@ -18,9 +18,8 @@ import { IndentedWriter } from './IndentedWriter';
 import { DtsEmitHelpers } from './DtsEmitHelpers';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { AstEntity } from '../analyzer/AstEntity';
-import type { AstModuleExportInfo } from '../analyzer/AstModule';
-import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
+import { collectAllReferencedEntities } from './utils';
 
 export class ApiReportGenerator {
   private static _trimSpacesRegExp: RegExp = / +$/gm;
@@ -171,27 +170,20 @@ export class ApiReportGenerator {
     }
 
     // Emit the regular declarations
-    const referencedEntities: ReadonlySet<CollectorEntity> = ApiReportGenerator._collectReferencedEntities(
+    const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
       collector,
       apiReportTimming,
       rootExportTrimmings
     );
     for (const entity of collector.entities) {
       const astEntity: AstEntity = entity.astEntity;
-      let shouldEmitEntity: boolean = false;
-      if (entity.exportedFromEntryPoint) {
-        shouldEmitEntity = Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name));
-      } else if (!collector.extractorConfig.apiReportIncludeForgottenExports) {
-        shouldEmitEntity = false;
-      } else if (entity.exported) {
-        // If entity is exported from local namespace, it'll be emitted as part of the namespace.
-        shouldEmitEntity = false;
-      } else {
-        // Only emit entities that are referenced by other entities
-        shouldEmitEntity = referencedEntities.has(entity);
-      }
-
-      if (shouldEmitEntity) {
+      if (
+        referencedEntities.has(entity) &&
+        (entity.exportedFromEntryPoint || // Exported from top-level?
+          (collector.extractorConfig.apiReportIncludeForgottenExports &&
+            // Non-exported from referenced parent? (otherwise it will be emitted by its parent)
+            !entity.getExportingParents().some((p) => referencedEntities.has(p))))
+      ) {
         // First, collect the list of export names for this symbol.  When reporting messages with
         // ExtractorMessage.properties.exportName, this will enable us to emit the warning comments alongside
         // the associated export statement.
@@ -305,65 +297,6 @@ export class ApiReportGenerator {
 
     // Remove any trailing spaces
     return writer.toString().replace(ApiReportGenerator._trimSpacesRegExp, '');
-  }
-
-  private static _collectReferencedEntities(
-    collector: Collector,
-    apiReportTimming: ReleaseTag,
-    rootExportTrimmings: ReadonlySet<string>
-  ): ReadonlySet<CollectorEntity> {
-    const referencedAstEntities: Set<AstEntity> = new Set<AstEntity>();
-
-    const alreadySeenAstEntities: Set<AstEntity> = new Set();
-    function collectReferencesFromAstEntity(astEntity: AstEntity) {
-      if (alreadySeenAstEntities.has(astEntity)) {
-        return;
-      }
-      alreadySeenAstEntities.add(astEntity);
-
-      referencedAstEntities.add(astEntity);
-
-      if (astEntity instanceof AstSymbol) {
-        for (const astDeclaration of astEntity.astDeclarations) {
-          const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
-          const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
-          if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
-            continue; // trim out items under specified release tag
-          }
-
-          for (const referencedAstEntity of astDeclaration.referencedAstEntities) {
-            collectReferencesFromAstEntity(referencedAstEntity);
-          }
-          for (const childDeclaration of astDeclaration.children) {
-            collectReferencesFromAstEntity(childDeclaration.astSymbol);
-          }
-        }
-      } else if (astEntity instanceof AstNamespaceImport) {
-        const astModuleExport: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
-        for (const exportedLocalEntity of astModuleExport.exportedLocalEntities.values()) {
-          collectReferencesFromAstEntity(exportedLocalEntity);
-        }
-      }
-    }
-
-    for (const entity of collector.entities) {
-      if (
-        entity.exportedFromEntryPoint &&
-        Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name))
-      ) {
-        collectReferencesFromAstEntity(entity.astEntity);
-      }
-    }
-
-    const referencedCollectorEntities: Set<CollectorEntity> = new Set();
-    for (const referencedAstEntity of referencedAstEntities) {
-      const referencedCollectorEntity: CollectorEntity | undefined =
-        collector.tryGetCollectorEntity(referencedAstEntity);
-      if (referencedCollectorEntity) {
-        referencedCollectorEntities.add(referencedCollectorEntity);
-      }
-    }
-    return referencedCollectorEntities;
   }
 
   /**
