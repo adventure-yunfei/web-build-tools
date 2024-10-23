@@ -85,13 +85,14 @@ export class ApiReportGenerator {
         // the associated export statement.
         interface IExportToEmit {
           readonly exportName: string;
+          readonly isTypeOnlyExport: boolean;
           readonly associatedMessages: ExtractorMessage[];
         }
         const exportsToEmit: Map<string, IExportToEmit> = new Map<string, IExportToEmit>();
 
-        for (const exportName of entity.exportNames) {
+        for (const [exportName, { isTypeOnlyExport }] of entity.exportNames) {
           if (!entity.shouldInlineExport) {
-            exportsToEmit.set(exportName, { exportName, associatedMessages: [] });
+            exportsToEmit.set(exportName, { exportName, isTypeOnlyExport, associatedMessages: [] });
           }
         }
 
@@ -169,11 +170,11 @@ export class ApiReportGenerator {
 
           // all local exports of local imported module are just references to top-level declarations
           writer.increaseIndent();
-          writer.writeLine('export {');
-          writer.increaseIndent();
 
-          const exportClauses: string[] = [];
-          for (const [exportedName, exportedEntity] of astModuleExportInfo.exportedLocalEntities) {
+          for (const [
+            exportedName,
+            { astEntity: exportedEntity, isTypeOnlyExport }
+          ] of astModuleExportInfo.exportedLocalEntities) {
             const collectorEntity: CollectorEntity | undefined =
               collector.tryGetCollectorEntity(exportedEntity);
             if (collectorEntity === undefined) {
@@ -185,15 +186,16 @@ export class ApiReportGenerator {
             }
 
             if (collectorEntity.nameForEmit === exportedName) {
-              exportClauses.push(collectorEntity.nameForEmit);
+              writer.writeLine(`export ${isTypeOnlyExport ? 'type ' : ''}{ ${collectorEntity.nameForEmit} }`);
             } else {
-              exportClauses.push(`${collectorEntity.nameForEmit} as ${exportedName}`);
+              writer.writeLine(
+                `export ${isTypeOnlyExport ? 'type ' : ''}{ ${
+                  collectorEntity.nameForEmit
+                } as ${exportedName} }`
+              );
             }
           }
-          writer.writeLine(exportClauses.join(',\n'));
 
-          writer.decreaseIndent();
-          writer.writeLine('}'); // end of "export { ... }"
           writer.decreaseIndent();
           writer.writeLine('}'); // end of "declare namespace { ... }"
         }
@@ -211,7 +213,12 @@ export class ApiReportGenerator {
             }
           }
 
-          DtsEmitHelpers.emitNamedExport(writer, exportToEmit.exportName, entity);
+          DtsEmitHelpers.emitNamedExport(
+            writer,
+            exportToEmit.exportName,
+            exportToEmit.isTypeOnlyExport,
+            entity
+          );
         }
         writer.ensureSkippedLine();
       }

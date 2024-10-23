@@ -23,10 +23,11 @@ export class CollectorEntity {
    */
   public readonly astEntity: AstEntity;
 
-  private _exportNames: Set<string> = new Set();
+  private _exportNames: Map<string, { isTypeOnlyExport: boolean }> = new Map();
   private _exportNamesSorted: boolean = false;
   private _singleExportName: string | undefined = undefined;
-  private _localExportNamesByParent: Map<CollectorEntity, Set<string>> = new Map();
+  private _localExportNamesByParent: Map<CollectorEntity, Map<string, { isTypeOnlyExport: boolean }>> =
+    new Map();
 
   private _nameForEmit: string | undefined = undefined;
 
@@ -61,9 +62,9 @@ export class CollectorEntity {
    * export { X as Y }
    * ```
    */
-  public get exportNames(): ReadonlySet<string> {
+  public get exportNames(): ReadonlyMap<string, { isTypeOnlyExport: boolean }> {
     if (!this._exportNamesSorted) {
-      Sort.sortSet(this._exportNames);
+      Sort.sortMapKeys(this._exportNames);
       this._exportNamesSorted = true;
     }
     return this._exportNames;
@@ -86,6 +87,10 @@ export class CollectorEntity {
     if (this.astEntity instanceof AstSymbol) {
       // We don't inline a symbol with more than one exported name
       if (this._singleExportName !== undefined && this._singleExportName !== ts.InternalSymbolName.Default) {
+        // We can't inline a type-only export
+        if (this._exportNames.get(this._singleExportName)?.isTypeOnlyExport) {
+          return false;
+        }
         // We can't inline a symbol whose emitted name is different from the export name
         if (this._nameForEmit === undefined || this._nameForEmit === this._singleExportName) {
           return true;
@@ -191,10 +196,10 @@ export class CollectorEntity {
   /**
    * Adds a new export name to the entity.
    */
-  public addExportName(exportName: string): void {
+  public addExportName(exportName: string, isTypeOnlyExport: boolean): void {
     if (!this._exportNames.has(exportName)) {
       this._exportNamesSorted = false;
-      this._exportNames.add(exportName);
+      this._exportNames.set(exportName, { isTypeOnlyExport });
 
       if (this._exportNames.size === 1) {
         this._singleExportName = exportName;
@@ -221,9 +226,14 @@ export class CollectorEntity {
    *
    * `add` is the local export name for the `CollectorEntity` for `add`.
    */
-  public addLocalExportName(localExportName: string, parent: CollectorEntity): void {
-    const localExportNames: Set<string> = this._localExportNamesByParent.get(parent) || new Set();
-    localExportNames.add(localExportName);
+  public addLocalExportName(
+    localExportName: string,
+    isTypeOnlyExport: boolean,
+    parent: CollectorEntity
+  ): void {
+    const localExportNames: Map<string, { isTypeOnlyExport: boolean }> =
+      this._localExportNamesByParent.get(parent) || new Map();
+    localExportNames.set(localExportName, { isTypeOnlyExport });
 
     this._localExportNamesByParent.set(parent, localExportNames);
   }

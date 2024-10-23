@@ -73,22 +73,25 @@ export class DtsEmitHelpers {
   public static emitNamedExport(
     writer: IndentedWriter,
     exportName: string,
+    isTypeOnlyExport: boolean,
     collectorEntity: CollectorEntity
   ): void {
-    if (exportName === ts.InternalSymbolName.Default) {
+    if (exportName === ts.InternalSymbolName.Default && !isTypeOnlyExport) {
       writer.writeLine(`export default ${collectorEntity.nameForEmit};`);
     } else if (collectorEntity.nameForEmit !== exportName) {
-      writer.writeLine(`export { ${collectorEntity.nameForEmit} as ${exportName} }`);
+      writer.writeLine(
+        `export ${isTypeOnlyExport ? 'type ' : ''}{ ${collectorEntity.nameForEmit} as ${exportName} }`
+      );
     } else {
-      writer.writeLine(`export { ${exportName} }`);
+      writer.writeLine(`export ${isTypeOnlyExport ? 'type ' : ''}{ ${exportName} }`);
     }
   }
 
   public static emitStarExports(writer: IndentedWriter, collector: Collector): void {
     if (collector.starExportedExternalModulePaths.length > 0) {
       writer.writeLine();
-      for (const starExportedExternalModulePath of collector.starExportedExternalModulePaths) {
-        writer.writeLine(`export * from "${starExportedExternalModulePath}";`);
+      for (const { modulePath, isTypeOnlyExport } of collector.starExportedExternalModulePaths) {
+        writer.writeLine(`export ${isTypeOnlyExport ? 'type ' : ''}* from "${modulePath}";`);
       }
     }
   }

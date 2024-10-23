@@ -159,7 +159,7 @@ export class ApiModelGenerator {
     }
 
     astModule.astModuleExportInfo!.exportedLocalEntities.forEach(
-      (exportedEntity: AstEntity, exportedName: string) => {
+      ({ astEntity: exportedEntity }, exportedName: string) => {
         this._processAstEntity(exportedEntity, {
           name: exportedName,
           isExported: true,
