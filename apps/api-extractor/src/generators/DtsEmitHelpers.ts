@@ -21,7 +21,7 @@ export class DtsEmitHelpers {
     collectorEntity: CollectorEntity,
     astImport: AstImport
   ): void {
-    const importPrefix: string = astImport.isTypeOnlyEverywhere ? 'import type' : 'import';
+    const importPrefix: string = 'import';
 
     switch (astImport.importKind) {
       case AstImportKind.DefaultImport:
