@@ -153,6 +153,7 @@ export class ApiReportGenerator {
               writer.writeLine();
               emitForAstNamespaceImport(childEntity, childAstEntity, shouldChildInlineExport);
             } else {
+              DtsEmitHelpers.emitNamedExport(writer, exportName, childEntity);
               return;
             }
             if (!shouldChildInlineExport) {
