@@ -50,7 +50,9 @@ export class ValidationEnhancer {
         const astModuleExportInfo: AstModuleExportInfo =
           astNamespaceImport.fetchAstModuleExportInfo(collector);
 
-        for (const namespaceMemberAstEntity of astModuleExportInfo.exportedLocalEntities.values()) {
+        for (const {
+          astEntity: namespaceMemberAstEntity
+        } of astModuleExportInfo.exportedLocalEntities.values()) {
           if (namespaceMemberAstEntity instanceof AstSymbol) {
             const astSymbol: AstSymbol = namespaceMemberAstEntity;
 
@@ -113,7 +115,7 @@ export class ValidationEnhancer {
     }
 
     if (needsUnderscore) {
-      for (const exportName of collectorEntity.exportNames) {
+      for (const [exportName] of collectorEntity.exportNames) {
         if (exportName[0] !== '_') {
           collector.messageRouter.addAnalyzerIssue(
             ExtractorMessageId.InternalMissingUnderscore,

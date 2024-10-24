@@ -162,7 +162,11 @@ export class ExportAnalyzer {
                 );
 
                 if (starExportedModule !== undefined) {
-                  astModule.starExportedModules.add(starExportedModule);
+                  astModule.starExportedModules.set(starExportedModule, {
+                    isTypeOnlyExport:
+                      exportStarDeclaration.isTypeOnly &&
+                      (astModule.starExportedModules.get(starExportedModule)?.isTypeOnlyExport ?? true)
+                  });
                 }
               } else {
                 // Ignore ExportDeclaration nodes that don't match the expected pattern
@@ -245,7 +249,7 @@ export class ExportAnalyzer {
     if (entryPointAstModule.astModuleExportInfo === undefined) {
       const astModuleExportInfo: AstModuleExportInfo = new AstModuleExportInfo();
 
-      this._collectAllExportsRecursive(astModuleExportInfo, entryPointAstModule, new Set<AstModule>());
+      this._collectAllExportsRecursive(astModuleExportInfo, entryPointAstModule, false, new Set<AstModule>());
 
       entryPointAstModule.astModuleExportInfo = astModuleExportInfo;
     }
@@ -313,6 +317,7 @@ export class ExportAnalyzer {
   private _collectAllExportsRecursive(
     astModuleExportInfo: AstModuleExportInfo,
     astModule: AstModule,
+    isTypeOnlyExportedAstModule: boolean,
     visitedAstModules: Set<AstModule>
   ): void {
     if (visitedAstModules.has(astModule)) {
@@ -321,7 +326,11 @@ export class ExportAnalyzer {
     visitedAstModules.add(astModule);
 
     if (astModule.isExternal) {
-      astModuleExportInfo.starExportedExternalModules.add(astModule);
+      astModuleExportInfo.starExportedExternalModules.set(astModule, {
+        isTypeOnlyExport:
+          isTypeOnlyExportedAstModule &&
+          (astModuleExportInfo.starExportedExternalModules.get(astModule)?.isTypeOnlyExport ?? true)
+      });
     } else {
       // Fetch each of the explicit exports for this module
       if (astModule.moduleSymbol.exports) {
@@ -344,7 +353,11 @@ export class ExportAnalyzer {
                     this._astSymbolTable.analyze(astEntity);
                   }
 
-                  astModuleExportInfo.exportedLocalEntities.set(exportSymbol.name, astEntity);
+                  astModuleExportInfo.exportedLocalEntities.set(exportSymbol.name, {
+                    astEntity,
+                    isTypeOnlyExport:
+                      isTypeOnlyExportedAstModule || this._isTypeOnlyReferenceSymbol(exportSymbol)
+                  });
                 }
               }
               break;
@@ -352,10 +365,96 @@ export class ExportAnalyzer {
         });
       }
 
-      for (const starExportedModule of astModule.starExportedModules) {
-        this._collectAllExportsRecursive(astModuleExportInfo, starExportedModule, visitedAstModules);
+      for (const [starExportedModule, { isTypeOnlyExport }] of astModule.starExportedModules) {
+        this._collectAllExportsRecursive(
+          astModuleExportInfo,
+          starExportedModule,
+          isTypeOnlyExport,
+          visitedAstModules
+        );
       }
     }
+  }
+
+  /**
+   * Check whether the given symbol is a type-only reference.
+   *
+   * e.g.
+   *  ```ts
+   *  // import type directly
+   *  // target.d.ts
+   *  import type { Foo } from './foo';
+   *
+   *  // import type indirectly
+   *  // bar.d.ts
+   *  export type { Foo } from './foo';
+   *  // target.d.ts
+   *  import { Foo } from './bar';
+   *  ```
+   */
+  private _isTypeOnlyReferenceSymbol(symbol: ts.Symbol): boolean {
+    let current: ts.Symbol = symbol;
+    for (;;) {
+      let isCurrentTypeOnlyReference: boolean = false;
+      let currentImportOrExportDeclaration: ts.ImportDeclaration | ts.ExportDeclaration | undefined =
+        undefined;
+
+      const declarations: readonly ts.Declaration[] | undefined = current.getDeclarations();
+      if (declarations?.length === 1) {
+        const declaration = declarations[0];
+        if (ts.isExportSpecifier(declaration)) {
+          // export type { Foo };
+          isCurrentTypeOnlyReference = declaration.isTypeOnly || declaration.parent.parent.isTypeOnly;
+          currentImportOrExportDeclaration = declaration.parent.parent;
+        } else if (ts.isNamespaceExport(declaration)) {
+          // export type * as Foo from 'foo';
+          isCurrentTypeOnlyReference = declaration.parent.isTypeOnly;
+          currentImportOrExportDeclaration = declaration.parent;
+        } else if (ts.isImportSpecifier(declaration)) {
+          // import type { Foo } from 'foo';
+          isCurrentTypeOnlyReference = declaration.isTypeOnly || declaration.parent.parent.isTypeOnly;
+          currentImportOrExportDeclaration = declaration.parent.parent.parent;
+        } else if (ts.isImportClause(declaration)) {
+          // import type Foo from 'foo';
+          isCurrentTypeOnlyReference = declaration.isTypeOnly;
+          currentImportOrExportDeclaration = declaration.parent;
+        } else if (ts.isNamespaceImport(declaration)) {
+          // import type * as Foo from 'foo';
+          isCurrentTypeOnlyReference = declaration.parent.isTypeOnly;
+          currentImportOrExportDeclaration = declaration.parent.parent;
+        }
+      }
+
+      if (isCurrentTypeOnlyReference) {
+        return true;
+      }
+
+      if (currentImportOrExportDeclaration) {
+        const moduleSpecifier: string | undefined = TypeScriptHelpers.getModuleSpecifier(
+          currentImportOrExportDeclaration
+        );
+        if (
+          moduleSpecifier &&
+          this._isExternalModulePath(currentImportOrExportDeclaration, moduleSpecifier)
+        ) {
+          break;
+        }
+      }
+
+      if (!(current.flags & ts.SymbolFlags.Alias)) {
+        break;
+      }
+      const currentAlias: ts.Symbol = TypeScriptInternals.getImmediateAliasedSymbol(
+        current,
+        this._typeChecker
+      );
+      if (!currentAlias || currentAlias === current) {
+        break;
+      }
+      current = currentAlias;
+    }
+
+    return false;
   }
 
   /**
@@ -906,7 +1005,7 @@ export class ExportAnalyzer {
     }
 
     // Try each of the star imports
-    for (const starExportedModule of astModule.starExportedModules) {
+    for (const [starExportedModule] of astModule.starExportedModules) {
       astEntity = this._tryGetExportOfAstModule(exportName, starExportedModule, visitedAstModules);
 
       if (astEntity !== undefined) {

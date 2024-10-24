@@ -98,12 +98,13 @@ export class ApiReportGenerator {
       writer.indentScope(() => {
         collector.astSymbolTable
           .fetchAstModuleExportInfo(astEntity.astModule)
-          .exportedLocalEntities.forEach((childAstEntity, exportName) => {
+          .exportedLocalEntities.forEach(({ astEntity: childAstEntity, isTypeOnlyExport }, exportName) => {
             const childEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(childAstEntity);
             if (!childEntity) {
               throw new Error(`Cannot find CollectorEntity for AstEntity "${childAstEntity.localName}"`);
             }
-            const shouldChildInlineExport: boolean = childEntity.nameForEmit === exportName;
+            const shouldChildInlineExport: boolean =
+              !isTypeOnlyExport && childEntity.nameForEmit === exportName;
             if (childAstEntity instanceof AstSymbol) {
               writer.writeLine();
               // Copy from AstSymbol entity, but only pick emit-declarations part.
@@ -162,7 +163,7 @@ export class ApiReportGenerator {
               return;
             }
             if (!shouldChildInlineExport) {
-              DtsEmitHelpers.emitNamedExport(writer, exportName, childEntity);
+              DtsEmitHelpers.emitNamedExport(writer, exportName, isTypeOnlyExport, childEntity);
             }
           });
       });
@@ -189,13 +190,14 @@ export class ApiReportGenerator {
         // the associated export statement.
         interface IExportToEmit {
           readonly exportName: string;
+          readonly isTypeOnlyExport: boolean;
           readonly associatedMessages: ExtractorMessage[];
         }
         const exportsToEmit: Map<string, IExportToEmit> = new Map<string, IExportToEmit>();
 
-        for (const exportName of entity.exportNames) {
+        for (const [exportName, { isTypeOnlyExport }] of entity.exportNames) {
           if (!entity.shouldInlineExport) {
-            exportsToEmit.set(exportName, { exportName, associatedMessages: [] });
+            exportsToEmit.set(exportName, { exportName, isTypeOnlyExport, associatedMessages: [] });
           }
         }
 
@@ -263,7 +265,12 @@ export class ApiReportGenerator {
             }
           }
 
-          DtsEmitHelpers.emitNamedExport(writer, exportToEmit.exportName, entity);
+          DtsEmitHelpers.emitNamedExport(
+            writer,
+            exportToEmit.exportName,
+            exportToEmit.isTypeOnlyExport,
+            entity
+          );
         }
         writer.ensureSkippedLine();
       }

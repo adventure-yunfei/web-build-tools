@@ -98,7 +98,10 @@ export class Collector {
   >();
   private readonly _entitiesBySymbol: Map<ts.Symbol, CollectorEntity> = new Map<ts.Symbol, CollectorEntity>();
 
-  private readonly _starExportedExternalModulePaths: string[] = [];
+  private readonly _starExportedExternalModulePaths: Array<{
+    modulePath: string;
+    isTypeOnlyExport: boolean;
+  }> = [];
 
   private readonly _dtsTypeReferenceDirectives: Set<string> = new Set<string>();
   private readonly _dtsLibReferenceDirectives: Set<string> = new Set<string>();
@@ -238,7 +241,10 @@ export class Collector {
    * A list of module specifiers (e.g. `"@rushstack/node-core-library/lib/FileSystem"`) that should be emitted
    * as star exports (e.g. `export * from "@rushstack/node-core-library/lib/FileSystem"`).
    */
-  public get starExportedExternalModulePaths(): ReadonlyArray<string> {
+  public get starExportedExternalModulePaths(): ReadonlyArray<{
+    modulePath: string;
+    isTypeOnlyExport: boolean;
+  }> {
     return this._starExportedExternalModulePaths;
   }
 
@@ -320,8 +326,8 @@ export class Collector {
 
     // Create a CollectorEntity for each top-level export.
     const processedAstEntities: AstEntity[] = [];
-    for (const [exportName, astEntity] of astModuleExportInfo.exportedLocalEntities) {
-      this._createCollectorEntity(astEntity, exportName);
+    for (const [exportName, { astEntity, isTypeOnlyExport }] of astModuleExportInfo.exportedLocalEntities) {
+      this._createCollectorEntity(astEntity, exportName, isTypeOnlyExport);
       processedAstEntities.push(astEntity);
     }
 
@@ -337,16 +343,22 @@ export class Collector {
 
     this._makeUniqueNames();
 
-    for (const starExportedExternalModule of astModuleExportInfo.starExportedExternalModules) {
+    for (const [
+      starExportedExternalModule,
+      { isTypeOnlyExport }
+    ] of astModuleExportInfo.starExportedExternalModules) {
       if (starExportedExternalModule.externalModulePath !== undefined) {
-        this._starExportedExternalModulePaths.push(starExportedExternalModule.externalModulePath);
+        this._starExportedExternalModulePaths.push({
+          modulePath: starExportedExternalModule.externalModulePath,
+          isTypeOnlyExport
+        });
       }
     }
 
     Sort.sortBy(this._entities, (x) => x.getSortKey());
     Sort.sortSet(this._dtsTypeReferenceDirectives);
     Sort.sortSet(this._dtsLibReferenceDirectives);
-    this._starExportedExternalModulePaths.sort();
+    Sort.sortBy(this._starExportedExternalModulePaths, (x) => x.modulePath);
   }
 
   /**
@@ -489,6 +501,7 @@ export class Collector {
   private _createCollectorEntity(
     astEntity: AstEntity,
     exportName?: string,
+    isTypeOnlyExport?: boolean,
     parent?: CollectorEntity
   ): CollectorEntity {
     let entity: CollectorEntity | undefined = this._entitiesByAstEntity.get(astEntity);
@@ -508,9 +521,9 @@ export class Collector {
 
     if (exportName) {
       if (parent) {
-        entity.addLocalExportName(exportName, parent);
+        entity.addLocalExportName(exportName, !!isTypeOnlyExport, parent);
       } else {
-        entity.addExportName(exportName);
+        entity.addExportName(exportName, !!isTypeOnlyExport);
       }
     }
 
@@ -556,9 +569,12 @@ export class Collector {
         );
       }
 
-      for (const [localExportName, localAstEntity] of astModuleExportInfo.exportedLocalEntities) {
+      for (const [
+        localExportName,
+        { astEntity: localAstEntity, isTypeOnlyExport }
+      ] of astModuleExportInfo.exportedLocalEntities) {
         // Create a CollectorEntity for each local export within an AstNamespaceImport entity.
-        this._createCollectorEntity(localAstEntity, localExportName, parentEntity);
+        this._createCollectorEntity(localAstEntity, localExportName, isTypeOnlyExport, parentEntity);
         this._recursivelyCreateEntities(localAstEntity, alreadySeenAstEntities);
       }
     }
@@ -613,7 +629,7 @@ export class Collector {
     };
     const alreadySeenEntitiesForNamespaceUniqueName: Set<AstEntity> = new Set();
     for (const entity of this._entities) {
-      for (const exportName of entity.exportNames) {
+      for (const [exportName] of entity.exportNames) {
         if (usedNames.has(exportName)) {
           // This should be impossible
           throw new InternalError(`A package cannot have two exports with the name "${exportName}"`);

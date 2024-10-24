@@ -297,7 +297,7 @@ export class DeclarationReferenceGenerator {
       if (entity.exportedFromEntryPoint) {
         return {
           parentReference: new DeclarationReference(this._sourceFileToModuleSource(sourceFile)),
-          exportNameInParent: first(Array.from(entity.exportNames))
+          exportNameInParent: first(Array.from(entity.exportNames.keys()))
         };
       }
 

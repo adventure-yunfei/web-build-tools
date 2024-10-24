@@ -189,11 +189,11 @@ export class DtsRollupGenerator {
 
         // all local exports of local imported module are just references to top-level declarations
         writer.increaseIndent();
-        writer.writeLine('export {');
-        writer.increaseIndent();
 
-        const exportClauses: string[] = [];
-        for (const [exportedName, exportedEntity] of astModuleExportInfo.exportedLocalEntities) {
+        for (const [
+          exportedName,
+          { astEntity: exportedEntity, isTypeOnlyExport }
+        ] of astModuleExportInfo.exportedLocalEntities) {
           const collectorEntity: CollectorEntity | undefined =
             collector.tryGetCollectorEntity(exportedEntity);
           if (collectorEntity === undefined) {
@@ -216,22 +216,21 @@ export class DtsRollupGenerator {
           }
 
           if (collectorEntity.nameForEmit === exportedName) {
-            exportClauses.push(collectorEntity.nameForEmit);
+            writer.writeLine(`export ${isTypeOnlyExport ? 'type ' : ''}{ ${collectorEntity.nameForEmit} }`);
           } else {
-            exportClauses.push(`${collectorEntity.nameForEmit} as ${exportedName}`);
+            writer.writeLine(
+              `export ${isTypeOnlyExport ? 'type ' : ''}{ ${collectorEntity.nameForEmit} as ${exportedName} }`
+            );
           }
         }
-        writer.writeLine(exportClauses.join(',\n'));
 
-        writer.decreaseIndent();
-        writer.writeLine('}'); // end of "export { ... }"
         writer.decreaseIndent();
         writer.writeLine('}'); // end of "declare namespace { ... }"
       }
 
       if (!entity.shouldInlineExport) {
-        for (const exportName of entity.exportNames) {
-          DtsEmitHelpers.emitNamedExport(writer, exportName, entity);
+        for (const [exportName, { isTypeOnlyExport }] of entity.exportNames) {
+          DtsEmitHelpers.emitNamedExport(writer, exportName, isTypeOnlyExport, entity);
         }
       }
 
