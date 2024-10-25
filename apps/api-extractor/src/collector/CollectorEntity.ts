@@ -199,7 +199,9 @@ export class CollectorEntity {
   public addExportName(exportName: string, isTypeOnlyExport: boolean): void {
     if (!this._exportNames.has(exportName)) {
       this._exportNamesSorted = false;
-      this._exportNames.set(exportName, { isTypeOnlyExport });
+      this._exportNames.set(exportName, {
+        isTypeOnlyExport: isTypeOnlyExport && (this._exportNames.get(exportName)?.isTypeOnlyExport ?? true)
+      });
 
       if (this._exportNames.size === 1) {
         this._singleExportName = exportName;
@@ -233,7 +235,9 @@ export class CollectorEntity {
   ): void {
     const localExportNames: Map<string, { isTypeOnlyExport: boolean }> =
       this._localExportNamesByParent.get(parent) || new Map();
-    localExportNames.set(localExportName, { isTypeOnlyExport });
+    localExportNames.set(localExportName, {
+      isTypeOnlyExport: isTypeOnlyExport && (localExportNames.get(localExportName)?.isTypeOnlyExport ?? true)
+    });
 
     this._localExportNamesByParent.set(parent, localExportNames);
   }
