@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.43.1-rc.4
+- 支持 type export
+- api report: 修正 AstNamespaceImport 中遗漏外部导入接口的问题
+
 ## 7.43.1-rc.3
 - api report: 修正 rootExportTrimmings 设置下可能造成某些引用类型丢失的问题
 - api model: 新增 rootExportTrimmings; 新增引用解析逻辑，仅导出有效类型

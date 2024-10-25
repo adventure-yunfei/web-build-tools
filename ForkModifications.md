@@ -5,6 +5,44 @@
 #### Features
 - 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）(3d696a3305c050a21c092de5378430e2851d61a0)
 - ~~新增完整的引用类型链接支持, 包括未导出的类型 (59e634c68baa4cac277bec171f4c6f404c9d384b)~~ api-extractor 本身已支持, 已回滚 (62809e68ec1198506ca8a0604fd9eeace10110da)
+- 支持 type export (42cec4675dc0a8cab84f1436c87e54b2715580b3)
+  <details>
+
+  输入类型：
+  ```ts
+  // foo.d.ts
+  export declare class Foo { }
+  // index.d.ts
+  import type { ExternalClass } from 'external-module';
+  import type * as FooModule from './foo';
+
+  export { ExternalClass };
+  export type { ExternalClass as ExternalClass2 } from 'external-module';
+
+  export { FooModule as FooModule };
+  export type * from './foo';
+  ```
+
+  输出类型（优化前没有 export type 输出）：
+  ```ts
+  import { ExternalClass } from 'external-module';
+
+  export type { ExternalClass }
+  export type { ExternalClass as ExternalClass2 }
+
+  declare class Foo {
+  }
+  export type { Foo }
+
+  declare namespace FooModule {
+    export { Foo }
+  }
+  export type { FooModule }
+
+  export { }
+  ```
+
+  </details
 - 优化 `nameForEmit` 在冲突时的命名策略，添加文件路径以区分声明来源 (1b8a738a6880d31ac80a6c719254deccbbfed9f1, bfbfe5610f65ff908ec0ec843335bab9bdb5c9f4, d38122b09c990aac3946fee936b184f2757aa38f)
   <details>
 
