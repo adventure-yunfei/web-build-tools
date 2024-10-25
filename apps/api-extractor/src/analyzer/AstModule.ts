@@ -10,8 +10,9 @@ import type { AstEntity } from './AstEntity';
  * Represents information collected by {@link AstSymbolTable.fetchAstModuleExportInfo}
  */
 export class AstModuleExportInfo {
-  public readonly exportedLocalEntities: Map<string, AstEntity> = new Map<string, AstEntity>();
-  public readonly starExportedExternalModules: Set<AstModule> = new Set<AstModule>();
+  public readonly exportedLocalEntities: Map<string, { astEntity: AstEntity; isTypeOnlyExport: boolean }> =
+    new Map();
+  public readonly starExportedExternalModules: Map<AstModule, { isTypeOnlyExport: boolean }> = new Map();
 }
 
 /**
@@ -54,7 +55,7 @@ export class AstModule {
   /**
    * A list of other `AstModule` objects that appear in `export * from "___";` statements.
    */
-  public readonly starExportedModules: Set<AstModule>;
+  public readonly starExportedModules: Map<AstModule, { isTypeOnlyExport: boolean }>;
 
   /**
    * A partial map of entities exported by this module.  The key is the exported name.
@@ -72,7 +73,7 @@ export class AstModule {
 
     this.externalModulePath = options.externalModulePath;
 
-    this.starExportedModules = new Set<AstModule>();
+    this.starExportedModules = new Map<AstModule, { isTypeOnlyExport: boolean }>();
 
     this.cachedExportedEntities = new Map<string, AstSymbol>();
 
