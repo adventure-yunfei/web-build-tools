@@ -1,6 +1,6 @@
 # Change Log - api-extractor custom version
 
-## 7.43.1-rc.4
+## 7.43.1-rc.5
 - 支持 type export
 - api report: 修正 AstNamespaceImport 中遗漏外部导入接口的问题
 
