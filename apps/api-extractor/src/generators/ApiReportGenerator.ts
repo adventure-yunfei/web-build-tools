@@ -329,6 +329,12 @@ export class ApiReportGenerator {
     const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
     if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
       span.modification.skipAll();
+      if (astDeclaration.declaration.kind === ts.SyntaxKind.Constructor) {
+        if (astDeclaration.astSymbol.astDeclarations.length === 1) {
+          // If the only constructor is trimmed, then emit private constructor
+          span.modification.prefix += 'private constructor();\n';
+        }
+      }
       return;
     }
 
@@ -523,7 +529,10 @@ export class ApiReportGenerator {
   private static _shouldIncludeInReport(astDeclaration: AstDeclaration): boolean {
     // Private declarations are not included in the API report
     // eslint-disable-next-line no-bitwise
-    return (astDeclaration.modifierFlags & ts.ModifierFlags.Private) === 0;
+    return (
+      (astDeclaration.modifierFlags & ts.ModifierFlags.Private) === 0 ||
+      astDeclaration.declaration.kind === ts.SyntaxKind.Constructor
+    );
   }
 
   /**

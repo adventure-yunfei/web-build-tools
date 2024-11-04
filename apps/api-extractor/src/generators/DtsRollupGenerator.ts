@@ -461,6 +461,13 @@ export class DtsRollupGenerator {
                 }
               }
             }
+            if (childAstDeclaration.declaration.kind === ts.SyntaxKind.Constructor) {
+              if (childAstDeclaration.astSymbol.astDeclarations.length === 1) {
+                // If the only constructor is trimmed, then emit private constructor
+                modification.prefix += 'protected constructor($private: never);';
+              }
+            }
+
             modification.suffix = '';
 
             if (nodeToTrim.children.length > 0) {
