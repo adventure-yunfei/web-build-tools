@@ -463,8 +463,11 @@ export class DtsRollupGenerator {
             }
             if (childAstDeclaration.declaration.kind === ts.SyntaxKind.Constructor) {
               if (childAstDeclaration.astSymbol.astDeclarations.length === 1) {
-                // If the only constructor is trimmed, then emit private constructor
-                modification.prefix += 'protected constructor($private: never);';
+                // If the only constructor is trimmed, then emit private constructor.
+                //
+                // To be compatible with `InstanceType` or sub-class inheritance
+                // emit public constructor with `never` param instead of `private constructor()`.
+                modification.prefix += 'constructor($private: { PRIVATE_CONSTRUCTOR: never });';
               }
             }
 
