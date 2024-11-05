@@ -20,6 +20,7 @@ import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 import { collectAllReferencedEntities } from './utils';
+import { last } from 'lodash';
 
 export class ApiReportGenerator {
   private static _trimSpacesRegExp: RegExp = / +$/gm;
@@ -329,9 +330,9 @@ export class ApiReportGenerator {
     const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
     if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
       span.modification.skipAll();
-      if (astDeclaration.declaration.kind === ts.SyntaxKind.Constructor) {
-        if (astDeclaration.astSymbol.astDeclarations.length === 1) {
-          // If the only constructor is trimmed, then emit private constructor
+      if (this._isTrimmedConstructor(collector, astDeclaration.astSymbol, apiReportTimming)) {
+        if (astDeclaration == last(astDeclaration.astSymbol.astDeclarations)) {
+          // If all constructor declarations are trimmed, then emit private constructor.
           span.modification.prefix += 'private constructor();\n';
         }
       }
@@ -524,6 +525,27 @@ export class ApiReportGenerator {
         );
       }
     }
+  }
+
+  private static _isTrimmedConstructor(
+    collector: Collector,
+    astSymbol: AstSymbol,
+    targetReleaseTag: ReleaseTag
+  ): boolean {
+    return (
+      !!astSymbol.astDeclarations.length &&
+      astSymbol.astDeclarations.every((astDeclaration: AstDeclaration) => {
+        if (astDeclaration.declaration.kind !== ts.SyntaxKind.Constructor) {
+          return false;
+        }
+        const releaseTag: ReleaseTag = collector.fetchApiItemMetadata(astDeclaration).effectiveReleaseTag;
+        return (
+          releaseTag !== ReleaseTag.None &&
+          targetReleaseTag !== ReleaseTag.None &&
+          ReleaseTag.compare(releaseTag, targetReleaseTag) < 0
+        );
+      })
+    );
   }
 
   private static _shouldIncludeInReport(astDeclaration: AstDeclaration): boolean {
