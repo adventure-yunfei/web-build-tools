@@ -20,6 +20,7 @@ import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 import { collectAllReferencedEntities } from './utils';
+import { last } from 'lodash';
 
 export class ApiReportGenerator {
   private static _trimSpacesRegExp: RegExp = / +$/gm;
@@ -329,6 +330,12 @@ export class ApiReportGenerator {
     const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
     if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
       span.modification.skipAll();
+      if (this._isTrimmedConstructor(collector, astDeclaration.astSymbol, apiReportTimming)) {
+        if (astDeclaration == last(astDeclaration.astSymbol.astDeclarations)) {
+          // If all constructor declarations are trimmed, then emit private constructor.
+          span.modification.prefix += 'private constructor();\n';
+        }
+      }
       return;
     }
 
@@ -520,10 +527,34 @@ export class ApiReportGenerator {
     }
   }
 
+  private static _isTrimmedConstructor(
+    collector: Collector,
+    astSymbol: AstSymbol,
+    targetReleaseTag: ReleaseTag
+  ): boolean {
+    return (
+      !!astSymbol.astDeclarations.length &&
+      astSymbol.astDeclarations.every((astDeclaration: AstDeclaration) => {
+        if (astDeclaration.declaration.kind !== ts.SyntaxKind.Constructor) {
+          return false;
+        }
+        const releaseTag: ReleaseTag = collector.fetchApiItemMetadata(astDeclaration).effectiveReleaseTag;
+        return (
+          releaseTag !== ReleaseTag.None &&
+          targetReleaseTag !== ReleaseTag.None &&
+          ReleaseTag.compare(releaseTag, targetReleaseTag) < 0
+        );
+      })
+    );
+  }
+
   private static _shouldIncludeInReport(astDeclaration: AstDeclaration): boolean {
     // Private declarations are not included in the API report
     // eslint-disable-next-line no-bitwise
-    return (astDeclaration.modifierFlags & ts.ModifierFlags.Private) === 0;
+    return (
+      (astDeclaration.modifierFlags & ts.ModifierFlags.Private) === 0 ||
+      astDeclaration.declaration.kind === ts.SyntaxKind.Constructor
+    );
   }
 
   /**

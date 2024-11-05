@@ -461,6 +461,16 @@ export class DtsRollupGenerator {
                 }
               }
             }
+            if (this._isTrimmedConstructor(collector, childAstDeclaration.astSymbol, dtsKind)) {
+              if (childAstDeclaration === last(childAstDeclaration.astSymbol.astDeclarations)) {
+                // If all constructor declarations are trimmed, then emit private constructor.
+                //
+                // To be compatible with `InstanceType` or sub-class inheritance
+                // emit public constructor with `never` param instead of `private constructor()`.
+                modification.prefix += 'constructor($private: { PRIVATE_CONSTRUCTOR: never });';
+              }
+            }
+
             modification.suffix = '';
 
             if (nodeToTrim.children.length > 0) {
@@ -488,6 +498,25 @@ export class DtsRollupGenerator {
         }
       }
     }
+  }
+
+  private static _isTrimmedConstructor(
+    collector: Collector,
+    astSymbol: AstSymbol,
+    dtsKind: DtsRollupKind
+  ): boolean {
+    return (
+      !!astSymbol.astDeclarations.length &&
+      astSymbol.astDeclarations.every((astDeclaration: AstDeclaration) => {
+        if (astDeclaration.declaration.kind !== ts.SyntaxKind.Constructor) {
+          return false;
+        }
+        return !this._shouldIncludeReleaseTag(
+          collector.fetchApiItemMetadata(astDeclaration).effectiveReleaseTag,
+          dtsKind
+        );
+      })
+    );
   }
 
   private static _shouldIncludeReleaseTag(releaseTag: ReleaseTag, dtsKind: DtsRollupKind): boolean {
