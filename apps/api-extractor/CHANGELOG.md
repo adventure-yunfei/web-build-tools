@@ -1,5 +1,9 @@
 # Change Log - api-extractor custom version
 
+## 7.43.1-rc.9
+- 优化 constructor 裁剪逻辑，输出 private constructor
+- api report: 保留 private constructor 输出
+
 ## 7.43.1-rc.5
 - 支持 type export
 - api report: 修正 AstNamespaceImport 中遗漏外部导入接口的问题

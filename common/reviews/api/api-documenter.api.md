@@ -35,6 +35,7 @@ export interface IMarkdownDocumenterFeatureOnFinishedArgs {
 
 // @public
 export class MarkdownDocumenterAccessor {
+    private constructor();
     getLinkForApiItem(apiItem: ApiItem): string | undefined;
 }
 
@@ -51,6 +52,7 @@ export class MarkdownDocumenterFeature extends PluginFeature {
 
 // @public
 export class MarkdownDocumenterFeatureContext {
+    private constructor();
     readonly apiModel: ApiModel;
     readonly documenter: MarkdownDocumenterAccessor;
     readonly outputFolder: string;
@@ -60,6 +62,7 @@ export class MarkdownDocumenterFeatureContext {
 export abstract class PluginFeature {
     // (undocumented)
     static [Symbol.hasInstance](instance: object): boolean;
+    private constructor();
     context: PluginFeatureContext;
     // @virtual
     onInitialized(): void;
@@ -71,6 +74,7 @@ export class PluginFeatureContext {
 
 // @public
 export class PluginFeatureInitialization {
+    private constructor();
 }
 
 ```

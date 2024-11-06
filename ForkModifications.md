@@ -83,6 +83,31 @@
     冲突概率也会更小，输出文件不会频繁大面积变更。
 
   </details>
+- 优化 `constructor` 裁剪输出，输出 `private constructor` 语法 (46dc59b8943f114aa4fd7d3de1a64e00cc3250ff)
+  <details>
+
+  输入类型：
+  ```ts
+  declare class Foo {
+    /** @internal */
+    constructor(a: number, b: string);
+  }
+  ```
+
+  优化前：
+  ```ts
+  declare class Foo {
+  }
+  ```
+
+  优化后：
+  ```ts
+  declare class Foo {
+    constructor($private: never);
+  }
+  ```
+
+  </details>
 - Dts Rollup:
   - 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723)
     <details>
