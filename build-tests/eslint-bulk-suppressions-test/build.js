@@ -1,3 +1,7 @@
+// This project has a duplicate "eslint-bulk-suppressions-test-legacy" intended to test eslint
+// against the older version of the TypeScript parser. Any modifications made to this project
+// should be reflected in "eslint-bulk-suppressions-test-legacy" as well.
+
 const { FileSystem, Executable, Text, Import } = require('@rushstack/node-core-library');
 const path = require('path');
 const {
@@ -22,7 +26,7 @@ function tryLoadSuppressions(suppressionsJsonPath) {
 }
 
 const RUN_FOLDER_PATHS = ['client', 'server'];
-const ESLINT_PACKAGE_NAMES = ['eslint', 'eslint-8.23', 'eslint-oldest'];
+const ESLINT_PACKAGE_NAMES = ['eslint'];
 
 const updateFilePaths = new Set();
 
@@ -42,7 +46,6 @@ for (const runFolderPath of RUN_FOLDER_PATHS) {
     const { version: eslintVersion } = require(`${eslintPackageName}/package.json`);
 
     const startLoggingMessage = `-- Running eslint-bulk-suppressions for eslint@${eslintVersion} in ${runFolderPath} --`;
-    const endLoggingMessage = '-'.repeat(startLoggingMessage.length);
     console.log(startLoggingMessage);
     const referenceSuppressionsJsonPath = `${folderPath}/.eslint-bulk-suppressions-${eslintVersion}.json`;
     const existingSuppressions = tryLoadSuppressions(referenceSuppressionsJsonPath);
@@ -75,11 +78,14 @@ for (const runFolderPath of RUN_FOLDER_PATHS) {
       }
     );
 
-    console.log('STDOUT:');
-    console.log(executableResult.stdout.toString());
-
-    console.log('STDERR:');
-    console.log(executableResult.stderr.toString());
+    if (executableResult.status !== 0) {
+      console.error('The eslint-bulk-suppressions command failed.');
+      console.error('STDOUT:');
+      console.error(executableResult.stdout.toString());
+      console.error('STDERR:');
+      console.error(executableResult.stderr.toString());
+      process.exit(1);
+    }
 
     const newSuppressions = tryLoadSuppressions(suppressionsJsonPath);
     if (newSuppressions === existingSuppressions) {
@@ -90,9 +96,6 @@ for (const runFolderPath of RUN_FOLDER_PATHS) {
     }
 
     FileSystem.deleteFile(suppressionsJsonPath);
-
-    console.log(endLoggingMessage);
-    console.log();
   }
 }
 

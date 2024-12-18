@@ -8,6 +8,7 @@ import { Collector } from './Collector';
 import { Sort } from '@rushstack/node-core-library';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
+import { AstNamespaceExport } from '../analyzer/AstNamespaceExport';
 
 /**
  * This is a data structure used by the Collector to track an AstEntity that may be emitted in the *.d.ts file.
@@ -84,6 +85,11 @@ export class CollectorEntity {
    * such as "export class X { }" instead of "export { X }".
    */
   public get shouldInlineExport(): boolean {
+    // We export the namespace directly
+    if (this.astEntity instanceof AstNamespaceExport) {
+      return true;
+    }
+
     // We don't inline an AstImport
     if (this.astEntity instanceof AstSymbol || this.astEntity instanceof AstNamespaceImport) {
       // We don't inline a symbol with more than one exported name

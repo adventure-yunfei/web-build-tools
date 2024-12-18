@@ -1,6 +1,209 @@
 # Change Log - @rushstack/debug-certificate-manager
 
-This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 1.4.12
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 1.4.11
+Mon, 09 Dec 2024 20:31:43 GMT
+
+_Version update only_
+
+## 1.4.10
+Tue, 03 Dec 2024 16:11:07 GMT
+
+_Version update only_
+
+## 1.4.9
+Sat, 23 Nov 2024 01:18:55 GMT
+
+_Version update only_
+
+## 1.4.8
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 1.4.7
+Thu, 24 Oct 2024 00:15:47 GMT
+
+_Version update only_
+
+## 1.4.6
+Mon, 21 Oct 2024 18:50:10 GMT
+
+_Version update only_
+
+## 1.4.5
+Thu, 17 Oct 2024 08:35:06 GMT
+
+_Version update only_
+
+## 1.4.4
+Tue, 15 Oct 2024 00:12:31 GMT
+
+_Version update only_
+
+## 1.4.3
+Wed, 02 Oct 2024 00:11:19 GMT
+
+_Version update only_
+
+## 1.4.2
+Tue, 01 Oct 2024 00:11:28 GMT
+
+_Version update only_
+
+## 1.4.1
+Mon, 30 Sep 2024 15:12:19 GMT
+
+_Version update only_
+
+## 1.4.0
+Sat, 21 Sep 2024 00:10:27 GMT
+
+### Minor changes
+
+- Add a `skipCertificateTrust` option to `CertificateManager.ensureCertificateAsync` that skips automatically trusting the generated certificate and untrusting an existing certificate with issues.
+
+## 1.3.66
+Fri, 13 Sep 2024 00:11:42 GMT
+
+_Version update only_
+
+## 1.3.65
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 1.3.64
+Wed, 21 Aug 2024 05:43:04 GMT
+
+_Version update only_
+
+## 1.3.63
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 1.3.62
+Fri, 02 Aug 2024 17:26:42 GMT
+
+_Version update only_
+
+## 1.3.61
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 1.3.60
+Wed, 24 Jul 2024 00:12:14 GMT
+
+_Version update only_
+
+## 1.3.59
+Wed, 17 Jul 2024 06:55:09 GMT
+
+_Version update only_
+
+## 1.3.58
+Wed, 17 Jul 2024 00:11:19 GMT
+
+_Version update only_
+
+## 1.3.57
+Tue, 16 Jul 2024 00:36:21 GMT
+
+_Version update only_
+
+## 1.3.56
+Thu, 27 Jun 2024 21:01:36 GMT
+
+_Version update only_
+
+## 1.3.55
+Mon, 03 Jun 2024 23:43:15 GMT
+
+_Version update only_
+
+## 1.3.54
+Thu, 30 May 2024 00:13:05 GMT
+
+### Patches
+
+- Include missing `type` modifiers on type-only exports.
+
+## 1.3.53
+Wed, 29 May 2024 02:03:50 GMT
+
+_Version update only_
+
+## 1.3.52
+Wed, 29 May 2024 00:10:52 GMT
+
+_Version update only_
+
+## 1.3.51
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 1.3.50
+Tue, 28 May 2024 00:09:47 GMT
+
+_Version update only_
+
+## 1.3.49
+Sat, 25 May 2024 04:54:07 GMT
+
+_Version update only_
+
+## 1.3.48
+Fri, 24 May 2024 00:15:08 GMT
+
+_Version update only_
+
+## 1.3.47
+Thu, 23 May 2024 02:26:56 GMT
+
+### Patches
+
+- Fix an issue where the task could report success if the subprocess was terminated by a signal
+
+## 1.3.46
+Thu, 16 May 2024 15:10:22 GMT
+
+_Version update only_
+
+## 1.3.45
+Wed, 15 May 2024 23:42:58 GMT
+
+_Version update only_
+
+## 1.3.44
+Wed, 15 May 2024 06:04:17 GMT
+
+_Version update only_
+
+## 1.3.43
+Fri, 10 May 2024 05:33:33 GMT
+
+_Version update only_
+
+## 1.3.42
+Wed, 08 May 2024 22:23:50 GMT
+
+_Version update only_
+
+## 1.3.41
+Mon, 06 May 2024 15:11:04 GMT
+
+_Version update only_
 
 ## 1.3.40
 Wed, 10 Apr 2024 15:10:09 GMT

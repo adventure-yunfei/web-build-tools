@@ -16,7 +16,8 @@ import { Utilities } from '../../utilities/Utilities';
 import { Stopwatch } from '../../utilities/Stopwatch';
 import type { BasePackage } from './BasePackage';
 import { EnvironmentConfiguration } from '../../api/EnvironmentConfiguration';
-import { LastLinkFlagFactory } from '../../api/LastLinkFlag';
+import { RushConstants } from '../RushConstants';
+import { FlagFile } from '../../api/FlagFile';
 
 export enum SymlinkKind {
   File,
@@ -189,15 +190,19 @@ export abstract class BaseLinkManager {
    * @param force - Normally the operation will be skipped if the links are already up to date;
    *   if true, this option forces the links to be recreated.
    */
-  public async createSymlinksForProjects(force: boolean): Promise<void> {
+  public async createSymlinksForProjectsAsync(force: boolean): Promise<void> {
     // eslint-disable-next-line no-console
     console.log('\n' + Colorize.bold('Linking local projects'));
     const stopwatch: Stopwatch = Stopwatch.start();
 
-    await this._linkProjects();
+    await this._linkProjectsAsync();
 
     // TODO: Remove when "rush link" and "rush unlink" are deprecated
-    LastLinkFlagFactory.getCommonTempFlag(this._rushConfiguration.defaultSubspace).create();
+    await new FlagFile(
+      this._rushConfiguration.defaultSubspace.getSubspaceTempFolderPath(),
+      RushConstants.lastLinkFlagFilename,
+      {}
+    ).createAsync();
 
     stopwatch.stop();
     // eslint-disable-next-line no-console
@@ -206,5 +211,5 @@ export abstract class BaseLinkManager {
     console.log('\nNext you should probably run "rush build" or "rush rebuild"');
   }
 
-  protected abstract _linkProjects(): Promise<void>;
+  protected abstract _linkProjectsAsync(): Promise<void>;
 }

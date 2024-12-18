@@ -1,6 +1,134 @@
 # Change Log - @rushstack/heft-config-file
 
-This log was last generated on Wed, 10 Apr 2024 15:10:08 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 0.16.2
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 0.16.1
+Mon, 09 Dec 2024 20:31:43 GMT
+
+### Patches
+
+- Bump `jsonpath-plus` to `~10.2.0`.
+
+## 0.16.0
+Tue, 03 Dec 2024 16:11:07 GMT
+
+### Minor changes
+
+- Add a new `NonProjectConfigurationFile` class that is designed to load absolute-pathed configuration files without rig support.
+- Rename `ConfigurationFile` to `ProjectConfigurationFile` and mark `ConfigurationFile` as `@deprecated`.
+
+## 0.15.9
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 0.15.8
+Thu, 24 Oct 2024 00:15:47 GMT
+
+### Patches
+
+- Update the `jsonpath-plus` dependency to mitigate CVE-2024-21534."
+
+## 0.15.7
+Fri, 13 Sep 2024 00:11:43 GMT
+
+_Version update only_
+
+## 0.15.6
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 0.15.5
+Wed, 21 Aug 2024 05:43:04 GMT
+
+_Version update only_
+
+## 0.15.4
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 0.15.3
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 0.15.2
+Wed, 17 Jul 2024 06:55:10 GMT
+
+_Version update only_
+
+## 0.15.1
+Tue, 16 Jul 2024 00:36:22 GMT
+
+_Version update only_
+
+## 0.15.0
+Thu, 27 Jun 2024 21:01:36 GMT
+
+### Minor changes
+
+- Add `ConfigurationFile.loadConfigurationFileForProject` and `ConfigurationFile.tryLoadConfigurationFileForProject` APIs to allow for synchronously loading Heft configuration files
+
+## 0.14.25
+Thu, 30 May 2024 00:13:05 GMT
+
+### Patches
+
+- Include missing `type` modifiers on type-only exports.
+
+## 0.14.24
+Wed, 29 May 2024 02:03:51 GMT
+
+_Version update only_
+
+## 0.14.23
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.14.22
+Tue, 28 May 2024 00:09:47 GMT
+
+_Version update only_
+
+## 0.14.21
+Sat, 25 May 2024 04:54:08 GMT
+
+_Version update only_
+
+## 0.14.20
+Thu, 23 May 2024 02:26:56 GMT
+
+_Version update only_
+
+## 0.14.19
+Wed, 15 May 2024 23:42:58 GMT
+
+_Version update only_
+
+## 0.14.18
+Wed, 15 May 2024 06:04:17 GMT
+
+_Version update only_
+
+## 0.14.17
+Fri, 10 May 2024 05:33:34 GMT
+
+_Version update only_
+
+## 0.14.16
+Mon, 06 May 2024 15:11:05 GMT
+
+_Version update only_
 
 ## 0.14.15
 Wed, 10 Apr 2024 15:10:08 GMT

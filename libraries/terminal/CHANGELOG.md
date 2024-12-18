@@ -1,6 +1,117 @@
 # Change Log - @rushstack/terminal
 
-This log was last generated on Wed, 10 Apr 2024 15:10:08 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 0.14.4
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 0.14.3
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 0.14.2
+Fri, 13 Sep 2024 00:11:43 GMT
+
+_Version update only_
+
+## 0.14.1
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 0.14.0
+Wed, 21 Aug 2024 05:43:04 GMT
+
+### Minor changes
+
+- Create a new instance function called `getVerboseOutput` on `StringBufferTerminalProvider` and mark `getVerbose` as deprecated.
+
+## 0.13.4
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 0.13.3
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 0.13.2
+Wed, 17 Jul 2024 06:55:09 GMT
+
+### Patches
+
+- Improve the PrintUtilities API to handle an edge case when word-wrapping a final line
+
+## 0.13.1
+Tue, 16 Jul 2024 00:36:21 GMT
+
+_Version update only_
+
+## 0.13.0
+Thu, 30 May 2024 00:13:05 GMT
+
+### Minor changes
+
+- Eliminate a const enum from the public API.
+
+### Patches
+
+- Include missing `type` modifiers on type-only exports.
+
+## 0.12.3
+Wed, 29 May 2024 02:03:51 GMT
+
+_Version update only_
+
+## 0.12.2
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.12.1
+Tue, 28 May 2024 00:09:47 GMT
+
+_Version update only_
+
+## 0.12.0
+Sat, 25 May 2024 04:54:07 GMT
+
+### Minor changes
+
+- Change the `eolCharacter` property value of `StringBufferTerminalProvider` to `\n` from `[n]`. This does not change the default `getOutput()` result, but removes the `[n]` characters from the `getOutput({ normalizeSpecialCharacters: false })` result.
+
+## 0.11.1
+Thu, 23 May 2024 02:26:56 GMT
+
+_Version update only_
+
+## 0.11.0
+Wed, 15 May 2024 23:42:58 GMT
+
+### Minor changes
+
+- Allow use of 'preventAutoclose' flag in StdioSummarizer.
+
+## 0.10.4
+Wed, 15 May 2024 06:04:17 GMT
+
+_Version update only_
+
+## 0.10.3
+Fri, 10 May 2024 05:33:34 GMT
+
+_Version update only_
+
+## 0.10.2
+Mon, 06 May 2024 15:11:05 GMT
+
+_Version update only_
 
 ## 0.10.1
 Wed, 10 Apr 2024 15:10:08 GMT

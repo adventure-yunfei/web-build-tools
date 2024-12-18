@@ -5,10 +5,19 @@
 
 import * as path from 'path';
 import { URL, pathToFileURL, fileURLToPath } from 'url';
-import { type CompileResult, type Syntax, type Exception, compileStringAsync } from 'sass-embedded';
+import {
+  type CompileResult,
+  type Syntax,
+  type Exception,
+  compileStringAsync,
+  type CanonicalizeContext,
+  deprecations,
+  type Deprecations,
+  type DeprecationOrId
+} from 'sass-embedded';
 import * as postcss from 'postcss';
 import cssModules from 'postcss-modules';
-import { FileSystem, Sort } from '@rushstack/node-core-library';
+import { FileSystem, Import, Sort } from '@rushstack/node-core-library';
 import { type IStringValueTypings, StringValuesTypingsGenerator } from '@rushstack/typings-generator';
 
 /**
@@ -73,6 +82,16 @@ export interface ISassConfiguration {
    * A list of file paths relative to the "src" folder that should be excluded from typings generation.
    */
   excludeFiles?: string[];
+
+  /**
+   * If set, deprecation warnings from dependencies will be suppressed.
+   */
+  ignoreDeprecationsInDependencies?: boolean;
+
+  /**
+   * A list of deprecation codes to silence.  This is useful for suppressing warnings from deprecated Sass features that are used in the project and known not to be a problem.
+   */
+  silenceDeprecations?: readonly string[];
 }
 
 /**
@@ -112,7 +131,9 @@ export class SassProcessor extends StringValuesTypingsGenerator {
       excludeFiles,
       secondaryGeneratedTsFolders,
       importIncludePaths,
-      preserveSCSSExtension = false
+      preserveSCSSExtension = false,
+      ignoreDeprecationsInDependencies = false,
+      silenceDeprecations = []
     } = sassConfiguration;
 
     const getCssPaths: ((relativePath: string) => string[]) | undefined = cssOutputFolders
@@ -144,6 +165,13 @@ export class SassProcessor extends StringValuesTypingsGenerator {
       }
     }
 
+    const deprecationsToSilence: DeprecationOrId[] = Array.from(silenceDeprecations, (deprecation) => {
+      if (!Object.prototype.hasOwnProperty.call(deprecations, deprecation)) {
+        throw new Error(`Unknown deprecation code: ${deprecation}`);
+      }
+      return deprecation as keyof Deprecations;
+    });
+
     super({
       srcFolder,
       generatedTsFolder,
@@ -156,6 +184,7 @@ export class SassProcessor extends StringValuesTypingsGenerator {
       getAdditionalOutputFiles: getCssPaths,
 
       // Generate typings function
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       parseAndGenerateTypings: async (fileContents: string, filePath: string, relativePath: string) => {
         if (this._isSassPartial(filePath)) {
           // Do not generate typings for Sass partials.
@@ -168,7 +197,9 @@ export class SassProcessor extends StringValuesTypingsGenerator {
           fileContents,
           filePath,
           buildFolder,
-          importIncludePaths
+          importIncludePaths,
+          ignoreDeprecationsInDependencies,
+          deprecationsToSilence
         );
 
         let classMap: IClassMap = {};
@@ -226,7 +257,9 @@ export class SassProcessor extends StringValuesTypingsGenerator {
     fileContents: string,
     filePath: string,
     buildFolder: string,
-    importIncludePaths: string[] | undefined
+    importIncludePaths: string[] | undefined,
+    ignoreDeprecationsInDependencies: boolean,
+    silenceDeprecations: DeprecationOrId[]
   ): Promise<string> {
     let result: CompileResult;
     const nodeModulesUrl: URL = pathToFileURL(`${buildFolder}/node_modules/`);
@@ -234,8 +267,33 @@ export class SassProcessor extends StringValuesTypingsGenerator {
       result = await compileStringAsync(fileContents, {
         importers: [
           {
-            findFileUrl: (url: string): URL | null => {
-              return this._patchSassUrl(url, nodeModulesUrl);
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            findFileUrl: async (url: string, context: CanonicalizeContext): Promise<URL | null> => {
+              if (url[0] === '~') {
+                const packagePath: string = url.slice(1);
+                const { containingUrl } = context;
+                if (containingUrl) {
+                  let packageNameDelimiter: number = packagePath.indexOf('/');
+                  if (packagePath[0] === '@') {
+                    packageNameDelimiter = packagePath.indexOf('/', packageNameDelimiter + 1);
+                  }
+
+                  const packageName: string = packagePath.slice(0, packageNameDelimiter);
+                  const modulePath: string = packagePath.slice(packageNameDelimiter + 1);
+
+                  const baseFolderPath: string = path.dirname(fileURLToPath(containingUrl));
+                  const resolvedPackagePath: string = await Import.resolvePackageAsync({
+                    packageName,
+                    baseFolderPath
+                  });
+                  const resolvedPath: string = `${resolvedPackagePath}/${modulePath}`;
+                  return pathToFileURL(resolvedPath);
+                } else {
+                  return new URL(packagePath, nodeModulesUrl);
+                }
+              } else {
+                return null;
+              }
             }
           }
         ],
@@ -243,7 +301,9 @@ export class SassProcessor extends StringValuesTypingsGenerator {
         loadPaths: importIncludePaths
           ? importIncludePaths
           : [`${buildFolder}/node_modules`, `${buildFolder}/src`],
-        syntax: determineSyntaxFromFilePath(filePath)
+        syntax: determineSyntaxFromFilePath(filePath),
+        quietDeps: ignoreDeprecationsInDependencies,
+        silenceDeprecations
       });
     } catch (err) {
       const typedError: Exception = err;
@@ -260,14 +320,6 @@ export class SassProcessor extends StringValuesTypingsGenerator {
     }
 
     return result.css.toString();
-  }
-
-  private _patchSassUrl(url: string, nodeModulesUrl: URL): URL | null {
-    if (url[0] !== '~') {
-      return null;
-    }
-
-    return new URL(url.slice(1), nodeModulesUrl);
   }
 }
 

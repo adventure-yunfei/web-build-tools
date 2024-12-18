@@ -7,7 +7,8 @@
 /// <reference types="node" />
 
 import * as child_process from 'child_process';
-import * as fs from 'fs';
+import * as nodeFs from 'fs';
+import * as nodePath from 'path';
 
 // @public
 export enum AlreadyExistsBehavior {
@@ -25,11 +26,22 @@ export class AlreadyReportedError extends Error {
 
 // @public
 export class Async {
-    static forEachAsync<TEntry>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<void>, options?: IAsyncParallelismOptions | undefined): Promise<void>;
+    static forEachAsync<TEntry>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<void>, options?: (IAsyncParallelismOptions & {
+        weighted?: false;
+    }) | undefined): Promise<void>;
+    static forEachAsync<TEntry extends IWeighted>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<void>, options: IAsyncParallelismOptions & {
+        weighted: true;
+    }): Promise<void>;
     static getSignal(): [Promise<void>, () => void, (err: Error) => void];
-    static mapAsync<TEntry, TRetVal>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<TRetVal>, options?: IAsyncParallelismOptions | undefined): Promise<TRetVal[]>;
+    static mapAsync<TEntry, TRetVal>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<TRetVal>, options?: (IAsyncParallelismOptions & {
+        weighted?: false;
+    }) | undefined): Promise<TRetVal[]>;
+    static mapAsync<TEntry extends IWeighted, TRetVal>(iterable: Iterable<TEntry> | AsyncIterable<TEntry>, callback: (entry: TEntry, arrayIndex: number) => Promise<TRetVal>, options: IAsyncParallelismOptions & {
+        weighted: true;
+    }): Promise<TRetVal[]>;
     static runWithRetriesAsync<TResult>({ action, maxRetries, retryDelayMs }: IRunWithRetriesOptions<TResult>): Promise<TResult>;
-    static sleep(ms: number): Promise<void>;
+    static sleepAsync(ms: number): Promise<void>;
+    static validateWeightedIterable(operation: IWeighted): void;
 }
 
 // @public
@@ -105,9 +117,9 @@ export type ExecutableStdioMapping = 'pipe' | 'ignore' | 'inherit' | ExecutableS
 export type ExecutableStdioStreamMapping = 'pipe' | 'ignore' | 'inherit' | NodeJS.WritableStream | NodeJS.ReadableStream | number | undefined;
 
 // @public
-export enum FileConstants {
-    PackageJson = "package.json"
-}
+export const FileConstants: {
+    readonly PackageJson: "package.json";
+};
 
 // @public
 export class FileError extends Error {
@@ -202,7 +214,7 @@ export type FileSystemCopyFilesAsyncFilter = (sourcePath: string, destinationPat
 export type FileSystemCopyFilesFilter = (sourcePath: string, destinationPath: string) => boolean;
 
 // @public
-export type FileSystemStats = fs.Stats;
+export type FileSystemStats = nodeFs.Stats;
 
 // @public
 export class FileWriter {
@@ -214,17 +226,18 @@ export class FileWriter {
 }
 
 // @public
-export enum FolderConstants {
-    Git = ".git",
-    NodeModules = "node_modules"
-}
+export const FolderConstants: {
+    readonly Git: ".git";
+    readonly NodeModules: "node_modules";
+};
 
 // @public
-export type FolderItem = fs.Dirent;
+export type FolderItem = nodeFs.Dirent;
 
 // @public
 export interface IAsyncParallelismOptions {
     concurrency?: number;
+    weighted?: boolean;
 }
 
 // @public
@@ -404,11 +417,17 @@ export interface IJsonFileSaveOptions extends IJsonFileStringifyOptions {
 }
 
 // @public
-export interface IJsonFileStringifyOptions {
+export interface IJsonFileStringifyOptions extends IJsonFileParseOptions {
     headerComment?: string;
     ignoreUndefinedValues?: boolean;
     newlineConversion?: NewlineKind;
     prettyFormatting?: boolean;
+}
+
+// @public
+export interface IJsonSchemaCustomFormat<T extends string | number> {
+    type: T extends string ? 'string' : T extends number ? 'number' : never;
+    validate: (data: T) => boolean;
 }
 
 // @public
@@ -417,12 +436,25 @@ export interface IJsonSchemaErrorInfo {
 }
 
 // @public
-export interface IJsonSchemaFromFileOptions {
+export type IJsonSchemaFromFileOptions = IJsonSchemaLoadOptions;
+
+// @public
+export type IJsonSchemaFromObjectOptions = IJsonSchemaLoadOptions;
+
+// @public
+export interface IJsonSchemaLoadOptions {
+    customFormats?: Record<string, IJsonSchemaCustomFormat<string> | IJsonSchemaCustomFormat<number>>;
     dependentSchemas?: JsonSchema[];
+    schemaVersion?: JsonSchemaVersion;
 }
 
 // @public
-export interface IJsonSchemaValidateOptions {
+export interface IJsonSchemaValidateObjectWithOptions {
+    ignoreSchemaField?: boolean;
+}
+
+// @public
+export interface IJsonSchemaValidateOptions extends IJsonSchemaValidateObjectWithOptions {
     customErrorHeader?: string;
 }
 
@@ -442,6 +474,8 @@ export interface INodePackageJson {
     dependenciesMeta?: IDependenciesMetaTable;
     description?: string;
     devDependencies?: IPackageJsonDependencyTable;
+    exports?: string | string[] | Record<string, null | string | IPackageJsonExports>;
+    files?: string[];
     homepage?: string;
     license?: string;
     main?: string;
@@ -456,6 +490,7 @@ export interface INodePackageJson {
     // @beta
     tsdocMetadata?: string;
     types?: string;
+    typesVersions?: Record<string, Record<string, [string, ...string[]]>>;
     typings?: string;
     version?: string;
 }
@@ -477,6 +512,19 @@ export interface IPackageJson extends INodePackageJson {
 // @public
 export interface IPackageJsonDependencyTable {
     [dependencyName: string]: string;
+}
+
+// @public
+export interface IPackageJsonExports {
+    'node-addons'?: string | IPackageJsonExports;
+    browser?: string | IPackageJsonExports;
+    default?: string | IPackageJsonExports;
+    development?: string | IPackageJsonExports;
+    import?: string | IPackageJsonExports;
+    node?: string | IPackageJsonExports;
+    production?: string | IPackageJsonExports;
+    require?: string | IPackageJsonExports;
+    types?: string | IPackageJsonExports;
 }
 
 // @public
@@ -558,6 +606,14 @@ export interface IReadLinesFromIterableOptions {
     ignoreEmptyLines?: boolean;
 }
 
+// @public
+export interface IRealNodeModulePathResolverOptions {
+    // (undocumented)
+    fs?: Partial<Pick<typeof nodeFs, 'lstatSync' | 'readlinkSync'>>;
+    // (undocumented)
+    path?: Partial<Pick<typeof nodePath, 'isAbsolute' | 'join' | 'resolve' | 'sep'>>;
+}
+
 // @public (undocumented)
 export interface IRunWithRetriesOptions<TResult> {
     // (undocumented)
@@ -583,11 +639,13 @@ export interface ISubprocessOptions {
 export interface IWaitForExitOptions {
     encoding?: BufferEncoding | 'buffer';
     throwOnNonZeroExitCode?: boolean;
+    throwOnSignal?: boolean;
 }
 
 // @public
 export interface IWaitForExitResult<T extends Buffer | string | never = never> {
     exitCode: number | null;
+    signal: string | null;
     stderr: T;
     stdout: T;
 }
@@ -600,6 +658,11 @@ export interface IWaitForExitWithBufferOptions extends IWaitForExitOptions {
 // @public
 export interface IWaitForExitWithStringOptions extends IWaitForExitOptions {
     encoding: BufferEncoding;
+}
+
+// @public (undocumented)
+export interface IWeighted {
+    weight: number;
 }
 
 // @public
@@ -630,11 +693,14 @@ export type JsonObject = any;
 export class JsonSchema {
     ensureCompiled(): void;
     static fromFile(filename: string, options?: IJsonSchemaFromFileOptions): JsonSchema;
-    static fromLoadedObject(schemaObject: JsonObject): JsonSchema;
+    static fromLoadedObject(schemaObject: JsonObject, options?: IJsonSchemaFromObjectOptions): JsonSchema;
     get shortName(): string;
     validateObject(jsonObject: JsonObject, filenameForErrors: string, options?: IJsonSchemaValidateOptions): void;
-    validateObjectWithCallback(jsonObject: JsonObject, errorCallback: (errorInfo: IJsonSchemaErrorInfo) => void): void;
+    validateObjectWithCallback(jsonObject: JsonObject, errorCallback: (errorInfo: IJsonSchemaErrorInfo) => void, options?: IJsonSchemaValidateObjectWithOptions): void;
 }
+
+// @public
+export type JsonSchemaVersion = 'draft-04' | 'draft-07';
 
 // @public
 export enum JsonSyntax {
@@ -662,7 +728,9 @@ export type LegacyCallback<TResult, TError> = (error: TError | null | undefined,
 
 // @public
 export class LockFile {
+    // @deprecated (undocumented)
     static acquire(resourceFolder: string, resourceName: string, maxWaitMs?: number): Promise<LockFile>;
+    static acquireAsync(resourceFolder: string, resourceName: string, maxWaitMs?: number): Promise<LockFile>;
     get dirtyWhenAcquired(): boolean;
     get filePath(): string;
     static getLockFilePath(resourceFolder: string, resourceName: string, pid?: number): string;
@@ -776,11 +844,19 @@ export class ProtectableMap<K, V> {
 }
 
 // @public
+export class RealNodeModulePathResolver {
+    constructor(options?: IRealNodeModulePathResolverOptions);
+    clearCache(): void;
+    readonly realNodeModulePath: (input: string) => string;
+}
+
+// @public
 export class Sort {
     static compareByValue(x: any, y: any): number;
     static isSorted<T>(collection: Iterable<T>, comparer?: (x: any, y: any) => number): boolean;
     static isSortedBy<T>(collection: Iterable<T>, keySelector: (element: T) => any, comparer?: (x: any, y: any) => number): boolean;
     static sortBy<T>(array: T[], keySelector: (element: T) => any, comparer?: (x: any, y: any) => number): void;
+    static sortKeys<T extends Partial<Record<string, unknown>> | unknown[]>(object: T): T;
     static sortMapKeys<K, V>(map: Map<K, V>, keyComparer?: (x: K, y: K) => number): void;
     static sortSet<T>(set: Set<T>, comparer?: (x: T, y: T) => number): void;
     static sortSetBy<T>(set: Set<T>, keySelector: (element: T) => any, keyComparer?: (x: T, y: T) => number): void;
@@ -814,6 +890,11 @@ export class Text {
     static readLinesFromIterableAsync(iterable: AsyncIterable<string | Buffer>, options?: IReadLinesFromIterableOptions): AsyncGenerator<string>;
     static replaceAll(input: string, searchValue: string, replaceValue: string): string;
     static reverse(s: string): string;
+    static splitByNewLines(s: undefined): undefined;
+    // (undocumented)
+    static splitByNewLines(s: string): string[];
+    // (undocumented)
+    static splitByNewLines(s: string | undefined): string[] | undefined;
     static truncateWithEllipsis(s: string, maximumLength: number): string;
 }
 

@@ -29,7 +29,7 @@ import { HeftParameterManager } from '../pluginFramework/HeftParameterManager';
 import { TaskOperationRunner } from '../operations/runners/TaskOperationRunner';
 import { PhaseOperationRunner } from '../operations/runners/PhaseOperationRunner';
 import type { HeftPhase } from '../pluginFramework/HeftPhase';
-import type { IHeftAction, IHeftActionOptions } from '../cli/actions/IHeftAction';
+import type { IHeftAction, IHeftActionOptions } from './actions/IHeftAction';
 import type {
   IHeftLifecycleCleanHookOptions,
   IHeftLifecycleSession,
@@ -497,9 +497,8 @@ async function _startLifecycleAsync(this: void, internalHeftSession: InternalHef
 
     // Delete all temp folders for tasks by default
     for (const pluginDefinition of lifecycle.pluginDefinitions) {
-      const lifecycleSession: IHeftLifecycleSession = await lifecycle.getSessionForPluginDefinitionAsync(
-        pluginDefinition
-      );
+      const lifecycleSession: IHeftLifecycleSession =
+        await lifecycle.getSessionForPluginDefinitionAsync(pluginDefinition);
       deleteOperations.push({ sourcePath: lifecycleSession.tempFolderPath });
     }
 

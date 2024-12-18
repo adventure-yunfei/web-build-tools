@@ -1,6 +1,198 @@
 # Change Log - @rushstack/heft-api-extractor-plugin
 
-This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 0.3.61
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 0.3.60
+Mon, 09 Dec 2024 20:31:43 GMT
+
+_Version update only_
+
+## 0.3.59
+Tue, 03 Dec 2024 16:11:07 GMT
+
+_Version update only_
+
+## 0.3.58
+Sat, 23 Nov 2024 01:18:55 GMT
+
+_Version update only_
+
+## 0.3.57
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 0.3.56
+Thu, 24 Oct 2024 00:15:48 GMT
+
+_Version update only_
+
+## 0.3.55
+Mon, 21 Oct 2024 18:50:10 GMT
+
+_Version update only_
+
+## 0.3.54
+Thu, 17 Oct 2024 08:35:06 GMT
+
+_Version update only_
+
+## 0.3.53
+Tue, 15 Oct 2024 00:12:31 GMT
+
+_Version update only_
+
+## 0.3.52
+Wed, 02 Oct 2024 00:11:19 GMT
+
+_Version update only_
+
+## 0.3.51
+Tue, 01 Oct 2024 00:11:28 GMT
+
+_Version update only_
+
+## 0.3.50
+Mon, 30 Sep 2024 15:12:19 GMT
+
+_Version update only_
+
+## 0.3.49
+Fri, 13 Sep 2024 00:11:43 GMT
+
+_Version update only_
+
+## 0.3.48
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 0.3.47
+Wed, 21 Aug 2024 05:43:04 GMT
+
+_Version update only_
+
+## 0.3.46
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 0.3.45
+Fri, 02 Aug 2024 17:26:42 GMT
+
+_Version update only_
+
+## 0.3.44
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 0.3.43
+Wed, 24 Jul 2024 00:12:14 GMT
+
+_Version update only_
+
+## 0.3.42
+Wed, 17 Jul 2024 06:55:09 GMT
+
+_Version update only_
+
+## 0.3.41
+Wed, 17 Jul 2024 00:11:19 GMT
+
+_Version update only_
+
+## 0.3.40
+Tue, 16 Jul 2024 00:36:21 GMT
+
+_Version update only_
+
+## 0.3.39
+Thu, 27 Jun 2024 21:01:36 GMT
+
+_Version update only_
+
+## 0.3.38
+Mon, 03 Jun 2024 23:43:15 GMT
+
+_Version update only_
+
+## 0.3.37
+Thu, 30 May 2024 00:13:05 GMT
+
+_Version update only_
+
+## 0.3.36
+Wed, 29 May 2024 02:03:50 GMT
+
+_Version update only_
+
+## 0.3.35
+Wed, 29 May 2024 00:10:52 GMT
+
+_Version update only_
+
+## 0.3.34
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.3.33
+Tue, 28 May 2024 00:09:47 GMT
+
+_Version update only_
+
+## 0.3.32
+Sat, 25 May 2024 04:54:07 GMT
+
+_Version update only_
+
+## 0.3.31
+Fri, 24 May 2024 00:15:08 GMT
+
+_Version update only_
+
+## 0.3.30
+Thu, 23 May 2024 02:26:56 GMT
+
+_Version update only_
+
+## 0.3.29
+Thu, 16 May 2024 15:10:22 GMT
+
+_Version update only_
+
+## 0.3.28
+Wed, 15 May 2024 23:42:58 GMT
+
+_Version update only_
+
+## 0.3.27
+Wed, 15 May 2024 06:04:17 GMT
+
+_Version update only_
+
+## 0.3.26
+Fri, 10 May 2024 05:33:34 GMT
+
+_Version update only_
+
+## 0.3.25
+Wed, 08 May 2024 22:23:50 GMT
+
+_Version update only_
+
+## 0.3.24
+Mon, 06 May 2024 15:11:04 GMT
+
+_Version update only_
 
 ## 0.3.23
 Wed, 10 Apr 2024 15:10:09 GMT

@@ -75,7 +75,7 @@ export class StringBufferTerminalProvider implements ITerminalProvider {
    * {@inheritDoc ITerminalProvider.eolCharacter}
    */
   public get eolCharacter(): string {
-    return '[n]';
+    return '\n';
   }
 
   /**
@@ -93,9 +93,16 @@ export class StringBufferTerminalProvider implements ITerminalProvider {
   }
 
   /**
-   * Get everything that has been written at verbose-level severity.
+   * @deprecated - use {@link StringBufferTerminalProvider.getVerboseOutput}
    */
   public getVerbose(options?: IStringBufferOutputOptions): string {
+    return this.getVerboseOutput(options);
+  }
+
+  /**
+   * Get everything that has been written at verbose-level severity.
+   */
+  public getVerboseOutput(options?: IStringBufferOutputOptions): string {
     return this._normalizeOutput(this._verboseBuffer.toString(), options);
   }
 

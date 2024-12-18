@@ -18,7 +18,7 @@ import { Colorize } from '@rushstack/terminal';
 
 import { BaseLinkManager } from '../base/BaseLinkManager';
 import { BasePackage } from '../base/BasePackage';
-import { RushConstants } from '../../logic/RushConstants';
+import { RushConstants } from '../RushConstants';
 import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import {
   PnpmShrinkwrapFile,
@@ -39,7 +39,7 @@ export class PnpmLinkManager extends BaseLinkManager {
   /**
    * @override
    */
-  public async createSymlinksForProjects(force: boolean): Promise<void> {
+  public async createSymlinksForProjectsAsync(force: boolean): Promise<void> {
     const useWorkspaces: boolean =
       this._rushConfiguration.pnpmOptions && this._rushConfiguration.pnpmOptions.useWorkspaces;
     if (useWorkspaces) {
@@ -53,10 +53,10 @@ export class PnpmLinkManager extends BaseLinkManager {
       throw new AlreadyReportedError();
     }
 
-    await super.createSymlinksForProjects(force);
+    await super.createSymlinksForProjectsAsync(force);
   }
 
-  protected async _linkProjects(): Promise<void> {
+  protected async _linkProjectsAsync(): Promise<void> {
     if (this._rushConfiguration.projects.length > 0) {
       // Use shrinkwrap from temp as the committed shrinkwrap may not always be up to date
       // See https://github.com/microsoft/rushstack/issues/1273#issuecomment-492779995
@@ -71,7 +71,7 @@ export class PnpmLinkManager extends BaseLinkManager {
       }
 
       for (const rushProject of this._rushConfiguration.projects) {
-        await this._linkProject(rushProject, pnpmShrinkwrapFile);
+        await this._linkProjectAsync(rushProject, pnpmShrinkwrapFile);
       }
     } else {
       // eslint-disable-next-line no-console
@@ -89,7 +89,7 @@ export class PnpmLinkManager extends BaseLinkManager {
    * @param project             The local project that we will create symlinks for
    * @param rushLinkJson        The common/temp/rush-link.json output file
    */
-  private async _linkProject(
+  private async _linkProjectAsync(
     project: RushConfigurationProject,
     pnpmShrinkwrapFile: PnpmShrinkwrapFile
   ): Promise<void> {
@@ -229,7 +229,8 @@ export class PnpmLinkManager extends BaseLinkManager {
     const pathToLocalInstallation: string = await this._getPathToLocalInstallationAsync(
       tarballEntry,
       absolutePathToTgzFile,
-      folderNameSuffix
+      folderNameSuffix,
+      tempProjectDependencyKey
     );
 
     const parentShrinkwrapEntry: IPnpmShrinkwrapDependencyYaml | undefined =
@@ -289,7 +290,8 @@ export class PnpmLinkManager extends BaseLinkManager {
   private async _getPathToLocalInstallationAsync(
     tarballEntry: string,
     absolutePathToTgzFile: string,
-    folderSuffix: string
+    folderSuffix: string,
+    tempProjectDependencyKey: string
   ): Promise<string> {
     if (this._pnpmVersion.major === 6) {
       // PNPM 6 changed formatting to replace all ':' and '/' chars with '+'. Additionally, folder names > 120
@@ -319,8 +321,22 @@ export class PnpmLinkManager extends BaseLinkManager {
         folderName,
         RushConstants.nodeModulesFolderName
       );
-    } else if (this._pnpmVersion.major >= 8) {
+    } else if (this._pnpmVersion.major >= 9) {
       const { depPathToFilename } = await import('@pnpm/dependency-path');
+
+      // project@file+projects+presentation-integration-tests.tgz_jsdom@11.12.0
+      // The second parameter is max length of virtual store dir, default is 120 https://pnpm.io/next/npmrc#virtual-store-dir-max-length
+      // TODO Read virtual-store-dir-max-length from .npmrc
+      const folderName: string = depPathToFilename(tempProjectDependencyKey, 120);
+      return path.join(
+        this._rushConfiguration.commonTempFolder,
+        RushConstants.nodeModulesFolderName,
+        '.pnpm',
+        folderName,
+        RushConstants.nodeModulesFolderName
+      );
+    } else if (this._pnpmVersion.major >= 8) {
+      const { depPathToFilename } = await import('@pnpm/dependency-path-lockfile-pre-v9');
       // PNPM 8 changed the local path format again and the hashing algorithm, and
       // is now using the scoped '@pnpm/dependency-path' package
       // See https://github.com/pnpm/pnpm/releases/tag/v8.0.0

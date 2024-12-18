@@ -17,7 +17,7 @@ import { PrintUtilities, Colorize, ConsoleTerminalProvider, Terminal } from '@ru
 import type { RushConfiguration } from '../../api/RushConfiguration';
 import { Utilities } from '../../utilities/Utilities';
 import { type IArtifactoryPackageRegistryJson, ArtifactoryConfiguration } from './ArtifactoryConfiguration';
-import { WebClient, type WebClientResponse } from '../../utilities/WebClient';
+import type { WebClient as WebClientType, IWebClientResponse } from '../../utilities/WebClient';
 import { TerminalInput } from './TerminalInput';
 
 interface IArtifactoryCustomizableMessages {
@@ -94,7 +94,7 @@ export class SetupPackageRegistry {
    *
    * @returns - `true` if valid, `false` if not valid
    */
-  public async checkOnly(): Promise<boolean> {
+  public async checkOnlyAsync(): Promise<boolean> {
     const packageRegistry: IArtifactoryPackageRegistryJson =
       this._artifactoryConfiguration.configuration.packageRegistry;
     if (!packageRegistry.enabled) {
@@ -110,7 +110,8 @@ export class SetupPackageRegistry {
     if (!this._options.syncNpmrcAlreadyCalled) {
       Utilities.syncNpmrc({
         sourceNpmrcFolder: this.rushConfiguration.commonRushConfigFolder,
-        targetNpmrcFolder: this.rushConfiguration.commonTempFolder
+        targetNpmrcFolder: this.rushConfiguration.commonTempFolder,
+        supportEnvVarFallbackSyntax: this.rushConfiguration.isPnpm
       });
     }
 
@@ -198,8 +199,8 @@ export class SetupPackageRegistry {
   /**
    * Test whether the NPM token is valid.  If not, prompt to update it.
    */
-  public async checkAndSetup(): Promise<void> {
-    if (await this.checkOnly()) {
+  public async checkAndSetupAsync(): Promise<void> {
+    if (await this.checkOnlyAsync()) {
       return;
     }
 
@@ -209,7 +210,7 @@ export class SetupPackageRegistry {
     const packageRegistry: IArtifactoryPackageRegistryJson =
       this._artifactoryConfiguration.configuration.packageRegistry;
 
-    const fixThisProblem: boolean = await TerminalInput.promptYesNo({
+    const fixThisProblem: boolean = await TerminalInput.promptYesNoAsync({
       message: 'Fix this problem now?',
       defaultValue: false
     });
@@ -220,7 +221,7 @@ export class SetupPackageRegistry {
 
     this._writeInstructionBlock(this._messages.introduction);
 
-    const hasArtifactoryAccount: boolean = await TerminalInput.promptYesNo({
+    const hasArtifactoryAccount: boolean = await TerminalInput.promptYesNoAsync({
       message: 'Do you already have an Artifactory user account?'
     });
     this._terminal.writeLine();
@@ -244,7 +245,7 @@ export class SetupPackageRegistry {
 
     this._writeInstructionBlock(this._messages.locateUserName);
 
-    let artifactoryUser: string = await TerminalInput.promptLine({
+    let artifactoryUser: string = await TerminalInput.promptLineAsync({
       message: this._messages.userNamePrompt
     });
     this._terminal.writeLine();
@@ -258,7 +259,7 @@ export class SetupPackageRegistry {
 
     this._writeInstructionBlock(this._messages.locateApiKey);
 
-    let artifactoryKey: string = await TerminalInput.promptPasswordLine({
+    let artifactoryKey: string = await TerminalInput.promptPasswordLineAsync({
       message: this._messages.apiKeyPrompt
     });
     this._terminal.writeLine();
@@ -270,21 +271,23 @@ export class SetupPackageRegistry {
       throw new AlreadyReportedError();
     }
 
-    await this._fetchTokenAndUpdateNpmrc(artifactoryUser, artifactoryKey, packageRegistry);
+    await this._fetchTokenAndUpdateNpmrcAsync(artifactoryUser, artifactoryKey, packageRegistry);
   }
 
   /**
    * Fetch a valid NPM token from the Artifactory service and add it to the `~/.npmrc` file,
    * preserving other settings in that file.
    */
-  private async _fetchTokenAndUpdateNpmrc(
+  private async _fetchTokenAndUpdateNpmrcAsync(
     artifactoryUser: string,
     artifactoryKey: string,
     packageRegistry: IArtifactoryPackageRegistryJson
   ): Promise<void> {
     this._terminal.writeLine('\nFetching an NPM token from the Artifactory service...');
 
-    const webClient: WebClient = new WebClient();
+    // Defer this import since it is conditionally needed.
+    const { WebClient } = await import('../../utilities/WebClient');
+    const webClient: WebClientType = new WebClient();
 
     webClient.addBasicAuthHeader(artifactoryUser, artifactoryKey);
 
@@ -298,7 +301,7 @@ export class SetupPackageRegistry {
     // our token.
     queryUrl += `auth/.npm`;
 
-    let response: WebClientResponse;
+    let response: IWebClientResponse;
     try {
       response = await webClient.fetchAsync(queryUrl);
     } catch (e) {
@@ -322,7 +325,7 @@ export class SetupPackageRegistry {
     //   //your-company.jfrog.io/your-artifacts/api/npm/npm-private/:username=your.name@your-company.com
     //   //your-company.jfrog.io/your-artifacts/api/npm/npm-private/:email=your.name@your-company.com
     //   //your-company.jfrog.io/your-artifacts/api/npm/npm-private/:always-auth=true
-    const responseText: string = await response.text();
+    const responseText: string = await response.getTextAsync();
     const responseLines: string[] = Text.convertToLf(responseText).trim().split('\n');
     if (responseLines.length < 2 || !responseLines[0].startsWith('@.npm:')) {
       throw new Error('Unexpected response from Artifactory');
@@ -496,7 +499,7 @@ export class SetupPackageRegistry {
    * @returns the JSON section, or `undefined` if a JSON object could not be detected
    */
   private static _tryFindJson(dirtyOutput: string): string | undefined {
-    const lines: string[] = dirtyOutput.split(/\r?\n/g);
+    const lines: string[] = Text.splitByNewLines(dirtyOutput);
     let startIndex: number | undefined;
     let endIndex: number | undefined;
 

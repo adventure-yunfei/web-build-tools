@@ -11,6 +11,7 @@ import type { RushConfigurationProject } from '../../api/RushConfigurationProjec
 import type { PnpmPackageManager } from '../../api/packageManager/PnpmPackageManager';
 import { RushConstants } from '../RushConstants';
 import type { Subspace } from '../../api/Subspace';
+import type { PnpmOptionsConfiguration } from './PnpmOptionsConfiguration';
 
 /**
  * Loads PNPM's pnpmfile.js configuration, and invokes it to preprocess package.json files,
@@ -24,7 +25,8 @@ export class SubspacePnpmfileConfiguration {
    */
   public static async writeCommonTempSubspaceGlobalPnpmfileAsync(
     rushConfiguration: RushConfiguration,
-    subspace: Subspace
+    subspace: Subspace,
+    variant: string | undefined
   ): Promise<void> {
     if (rushConfiguration.packageManager !== 'pnpm') {
       throw new Error(
@@ -32,7 +34,7 @@ export class SubspacePnpmfileConfiguration {
       );
     }
 
-    const targetDir: string = subspace.getSubspaceTempFolder();
+    const targetDir: string = subspace.getSubspaceTempFolderPath();
     const subspaceGlobalPnpmfilePath: string = path.join(targetDir, RushConstants.pnpmfileGlobalFilename);
 
     // Write the shim itself
@@ -42,7 +44,7 @@ export class SubspacePnpmfileConfiguration {
     });
 
     const subspaceGlobalPnpmfileShimSettings: ISubspacePnpmfileShimSettings =
-      SubspacePnpmfileConfiguration._getSubspacePnpmfileShimSettings(rushConfiguration, subspace);
+      SubspacePnpmfileConfiguration.getSubspacePnpmfileShimSettings(rushConfiguration, subspace, variant);
 
     // Write the settings file used by the shim
     await JsonFile.saveAsync(
@@ -54,9 +56,10 @@ export class SubspacePnpmfileConfiguration {
     );
   }
 
-  private static _getSubspacePnpmfileShimSettings(
+  public static getSubspacePnpmfileShimSettings(
     rushConfiguration: RushConfiguration,
-    subspace: Subspace
+    subspace: Subspace,
+    variant: string | undefined
   ): ISubspacePnpmfileShimSettings {
     const workspaceProjects: Record<string, IWorkspaceProjectInfo> = {};
     const subspaceProjects: Record<string, IWorkspaceProjectInfo> = {};
@@ -82,10 +85,10 @@ export class SubspacePnpmfileConfiguration {
       semverPath: Import.resolveModule({ modulePath: 'semver', baseFolderPath: __dirname })
     };
 
-    // common/config/subspaces/<subspace_name>/.pnpmfile-subspace.cjs
+    // common/config/subspaces/<subspace_name>/.pnpmfile.cjs
     const userPnpmfilePath: string = path.join(
-      subspace.getSubspaceConfigFolder(),
-      (rushConfiguration.packageManagerWrapper as PnpmPackageManager).subspacePnpmfileFilename
+      subspace.getVariantDependentSubspaceConfigFolderPath(variant),
+      (rushConfiguration.packageManagerWrapper as PnpmPackageManager).pnpmfileFilename
     );
     if (FileSystem.exists(userPnpmfilePath)) {
       settings.userPnpmfilePath = userPnpmfilePath;
@@ -115,11 +118,13 @@ export class SubspacePnpmfileConfiguration {
     const processTransitiveInjectedInstallQueue: Array<RushConfigurationProject> = [];
 
     for (const subspaceProject of subspaceProjectsMap.values()) {
+      const injectedDependencySet: Set<string> = new Set();
       const dependenciesMeta: IDependenciesMetaTable | undefined =
         subspaceProject.packageJson.dependenciesMeta;
       if (dependenciesMeta) {
         for (const [dependencyName, { injected }] of Object.entries(dependenciesMeta)) {
           if (injected) {
+            injectedDependencySet.add(dependencyName);
             projectNameToInjectedDependenciesMap.get(subspaceProject.packageName)?.add(dependencyName);
 
             //if this dependency is in the same subspace, leave as it is, PNPM will handle it
@@ -128,6 +133,24 @@ export class SubspacePnpmfileConfiguration {
             if (!subspaceProjectsMap.has(dependencyName)) {
               processTransitiveInjectedInstallQueue.push(workspaceProjectsMap.get(dependencyName)!);
             }
+          }
+        }
+      }
+
+      // if alwaysInjectDependenciesFromOtherSubspaces policy is true in pnpm-config.json
+      // and the dependency is not injected yet
+      // and the dependency is in another subspace
+      // then, make this dependency as injected dependency
+      const pnpmOptions: PnpmOptionsConfiguration | undefined =
+        subspace.getPnpmOptions() || rushConfiguration.pnpmOptions;
+      if (pnpmOptions && pnpmOptions.alwaysInjectDependenciesFromOtherSubspaces) {
+        const dependencyProjects: ReadonlySet<RushConfigurationProject> = subspaceProject.dependencyProjects;
+        for (const dependencyProject of dependencyProjects) {
+          const dependencyName: string = dependencyProject.packageName;
+          if (!injectedDependencySet.has(dependencyName) && !subspaceProjectsMap.has(dependencyName)) {
+            projectNameToInjectedDependenciesMap.get(subspaceProject.packageName)?.add(dependencyName);
+            // process transitive injected installation
+            processTransitiveInjectedInstallQueue.push(workspaceProjectsMap.get(dependencyName)!);
           }
         }
       }

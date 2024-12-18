@@ -224,7 +224,7 @@ export class RushXCommandLine {
     });
     const terminal: ITerminal = new Terminal(terminalProvider);
 
-    if (rushConfiguration?.packageManager === 'pnpm' && rushConfiguration?.experimentsConfiguration) {
+    if (rushConfiguration?.isPnpm && rushConfiguration?.experimentsConfiguration) {
       const { configuration: experiments } = rushConfiguration?.experimentsConfiguration;
 
       if (experiments?.usePnpmSyncForInjectedDependencies) {
@@ -236,7 +236,7 @@ export class RushXCommandLine {
           );
           await pnpmSyncCopyAsync({
             pnpmSyncJsonPath,
-            ensureFolder: FileSystem.ensureFolderAsync,
+            ensureFolderAsync: FileSystem.ensureFolderAsync,
             forEachAsyncWithConcurrency: Async.forEachAsync,
             getPackageIncludedFiles: PackageExtractor.getPackageIncludedFilesAsync,
             logMessageCallback: (logMessageOptions: ILogMessageCallbackOptions) =>

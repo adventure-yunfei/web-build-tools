@@ -79,7 +79,6 @@ const TIMELINE_CHART_SYMBOLS: Record<OperationStatus, string> = {
   [OperationStatus.Ready]: '?',
   [OperationStatus.Queued]: '?',
   [OperationStatus.Executing]: '?',
-  [OperationStatus.RemoteExecuting]: '?',
   [OperationStatus.Success]: '#',
   [OperationStatus.SuccessWithWarning]: '!',
   [OperationStatus.Failure]: '!',
@@ -89,6 +88,13 @@ const TIMELINE_CHART_SYMBOLS: Record<OperationStatus, string> = {
   [OperationStatus.NoOp]: '%'
 };
 
+const COBUILD_REPORTABLE_STATUSES: Set<OperationStatus> = new Set([
+  OperationStatus.Success,
+  OperationStatus.SuccessWithWarning,
+  OperationStatus.Failure,
+  OperationStatus.Blocked
+]);
+
 /**
  * Timeline - colorizer for each operation status
  */
@@ -97,7 +103,6 @@ const TIMELINE_CHART_COLORIZER: Record<OperationStatus, (string: string) => stri
   [OperationStatus.Ready]: Colorize.yellow,
   [OperationStatus.Queued]: Colorize.yellow,
   [OperationStatus.Executing]: Colorize.yellow,
-  [OperationStatus.RemoteExecuting]: Colorize.yellow,
   [OperationStatus.Success]: Colorize.green,
   [OperationStatus.SuccessWithWarning]: Colorize.yellow,
   [OperationStatus.Failure]: Colorize.red,
@@ -145,7 +150,7 @@ export function _printTimeline({ terminal, result, cobuildConfiguration }: IPrin
   let workDuration: number = 0;
 
   for (const [operation, operationResult] of result.operationResults) {
-    if (operation.runner?.silent) {
+    if (operationResult.silent) {
       continue;
     }
 
@@ -232,7 +237,7 @@ export function _printTimeline({ terminal, result, cobuildConfiguration }: IPrin
 
   function getChartSymbol(record: ITimelineRecord): string {
     const { isExecuteByOtherCobuildRunner, status } = record;
-    if (isExecuteByOtherCobuildRunner) {
+    if (isExecuteByOtherCobuildRunner && COBUILD_REPORTABLE_STATUSES.has(status)) {
       hasCobuildSymbol = true;
       return 'C';
     }

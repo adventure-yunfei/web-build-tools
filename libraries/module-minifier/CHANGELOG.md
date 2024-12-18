@@ -1,6 +1,200 @@
 # Change Log - @rushstack/module-minifier
 
-This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 0.6.34
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 0.6.33
+Mon, 09 Dec 2024 20:31:43 GMT
+
+_Version update only_
+
+## 0.6.32
+Tue, 03 Dec 2024 16:11:08 GMT
+
+_Version update only_
+
+## 0.6.31
+Sat, 23 Nov 2024 01:18:55 GMT
+
+_Version update only_
+
+## 0.6.30
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 0.6.29
+Thu, 24 Oct 2024 00:15:48 GMT
+
+_Version update only_
+
+## 0.6.28
+Mon, 21 Oct 2024 18:50:10 GMT
+
+_Version update only_
+
+## 0.6.27
+Thu, 17 Oct 2024 08:35:06 GMT
+
+_Version update only_
+
+## 0.6.26
+Tue, 15 Oct 2024 00:12:31 GMT
+
+_Version update only_
+
+## 0.6.25
+Wed, 02 Oct 2024 00:11:19 GMT
+
+_Version update only_
+
+## 0.6.24
+Tue, 01 Oct 2024 00:11:28 GMT
+
+_Version update only_
+
+## 0.6.23
+Mon, 30 Sep 2024 15:12:19 GMT
+
+_Version update only_
+
+## 0.6.22
+Fri, 13 Sep 2024 00:11:43 GMT
+
+_Version update only_
+
+## 0.6.21
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 0.6.20
+Wed, 21 Aug 2024 05:43:04 GMT
+
+_Version update only_
+
+## 0.6.19
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 0.6.18
+Fri, 02 Aug 2024 17:26:42 GMT
+
+_Version update only_
+
+## 0.6.17
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 0.6.16
+Wed, 24 Jul 2024 00:12:14 GMT
+
+_Version update only_
+
+## 0.6.15
+Wed, 17 Jul 2024 06:55:10 GMT
+
+_Version update only_
+
+## 0.6.14
+Wed, 17 Jul 2024 00:11:19 GMT
+
+_Version update only_
+
+## 0.6.13
+Tue, 16 Jul 2024 00:36:22 GMT
+
+_Version update only_
+
+## 0.6.12
+Thu, 27 Jun 2024 21:01:36 GMT
+
+_Version update only_
+
+## 0.6.11
+Mon, 03 Jun 2024 23:43:15 GMT
+
+_Version update only_
+
+## 0.6.10
+Thu, 30 May 2024 00:13:05 GMT
+
+_Version update only_
+
+## 0.6.9
+Wed, 29 May 2024 02:03:51 GMT
+
+_Version update only_
+
+## 0.6.8
+Wed, 29 May 2024 00:10:52 GMT
+
+_Version update only_
+
+## 0.6.7
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.6.6
+Tue, 28 May 2024 00:09:47 GMT
+
+_Version update only_
+
+## 0.6.5
+Sat, 25 May 2024 04:54:07 GMT
+
+_Version update only_
+
+## 0.6.4
+Fri, 24 May 2024 00:15:09 GMT
+
+_Version update only_
+
+## 0.6.3
+Thu, 23 May 2024 02:26:56 GMT
+
+_Version update only_
+
+## 0.6.2
+Thu, 16 May 2024 15:10:22 GMT
+
+_Version update only_
+
+## 0.6.1
+Wed, 15 May 2024 23:42:58 GMT
+
+_Version update only_
+
+## 0.6.0
+Wed, 15 May 2024 06:04:17 GMT
+
+### Minor changes
+
+- Rename `IMinifierConnection.disconnect` to `IMinifierConnection.disconnectAsync` and `IModuleMinifier.connect` to `IModuleMinifier.connectAsync`. The old functions are marked as `@deprecated`.
+
+## 0.5.4
+Fri, 10 May 2024 05:33:34 GMT
+
+_Version update only_
+
+## 0.5.3
+Wed, 08 May 2024 22:23:51 GMT
+
+_Version update only_
+
+## 0.5.2
+Mon, 06 May 2024 15:11:04 GMT
+
+_Version update only_
 
 ## 0.5.1
 Wed, 10 Apr 2024 15:10:09 GMT

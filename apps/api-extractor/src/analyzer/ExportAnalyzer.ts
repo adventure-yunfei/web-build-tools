@@ -15,6 +15,7 @@ import type { AstEntity } from './AstEntity';
 import { AstNamespaceImport } from './AstNamespaceImport';
 import { SyntaxHelpers } from './SyntaxHelpers';
 import { last } from 'lodash';
+import { AstNamespaceExport } from './AstNamespaceExport';
 
 /**
  * Exposes the minimal APIs from AstSymbolTable that are needed by ExportAnalyzer.
@@ -269,7 +270,11 @@ export class ExportAnalyzer {
       : importOrExportDeclaration.moduleSpecifier;
     const mode: ts.ModuleKind.CommonJS | ts.ModuleKind.ESNext | undefined =
       specifier && ts.isStringLiteralLike(specifier)
-        ? TypeScriptInternals.getModeForUsageLocation(importOrExportDeclaration.getSourceFile(), specifier)
+        ? TypeScriptInternals.getModeForUsageLocation(
+            importOrExportDeclaration.getSourceFile(),
+            specifier,
+            this._program.getCompilerOptions()
+          )
         : undefined;
 
     const resolvedModule: ts.ResolvedModuleFull | undefined = TypeScriptInternals.getResolvedModule(
@@ -663,11 +668,9 @@ export class ExportAnalyzer {
         //   SemicolonToken:  pre=[;]
 
         // Issue tracking this feature: https://github.com/microsoft/rushstack/issues/2780
-        throw new Error(
-          `The "export * as ___" syntax is not supported yet; as a workaround,` +
-            ` use "import * as ___" with a separate "export { ___ }" declaration\n` +
-            SourceFileLocationFormatter.formatDeclaration(declaration)
-        );
+
+        const astModule: AstModule = this._fetchSpecifierAstModule(exportDeclaration, declarationSymbol);
+        return this._getAstNamespaceExport(astModule, declarationSymbol, declaration);
       } else {
         throw new InternalError(
           `Unimplemented export declaration kind: ${declaration.getText()}\n` +
@@ -693,6 +696,25 @@ export class ExportAnalyzer {
     }
 
     return undefined;
+  }
+
+  private _getAstNamespaceExport(
+    astModule: AstModule,
+    declarationSymbol: ts.Symbol,
+    declaration: ts.Declaration
+  ): AstNamespaceExport {
+    const imoprtNamespace: AstNamespaceImport = this._getAstNamespaceImport(
+      astModule,
+      declarationSymbol,
+      declaration
+    );
+
+    return new AstNamespaceExport({
+      namespaceName: imoprtNamespace.localName,
+      astModule: astModule,
+      declaration,
+      symbol: declarationSymbol
+    });
   }
 
   private _tryMatchImportDeclaration(
@@ -722,18 +744,7 @@ export class ExportAnalyzer {
 
         if (externalModulePath === undefined) {
           const astModule: AstModule = this._fetchSpecifierAstModule(importDeclaration, declarationSymbol);
-          let namespaceImport: AstNamespaceImport | undefined =
-            this._astNamespaceImportByModule.get(astModule);
-          if (namespaceImport === undefined) {
-            namespaceImport = new AstNamespaceImport({
-              namespaceName: declarationSymbol.name,
-              astModule: astModule,
-              declaration: declaration,
-              symbol: declarationSymbol
-            });
-            this._astNamespaceImportByModule.set(astModule, namespaceImport);
-          }
-          return namespaceImport;
+          return this._getAstNamespaceImport(astModule, declarationSymbol, declaration);
         }
 
         // Here importSymbol=undefined because {@inheritDoc} and such are not going to work correctly for
@@ -913,6 +924,25 @@ export class ExportAnalyzer {
     return undefined;
   }
 
+  private _getAstNamespaceImport(
+    astModule: AstModule,
+    declarationSymbol: ts.Symbol,
+    declaration: ts.Declaration
+  ): AstNamespaceImport {
+    let namespaceImport: AstNamespaceImport | undefined = this._astNamespaceImportByModule.get(astModule);
+    if (namespaceImport === undefined) {
+      namespaceImport = new AstNamespaceImport({
+        namespaceName: declarationSymbol.name,
+        astModule: astModule,
+        declaration: declaration,
+        symbol: declarationSymbol
+      });
+      this._astNamespaceImportByModule.set(astModule, namespaceImport);
+    }
+
+    return namespaceImport;
+  }
+
   private static _getIsTypeOnly(importDeclaration: ts.ImportDeclaration): boolean {
     if (importDeclaration.importClause) {
       return !!importDeclaration.importClause.isTypeOnly;
@@ -1052,7 +1082,8 @@ export class ExportAnalyzer {
       ts.isStringLiteralLike(importOrExportDeclaration.moduleSpecifier)
         ? TypeScriptInternals.getModeForUsageLocation(
             importOrExportDeclaration.getSourceFile(),
-            importOrExportDeclaration.moduleSpecifier
+            importOrExportDeclaration.moduleSpecifier,
+            this._program.getCompilerOptions()
           )
         : undefined;
     const resolvedModule: ts.ResolvedModuleFull | undefined = TypeScriptInternals.getResolvedModule(
