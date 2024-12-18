@@ -8,34 +8,41 @@ import { ApiItem } from '@microsoft/api-extractor-model';
 import { ApiModel } from '@microsoft/api-extractor-model';
 
 // @public
-export interface IApiDocumenterPluginManifest {
+interface IApiDocumenterPluginManifest {
     features: IFeatureDefinition[];
     manifestVersion: 1000;
 }
+export type { IApiDocumenterPluginManifest }
 
 // @public
-export interface IFeatureDefinition {
+interface IFeatureDefinition {
     featureName: string;
     kind: 'MarkdownDocumenterFeature';
     subclass: {
         new (initialization: PluginFeatureInitialization): MarkdownDocumenterFeature;
     };
 }
+export type { IFeatureDefinition }
 
 // @public
-export interface IMarkdownDocumenterFeatureOnBeforeWritePageArgs {
+interface IMarkdownDocumenterFeatureOnBeforeWritePageArgs {
     readonly apiItem: ApiItem;
     readonly outputFilename: string;
     pageContent: string;
 }
+export type { IMarkdownDocumenterFeatureOnBeforeWritePageArgs }
 
 // @public
-export interface IMarkdownDocumenterFeatureOnFinishedArgs {
+interface IMarkdownDocumenterFeatureOnFinishedArgs {
 }
+export type { IMarkdownDocumenterFeatureOnFinishedArgs }
 
 // @public
 export class MarkdownDocumenterAccessor {
-    private constructor();
+    // Warning: (ae-forgotten-export) The symbol "IMarkdownDocumenterAccessorImplementation" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    constructor(implementation: IMarkdownDocumenterAccessorImplementation);
     getLinkForApiItem(apiItem: ApiItem): string | undefined;
 }
 
@@ -52,7 +59,8 @@ export class MarkdownDocumenterFeature extends PluginFeature {
 
 // @public
 export class MarkdownDocumenterFeatureContext {
-    private constructor();
+    // @internal
+    constructor(options: MarkdownDocumenterFeatureContext);
     readonly apiModel: ApiModel;
     readonly documenter: MarkdownDocumenterAccessor;
     readonly outputFolder: string;
@@ -62,7 +70,8 @@ export class MarkdownDocumenterFeatureContext {
 export abstract class PluginFeature {
     // (undocumented)
     static [Symbol.hasInstance](instance: object): boolean;
-    private constructor();
+    // @internal
+    constructor(initialization: PluginFeatureInitialization);
     context: PluginFeatureContext;
     // @virtual
     onInitialized(): void;
@@ -74,7 +83,10 @@ export class PluginFeatureContext {
 
 // @public
 export class PluginFeatureInitialization {
-    private constructor();
+    // @internal
+    constructor();
+    // @internal (undocumented)
+    _context: PluginFeatureContext;
 }
 
 ```

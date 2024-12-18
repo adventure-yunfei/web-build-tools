@@ -420,7 +420,7 @@ export class Extractor {
     const actualApiReportContent: string = ApiReportGenerator.generateReviewFileContent(
       collector,
       reportConfig.variant,
-      new Set(process.env.API_MODEL_EXPORT_TRIMMINGS?.split(',') || [])
+      new Set(process.env.API_REPORT_EXPORT_TRIMMINGS?.split(',') || [])
     );
 
     // Write the actual file
