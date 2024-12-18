@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.26.3-rc.0
+- 合并 7.26.3
+
 ## 7.24.2-rc.1
 - Package 页面仅输出导出的 API
 

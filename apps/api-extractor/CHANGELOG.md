@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.48.1-rc.0
+- 合并 7.48.1
+
 ## 7.43.1-rc.9
 - 优化 constructor 裁剪逻辑，输出 private constructor
 - api report: 保留 private constructor 输出
