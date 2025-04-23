@@ -21,8 +21,6 @@ export function collectAllReferencedEntities(
     }
     alreadySeenAstEntities.add(astEntity);
 
-    referencedAstEntities.add(astEntity);
-
     if (astEntity instanceof AstSymbol) {
       for (const astDeclaration of astEntity.astDeclarations) {
         const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
@@ -30,6 +28,8 @@ export function collectAllReferencedEntities(
         if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, releaseTimming) < 0) {
           continue; // trim out items under specified release tag
         }
+
+        referencedAstEntities.add(astEntity);
 
         for (const referencedAstEntity of astDeclaration.referencedAstEntities) {
           collectReferencesFromAstEntity(referencedAstEntity);
@@ -39,10 +39,14 @@ export function collectAllReferencedEntities(
         }
       }
     } else if (astEntity instanceof AstNamespaceImport) {
+      referencedAstEntities.add(astEntity);
+
       const astModuleExport: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
       for (const { astEntity: exportedLocalEntity } of astModuleExport.exportedLocalEntities.values()) {
         collectReferencesFromAstEntity(exportedLocalEntity);
       }
+    } else {
+      referencedAstEntities.add(astEntity);
     }
   }
 

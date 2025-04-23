@@ -116,11 +116,12 @@ export class ApiReportGenerator {
      * TODO: won't handle duplicate case,
      * AstImportInternal will be emitted multiple times if multi-exported
      */
-    function emitForAstNamespaceImport(
+    const emitForAstNamespaceImport = (
       entity: CollectorEntity,
       astEntity: AstNamespaceImport,
+      allReferencedEntities: ReadonlySet<CollectorEntity>,
       shouldInlineExport: boolean
-    ): void {
+    ): void => {
       if (shouldInlineExport) {
         writer.write('export ');
       }
@@ -132,6 +133,9 @@ export class ApiReportGenerator {
             const childEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(childAstEntity);
             if (!childEntity) {
               throw new Error(`Cannot find CollectorEntity for AstEntity "${childAstEntity.localName}"`);
+            }
+            if (!allReferencedEntities.has(childEntity)) {
+              return;
             }
             const shouldChildInlineExport: boolean =
               !isTypeOnlyExport && childEntity.nameForEmit === exportName;
@@ -162,33 +166,40 @@ export class ApiReportGenerator {
                   messagesToReport.push(message);
                 }
 
-                writer.ensureSkippedLine();
-                writer.write(
-                  ApiReportGenerator._getAedocSynopsis(collector, astDeclaration, messagesToReport)
-                );
-
-                const span: Span = new Span(astDeclaration.declaration);
-
-                const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
-                if (apiItemMetadata.isPreapproved) {
-                  ApiReportGenerator._modifySpanForPreapproved(span);
-                } else {
-                  ApiReportGenerator._modifySpan(
-                    collector,
-                    span,
-                    shouldChildInlineExport,
-                    astDeclaration,
-                    false,
-                    reportVariant
+                if (this._shouldIncludeInReport(collector, astDeclaration, reportVariant)) {
+                  writer.ensureSkippedLine();
+                  writer.write(
+                    ApiReportGenerator._getAedocSynopsis(collector, astDeclaration, messagesToReport)
                   );
-                }
 
-                span.writeModifiedText(writer);
-                writer.ensureNewLine();
+                  const span: Span = new Span(astDeclaration.declaration);
+
+                  const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
+                  if (apiItemMetadata.isPreapproved) {
+                    ApiReportGenerator._modifySpanForPreapproved(span);
+                  } else {
+                    ApiReportGenerator._modifySpan(
+                      collector,
+                      span,
+                      shouldChildInlineExport,
+                      astDeclaration,
+                      false,
+                      reportVariant
+                    );
+                  }
+
+                  span.writeModifiedText(writer);
+                  writer.ensureNewLine();
+                }
               }
             } else if (childAstEntity instanceof AstNamespaceImport) {
               writer.writeLine();
-              emitForAstNamespaceImport(childEntity, childAstEntity, shouldChildInlineExport);
+              emitForAstNamespaceImport(
+                childEntity,
+                childAstEntity,
+                allReferencedEntities,
+                shouldChildInlineExport
+              );
             } else {
               DtsEmitHelpers.emitNamedExport(writer, exportName, isTypeOnlyExport, childEntity);
               return;
@@ -199,7 +210,7 @@ export class ApiReportGenerator {
           });
       });
       writer.writeLine(`}`);
-    }
+    };
 
     // Emit the regular declarations
     const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
@@ -281,7 +292,7 @@ export class ApiReportGenerator {
             }
           }
         } else if (entity.astEntity instanceof AstNamespaceImport) {
-          emitForAstNamespaceImport(entity, entity.astEntity, entity.shouldInlineExport);
+          emitForAstNamespaceImport(entity, entity.astEntity, referencedEntities, entity.shouldInlineExport);
           writer.writeLine();
         }
 
