@@ -3,7 +3,7 @@
 
 import { AlreadyReportedError, Async, Path } from '@rushstack/node-core-library';
 import type { ITerminal } from '@rushstack/terminal';
-import { ConfigurationFile, InheritanceType } from '@rushstack/heft-config-file';
+import { ProjectConfigurationFile, InheritanceType } from '@rushstack/heft-config-file';
 import { RigConfig } from '@rushstack/rig-package';
 
 import type { RushConfigurationProject } from './RushConfigurationProject';
@@ -40,6 +40,34 @@ export interface IRushProjectJson {
   disableBuildCacheForProject?: boolean;
 
   operationSettings?: IOperationSettings[];
+}
+
+/** @alpha */
+export interface IRushPhaseSharding {
+  /**
+   * The number of shards to create.
+   */
+  count: number;
+
+  /**
+   * The format of the argument to pass to the command to indicate the shard index and count.
+   *
+   * @defaultValue `--shard={shardIndex}/{shardCount}`
+   */
+  shardArgumentFormat?: string;
+
+  /**
+   * An optional argument to pass to the command to indicate the output folder for the shard.
+   *  It must end with `{shardIndex}`.
+   *
+   * @defaultValue `--shard-output-folder=.rush/operations/{phaseName}/shards/{shardIndex}`.
+   */
+  outputFolderArgumentFormat?: string;
+
+  /**
+   * @deprecated Create a separate operation settings object for the shard operation settings with the name `{operationName}:shard`.
+   */
+  shardOperationSettings?: unknown;
 }
 
 /**
@@ -92,6 +120,25 @@ export interface IOperationSettings {
    * calculating final hash value when reading and writing the build cache
    */
   dependsOnAdditionalFiles?: string[];
+
+  /**
+   * An optional config object for sharding the operation. If specified, the operation will be sharded
+   * into multiple invocations. The `count` property specifies the number of shards to create. The
+   * `shardArgumentFormat` property specifies the format of the argument to pass to the command to
+   * indicate the shard index and count. The default value is `--shard={shardIndex}/{shardCount}`.
+   */
+  sharding?: IRushPhaseSharding;
+
+  /**
+   * How many concurrency units this operation should take up during execution. The maximum concurrent units is
+   *  determined by the -p flag.
+   */
+  weight?: number;
+
+  /**
+   * If true, this operation can use cobuilds for orchestration without restoring build cache entries.
+   */
+  allowCobuildWithoutCache?: boolean;
 }
 
 interface IOldRushProjectJson {
@@ -100,8 +147,8 @@ interface IOldRushProjectJson {
   buildCacheOptions?: unknown;
 }
 
-const RUSH_PROJECT_CONFIGURATION_FILE: ConfigurationFile<IRushProjectJson> =
-  new ConfigurationFile<IRushProjectJson>({
+const RUSH_PROJECT_CONFIGURATION_FILE: ProjectConfigurationFile<IRushProjectJson> =
+  new ProjectConfigurationFile<IRushProjectJson>({
     projectRelativeFilePath: `config/${RushConstants.rushProjectConfigFilename}`,
     jsonSchemaObject: schemaJson,
     propertyInheritance: {
@@ -183,8 +230,8 @@ const RUSH_PROJECT_CONFIGURATION_FILE: ConfigurationFile<IRushProjectJson> =
     }
   });
 
-const OLD_RUSH_PROJECT_CONFIGURATION_FILE: ConfigurationFile<IOldRushProjectJson> =
-  new ConfigurationFile<IOldRushProjectJson>({
+const OLD_RUSH_PROJECT_CONFIGURATION_FILE: ProjectConfigurationFile<IOldRushProjectJson> =
+  new ProjectConfigurationFile<IOldRushProjectJson>({
     projectRelativeFilePath: RUSH_PROJECT_CONFIGURATION_FILE.projectRelativeFilePath,
     jsonSchemaObject: anythingSchemaJson
   });
@@ -293,12 +340,18 @@ export class RushProjectConfiguration {
    * Examines the list of source files for the project and the target phase and returns a reason
    * why the project cannot enable the build cache for that phase, or undefined if it is safe to so do.
    */
-  public getCacheDisabledReason(trackedFileNames: Iterable<string>, phaseName: string): string | undefined {
+  public getCacheDisabledReason(
+    trackedFileNames: Iterable<string>,
+    phaseName: string,
+    isNoOp: boolean
+  ): string | undefined {
+    // Skip no-op operations as they won't have any output/cacheable things.
+    if (isNoOp) {
+      return undefined;
+    }
     if (this.disableBuildCacheForProject) {
       return 'Caching has been disabled for this project.';
     }
-
-    const normalizedProjectRelativeFolder: string = Path.convertToSlashes(this.project.projectRelativeFolder);
 
     const operationSettings: IOperationSettings | undefined =
       this.operationSettingsByOperationName.get(phaseName);
@@ -314,6 +367,7 @@ export class RushProjectConfiguration {
     if (!outputFolderNames) {
       return;
     }
+    const normalizedProjectRelativeFolder: string = Path.convertToSlashes(this.project.projectRelativeFolder);
 
     const normalizedOutputFolders: string[] = outputFolderNames.map(
       (outputFolderName) => `${normalizedProjectRelativeFolder}/${outputFolderName}/`
@@ -334,6 +388,32 @@ export class RushProjectConfiguration {
         `and are considered project output: ${inputOutputFiles.join(', ')}`
       );
     }
+  }
+
+  /**
+   * Source of truth for whether a project is unable to use the build cache for a given phase.
+   * As some operations may not have a rush-project.json file defined at all, but may be no-op operations
+   *  we'll want to ignore those completely.
+   */
+  public static getCacheDisabledReasonForProject(options: {
+    projectConfiguration: RushProjectConfiguration | undefined;
+    trackedFileNames: Iterable<string>;
+    phaseName: string;
+    isNoOp: boolean;
+  }): string | undefined {
+    const { projectConfiguration, trackedFileNames, phaseName, isNoOp } = options;
+    if (isNoOp) {
+      return undefined;
+    }
+
+    if (!projectConfiguration) {
+      return (
+        `Project does not have a ${RushConstants.rushProjectConfigFilename} configuration file, ` +
+        'or one provided by a rig, so it does not support caching.'
+      );
+    }
+
+    return projectConfiguration.getCacheDisabledReason(trackedFileNames, phaseName, isNoOp);
   }
 
   /**
@@ -502,6 +582,14 @@ export class RushProjectConfiguration {
           terminal.writeErrorLine(errorMessage);
         } else {
           operationSettingsByOperationName.set(operationName, operationSettings);
+        }
+      }
+
+      for (const [operationName, operationSettings] of operationSettingsByOperationName) {
+        if (operationSettings.sharding?.shardOperationSettings) {
+          terminal.writeWarningLine(
+            `DEPRECATED: The "sharding.shardOperationSettings" field is deprecated. Please create a new operation, '${operationName}:shard' to track shard operation settings.`
+          );
         }
       }
     }

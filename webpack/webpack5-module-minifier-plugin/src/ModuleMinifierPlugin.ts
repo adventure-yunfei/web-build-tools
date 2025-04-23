@@ -183,8 +183,8 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
       typeof this._sourceMap === 'boolean'
         ? this._sourceMap
         : typeof devtool === 'string'
-        ? devtool.endsWith('source-map')
-        : mode === 'production' && devtool !== false;
+          ? devtool.endsWith('source-map')
+          : mode === 'production' && devtool !== false;
 
     this._optionsForHash.sourceMap = useSourceMaps;
     const binaryConfig: Buffer = Buffer.from(JSON.stringify(this._optionsForHash), 'utf-8');
@@ -196,7 +196,10 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
         parser.hooks.program.tap(PLUGIN_NAME, (program: unknown, comments: Comment[]) => {
           const relevantComments: Comment[] = comments.filter(isLicenseComment);
           if (comments.length > 0) {
-            const module: Module = parser.state.module;
+            // Webpack's typings now restrict the properties on factoryMeta for unknown reasons
+            const module: { factoryMeta?: IFactoryMeta } = parser.state.module as unknown as {
+              factoryMeta?: IFactoryMeta;
+            };
             if (!module.factoryMeta) {
               module.factoryMeta = {
                 comments: relevantComments
@@ -316,7 +319,12 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
             return source;
           }
 
-          const id: string | number = compilation.chunkGraph.getModuleId(mod);
+          const id: string | number | null = compilation.chunkGraph.getModuleId(mod);
+
+          if (id === null) {
+            // This module has no id. Abandon per-module minification.
+            return source;
+          }
 
           const metadata: IModuleStats = getOrCreateMetadata(mod);
           const cachedResult: ISourceCacheEntry | undefined = sourceCache.get(source);
@@ -419,7 +427,7 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
 
       // The optimizeChunkModules hook is the last async hook that occurs before chunk rendering
       compilation.hooks.optimizeChunkModules.tapPromise(PLUGIN_NAME, async () => {
-        minifierConnection = await minifier.connect();
+        minifierConnection = await minifier.connectAsync();
 
         submittedModules.clear();
       });
@@ -533,7 +541,7 @@ export class ModuleMinifierPlugin implements WebpackPluginInstance {
         }
 
         // Handle any error from the minifier.
-        await minifierConnection?.disconnect();
+        await minifierConnection?.disconnectAsync();
 
         // All assets and modules have been minified, hand them off to be rehydrated
         await this.hooks.rehydrateAssets.promise(

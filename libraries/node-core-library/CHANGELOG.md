@@ -1,6 +1,145 @@
 # Change Log - @rushstack/node-core-library
 
-This log was last generated on Wed, 10 Apr 2024 15:10:08 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 5.10.1
+Sat, 14 Dec 2024 01:11:07 GMT
+
+### Patches
+
+- Fix handling of trailing slashes and relative paths in RealNodeModulePath to match semantics of `fs.realpathSync.native`.
+
+## 5.10.0
+Fri, 22 Nov 2024 01:10:43 GMT
+
+### Minor changes
+
+- Add `RealNodeModulePathResolver` class to get equivalent behavior to `realpath` with fewer system calls (and therefore higher performance) in the typical scenario where the only symlinks in the repository are inside of `node_modules` folders and are links to package folders.
+
+## 5.9.0
+Fri, 13 Sep 2024 00:11:42 GMT
+
+### Minor changes
+
+- Add a `Sort.sortKeys` function for sorting keys in an object
+- Rename `LockFile.acquire` to `Lockfile.acquireAsync`.
+
+### Patches
+
+- Fix an issue where attempting to acquire multiple `LockFile`s at the same time on POSIX would cause the second to immediately be acquired without releasing the first.
+
+## 5.8.0
+Tue, 10 Sep 2024 20:08:11 GMT
+
+### Minor changes
+
+- Add a `customFormats` option to `JsonSchema`.
+
+## 5.7.0
+Wed, 21 Aug 2024 05:43:04 GMT
+
+### Minor changes
+
+- Introduce a `Text.splitByNewLines` function.
+
+## 5.6.0
+Mon, 12 Aug 2024 22:16:04 GMT
+
+### Minor changes
+
+- Add a `ignoreSchemaField` option to the `JsonSchema.validateObject` options to ignore `$schema` properties and add an options object argument to `JsonSchema.validateObjectWithCallback` with the same `ignoreSchemaField` option.
+
+## 5.5.1
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 5.5.0
+Tue, 16 Jul 2024 00:36:21 GMT
+
+### Minor changes
+
+- Add support for the `jsonSyntax` option to the `JsonFile.save`, `JsonFile.saveAsync`, and `JsonFile.stringify` functions.
+
+## 5.4.1
+Thu, 30 May 2024 00:13:05 GMT
+
+### Patches
+
+- Include missing `type` modifiers on type-only exports.
+
+## 5.4.0
+Wed, 29 May 2024 02:03:50 GMT
+
+### Minor changes
+
+- Add a `throwOnSignal` option to the `Executable.waitForExitAsync` to control if that function should throw if the process is terminated with a signal.
+- Add a `signal` property to the result of `Executable.waitForExitAsync` that includes a signal if the process was termianted by a signal.
+
+## 5.3.0
+Tue, 28 May 2024 15:10:09 GMT
+
+### Minor changes
+
+- Include typings for the the `"files"` field in `IPackageJson`.
+
+## 5.2.0
+Tue, 28 May 2024 00:09:47 GMT
+
+### Minor changes
+
+- Include typings for the `"exports"` and `"typesVersions"` fields in `IPackageJson`.
+
+## 5.1.0
+Sat, 25 May 2024 04:54:07 GMT
+
+### Minor changes
+
+- Update `JsonFile` to support loading JSON files that include object keys that are members of `Object.prototype`.
+
+### Patches
+
+- Fix an issue with `JsonSchema` where `"uniqueItems": true` would throw an error if the `"item"` type in the schema has `"type": "object"`.
+
+## 5.0.0
+Thu, 23 May 2024 02:26:56 GMT
+
+### Breaking changes
+
+- Replace z-schema with ajv for schema validation and add support for json-schema draft-07.
+- Remove the deprecated `Async.sleep` function.
+- Convert `FileConstants` and `FolderConstants` from enums to const objects.
+
+### Patches
+
+- Fix an issue where waitForExitAsync() might reject before all output was collected
+
+## 4.3.0
+Wed, 15 May 2024 06:04:17 GMT
+
+### Minor changes
+
+- Rename `Async.sleep` to `Async.sleepAsync`. The old function is marked as `@deprecated`.
+
+## 4.2.1
+Fri, 10 May 2024 05:33:33 GMT
+
+### Patches
+
+- Fix a bug in `Async.forEachAsync` where weight wasn't respected.
+
+## 4.2.0
+Mon, 06 May 2024 15:11:04 GMT
+
+### Minor changes
+
+- Add a new `weighted: true` option to the `Async.forEachAsync` method that allows each element to specify how much of the allowed parallelism the callback uses.
+
+### Patches
+
+- Add a new `weighted: true` option to the `Async.mapAsync` method that allows each element to specify how much of the allowed parallelism the callback uses.
 
 ## 4.1.0
 Wed, 10 Apr 2024 15:10:08 GMT

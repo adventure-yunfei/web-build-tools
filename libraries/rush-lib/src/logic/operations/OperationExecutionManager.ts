@@ -6,17 +6,13 @@ import {
   StdioWritable,
   TextRewriterTransform,
   Colorize,
-  ConsoleTerminalProvider
+  ConsoleTerminalProvider,
+  TerminalChunkKind
 } from '@rushstack/terminal';
 import { StreamCollator, type CollatedTerminal, type CollatedWriter } from '@rushstack/stream-collator';
-import { NewlineKind, Async, InternalError } from '@rushstack/node-core-library';
+import { NewlineKind, Async, InternalError, AlreadyReportedError } from '@rushstack/node-core-library';
 
-import {
-  AsyncOperationQueue,
-  type IOperationIteratorResult,
-  type IOperationSortFunction,
-  UNASSIGNED_OPERATION
-} from './AsyncOperationQueue';
+import { AsyncOperationQueue, type IOperationSortFunction } from './AsyncOperationQueue';
 import type { Operation } from './Operation';
 import { OperationStatus } from './OperationStatus';
 import { type IOperationExecutionRecordContext, OperationExecutionRecord } from './OperationExecutionRecord';
@@ -29,10 +25,10 @@ export interface IOperationExecutionManagerOptions {
   changedProjectsOnly: boolean;
   destination?: TerminalWritable;
 
-  beforeExecuteOperation?: (operation: OperationExecutionRecord) => Promise<OperationStatus | undefined>;
-  afterExecuteOperation?: (operation: OperationExecutionRecord) => Promise<void>;
-  onOperationStatusChanged?: (record: OperationExecutionRecord) => void;
-  beforeExecuteOperations?: (records: Map<Operation, OperationExecutionRecord>) => Promise<void>;
+  beforeExecuteOperationAsync?: (operation: OperationExecutionRecord) => Promise<OperationStatus | undefined>;
+  afterExecuteOperationAsync?: (operation: OperationExecutionRecord) => Promise<void>;
+  onOperationStatusChangedAsync?: (record: OperationExecutionRecord) => void;
+  beforeExecuteOperationsAsync?: (records: Map<Operation, OperationExecutionRecord>) => Promise<void>;
 }
 
 /**
@@ -87,10 +83,10 @@ export class OperationExecutionManager {
       debugMode,
       parallelism,
       changedProjectsOnly,
-      beforeExecuteOperation,
-      afterExecuteOperation,
-      onOperationStatusChanged,
-      beforeExecuteOperations
+      beforeExecuteOperationAsync: beforeExecuteOperation,
+      afterExecuteOperationAsync: afterExecuteOperation,
+      onOperationStatusChangedAsync: onOperationStatusChanged,
+      beforeExecuteOperationsAsync: beforeExecuteOperations
     } = options;
     this._completedOperations = 0;
     this._quietMode = quietMode;
@@ -102,7 +98,12 @@ export class OperationExecutionManager {
     this._beforeExecuteOperation = beforeExecuteOperation;
     this._afterExecuteOperation = afterExecuteOperation;
     this._beforeExecuteOperations = beforeExecuteOperations;
-    this._onOperationStatusChanged = onOperationStatusChanged;
+    this._onOperationStatusChanged = (record: OperationExecutionRecord) => {
+      if (record.status === OperationStatus.Ready) {
+        this._executionQueue.assignOperations();
+      }
+      onOperationStatusChanged?.(record);
+    };
 
     // TERMINAL PIPELINE:
     //
@@ -123,7 +124,7 @@ export class OperationExecutionManager {
     // Convert the developer graph to the mutable execution graph
     const executionRecordContext: IOperationExecutionRecordContext = {
       streamCollator: this._streamCollator,
-      onOperationStatusChanged,
+      onOperationStatusChanged: this._onOperationStatusChanged,
       debugMode,
       quietMode
     };
@@ -137,7 +138,7 @@ export class OperationExecutionManager {
       );
 
       executionRecords.set(operation, executionRecord);
-      if (!executionRecord.runner.silent) {
+      if (!executionRecord.silent) {
         // Only count non-silent operations
         totalOperations++;
       }
@@ -211,7 +212,7 @@ export class OperationExecutionManager {
       this._terminal.writeStdoutLine(`Selected ${totalOperations} operation${plural}:`);
       const nonSilentOperations: string[] = [];
       for (const record of this._executionRecords.values()) {
-        if (!record.runner.silent) {
+        if (!record.silent) {
           nonSilentOperations.push(record.name);
         }
       }
@@ -236,13 +237,9 @@ export class OperationExecutionManager {
       try {
         await this._afterExecuteOperation?.(record);
       } catch (e) {
-        // Failed operations get reported here
-        const message: string | undefined = record.error?.message;
-        if (message) {
-          this._terminal.writeStderrLine('Unhandled exception: ');
-          this._terminal.writeStderrLine(message);
-        }
-        throw e;
+        this._reportOperationErrorIfAny(record);
+        record.error = e;
+        record.status = OperationStatus.Failure;
       }
       this._onOperationComplete(record);
     };
@@ -255,41 +252,23 @@ export class OperationExecutionManager {
 
     await Async.forEachAsync(
       this._executionQueue,
-      async (operation: IOperationIteratorResult) => {
-        let record: OperationExecutionRecord | undefined;
-        /**
-         * If the operation is UNASSIGNED_OPERATION, it means that the queue is not able to assign a operation.
-         * This happens when some operations run remotely. So, we should try to get a remote executing operation
-         * from the queue manually here.
-         */
-        if (operation === UNASSIGNED_OPERATION) {
-          // Pause for a few time
-          await Async.sleep(5000);
-          record = this._executionQueue.tryGetRemoteExecutingOperation();
-        } else {
-          record = operation;
-        }
-
-        if (!record) {
-          // Fail to assign a operation, start over again
-          return;
-        } else {
-          await record.executeAsync({
-            onStart: onOperationStartAsync,
-            onResult: onOperationCompleteAsync
-          });
-        }
+      async (record: OperationExecutionRecord) => {
+        await record.executeAsync({
+          onStart: onOperationStartAsync,
+          onResult: onOperationCompleteAsync
+        });
       },
       {
-        concurrency: maxParallelism
+        concurrency: maxParallelism,
+        weighted: true
       }
     );
 
     const status: OperationStatus = this._hasAnyFailures
       ? OperationStatus.Failure
       : this._hasAnyNonAllowedWarnings
-      ? OperationStatus.SuccessWithWarning
-      : OperationStatus.Success;
+        ? OperationStatus.SuccessWithWarning
+        : OperationStatus.Success;
 
     return {
       operationResults: this._executionRecords,
@@ -297,13 +276,34 @@ export class OperationExecutionManager {
     };
   }
 
+  private _reportOperationErrorIfAny(record: OperationExecutionRecord): void {
+    // Failed operations get reported, even if silent.
+    // Generally speaking, silent operations shouldn't be able to fail, so this is a safety measure.
+    let message: string | undefined = undefined;
+    if (record.error) {
+      if (!(record.error instanceof AlreadyReportedError)) {
+        message = record.error.message;
+      }
+    }
+
+    if (message) {
+      // This creates the writer, so don't do this until needed
+      record.collatedWriter.terminal.writeStderrLine(message);
+      // Ensure that the summary isn't blank if we have an error message
+      // If the summary already contains max lines of stderr, this will get dropped, so we hope those lines
+      // are more useful than the final exit code.
+      record.stdioSummarizer.writeChunk({
+        text: `${message}\n`,
+        kind: TerminalChunkKind.Stdout
+      });
+    }
+  }
+
   /**
    * Handles the result of the operation and propagates any relevant effects.
    */
   private _onOperationComplete(record: OperationExecutionRecord): void {
-    const { runner, name, status } = record;
-
-    const silent: boolean = runner.silent;
+    const { runner, name, status, silent } = record;
 
     switch (status) {
       /**
@@ -312,12 +312,10 @@ export class OperationExecutionManager {
       case OperationStatus.Failure: {
         // Failed operations get reported, even if silent.
         // Generally speaking, silent operations shouldn't be able to fail, so this is a safety measure.
-        const message: string | undefined = record.error?.message;
+        this._reportOperationErrorIfAny(record);
+
         // This creates the writer, so don't do this globally
         const { terminal } = record.collatedWriter;
-        if (message) {
-          terminal.writeStderrLine(message);
-        }
         terminal.writeStderrLine(Colorize.red(`"${name}" failed to build.`));
         const blockedQueue: Set<OperationExecutionRecord> = new Set(record.consumers);
 
@@ -326,13 +324,17 @@ export class OperationExecutionManager {
             // Now that we have the concept of architectural no-ops, we could implement this by replacing
             // {blockedRecord.runner} with a no-op that sets status to Blocked and logs the blocking
             // operations. However, the existing behavior is a bit simpler, so keeping that for now.
-            if (!blockedRecord.runner.silent) {
+            if (!blockedRecord.silent) {
               terminal.writeStdoutLine(`"${blockedRecord.name}" is blocked by "${name}".`);
             }
             blockedRecord.status = OperationStatus.Blocked;
 
             this._executionQueue.complete(blockedRecord);
-            this._completedOperations++;
+            if (!blockedRecord.silent) {
+              // Only increment the count if the operation is not silent to avoid confusing the user.
+              // The displayed total is the count of non-silent operations.
+              this._completedOperations++;
+            }
 
             for (const dependent of blockedRecord.consumers) {
               blockedQueue.add(dependent);
@@ -400,9 +402,11 @@ export class OperationExecutionManager {
       }
     }
 
-    if (record.status !== OperationStatus.RemoteExecuting) {
+    if (record.isTerminal) {
       // If the operation was not remote, then we can notify queue that it is complete
       this._executionQueue.complete(record);
+    } else {
+      this._executionQueue.assignOperations();
     }
   }
 }

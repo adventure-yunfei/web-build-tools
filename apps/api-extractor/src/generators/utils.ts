@@ -40,7 +40,7 @@ export function collectAllReferencedEntities(
       }
     } else if (astEntity instanceof AstNamespaceImport) {
       const astModuleExport: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
-      for (const exportedLocalEntity of astModuleExport.exportedLocalEntities.values()) {
+      for (const { astEntity: exportedLocalEntity } of astModuleExport.exportedLocalEntities.values()) {
         collectReferencesFromAstEntity(exportedLocalEntity);
       }
     }
@@ -49,7 +49,7 @@ export function collectAllReferencedEntities(
   for (const entity of collector.entities) {
     if (
       entity.exportedFromEntryPoint &&
-      Array.from(entity.exportNames).some((name) => !rootExportTrimmings.has(name))
+      Array.from(entity.exportNames.keys()).some((name) => !rootExportTrimmings.has(name))
     ) {
       collectReferencesFromAstEntity(entity.astEntity);
     }

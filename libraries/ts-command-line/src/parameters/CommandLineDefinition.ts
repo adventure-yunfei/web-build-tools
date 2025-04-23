@@ -127,8 +127,10 @@ export interface IBaseCommandLineDefinitionWithArgument extends IBaseCommandLine
    * @remarks
    * This option is only used when `ICommandLineParserOptions.enableTabCompletionAction`
    * is enabled.
+   *
+   * In a future release, this will be renamed to `getCompletionsAsync`
    */
-  completions?: () => Promise<string[]>;
+  completions?: () => Promise<ReadonlyArray<string> | ReadonlySet<string>>;
 }
 
 /**
@@ -144,7 +146,7 @@ export interface ICommandLineChoiceDefinition<TChoice extends string = string>
   /**
    * A list of strings (which contain no spaces), of possible options which can be selected
    */
-  alternatives: TChoice[];
+  alternatives: ReadonlyArray<TChoice> | ReadonlySet<TChoice>;
 
   /**
    * {@inheritDoc ICommandLineStringDefinition.defaultValue}
@@ -157,7 +159,7 @@ export interface ICommandLineChoiceDefinition<TChoice extends string = string>
    * This option is only used when `ICommandLineParserOptions.enableTabCompletionAction`
    * is enabled.
    */
-  completions?: () => Promise<TChoice[]>;
+  completions?: () => Promise<ReadonlyArray<TChoice> | ReadonlySet<TChoice>>;
 }
 
 /**
@@ -172,7 +174,7 @@ export interface ICommandLineChoiceListDefinition<TChoice extends string = strin
   /**
    * A list of strings (which contain no spaces), of possible options which can be selected
    */
-  alternatives: TChoice[];
+  alternatives: ReadonlyArray<TChoice> | ReadonlySet<TChoice>;
 
   /**
    * An optional callback that provides a list of custom choices for tab completion.
@@ -180,7 +182,7 @@ export interface ICommandLineChoiceListDefinition<TChoice extends string = strin
    * This option is only used when `ICommandLineParserOptions.enableTabCompletionAction`
    * is enabled.
    */
-  completions?: () => Promise<TChoice[]>;
+  completions?: () => Promise<ReadonlyArray<TChoice> | ReadonlySet<TChoice>>;
 }
 
 /**

@@ -73,13 +73,13 @@ export class TabCompleteAction extends CommandLineAction {
     const commandLine: string = this._wordToCompleteParameter.value;
     const caretPosition: number = this._positionParameter.value || commandLine.length;
 
-    for await (const value of this.getCompletions(commandLine, caretPosition)) {
+    for await (const value of this.getCompletionsAsync(commandLine, caretPosition)) {
       // eslint-disable-next-line no-console
       console.log(value);
     }
   }
 
-  public async *getCompletions(
+  public async *getCompletionsAsync(
     commandLine: string,
     caretPosition: number = commandLine.length
   ): AsyncIterable<string> {
@@ -103,7 +103,8 @@ export class TabCompleteAction extends CommandLineAction {
     const lastToken: string = tokens[tokens.length - 1];
     const secondLastToken: string = tokens[tokens.length - 2];
 
-    const completePartialWord: boolean = caretPosition === commandLine.length;
+    const lastCharacterIsWhitespace: boolean = !commandLine.slice(-1).trim();
+    const completePartialWord: boolean = caretPosition === commandLine.length && !lastCharacterIsWhitespace;
 
     if (completePartialWord && tokens.length === 2 + globalParameterOffset) {
       for (const actionName of actions.keys()) {
@@ -121,10 +122,10 @@ export class TabCompleteAction extends CommandLineAction {
           if (completePartialWord) {
             for (const parameterName of parameterNames) {
               if (parameterName === secondLastToken) {
-                const values: ReadonlyArray<string> = await this._getParameterValueCompletions(
+                const values: ReadonlySet<string> = await this._getParameterValueCompletionsAsync(
                   parameterNameMap.get(parameterName)!
                 );
-                if (values.length > 0) {
+                if (values.size > 0) {
                   yield* this._completeParameterValues(values, lastToken);
                   return;
                 }
@@ -134,10 +135,10 @@ export class TabCompleteAction extends CommandLineAction {
           } else {
             for (const parameterName of parameterNames) {
               if (parameterName === lastToken) {
-                const values: ReadonlyArray<string> = await this._getParameterValueCompletions(
+                const values: ReadonlySet<string> = await this._getParameterValueCompletionsAsync(
                   parameterNameMap.get(parameterName)!
                 );
-                if (values.length > 0) {
+                if (values.size > 0) {
                   yield* values;
                   return;
                 }
@@ -171,10 +172,10 @@ export class TabCompleteAction extends CommandLineAction {
     return stringArgv(commandLine);
   }
 
-  private async _getParameterValueCompletions(
+  private async _getParameterValueCompletionsAsync(
     parameter: CommandLineParameter
-  ): Promise<ReadonlyArray<string>> {
-    let choiceParameterValues: ReadonlyArray<string> = [];
+  ): Promise<ReadonlySet<string>> {
+    let choiceParameterValues: ReadonlySet<string> | undefined;
     if (parameter.kind === CommandLineParameterKind.Choice) {
       choiceParameterValues = parameter.alternatives;
     } else if (parameter.kind !== CommandLineParameterKind.Flag) {
@@ -189,12 +190,12 @@ export class TabCompleteAction extends CommandLineAction {
         parameterWithArgumentOrChoices = parameter;
       }
 
-      if (parameterWithArgumentOrChoices?.completions) {
-        choiceParameterValues = await parameterWithArgumentOrChoices.completions();
-      }
+      const completionValues: ReadonlyArray<string> | ReadonlySet<string> | undefined =
+        await parameterWithArgumentOrChoices?.completions?.();
+      choiceParameterValues = completionValues instanceof Set ? completionValues : new Set(completionValues);
     }
 
-    return choiceParameterValues;
+    return choiceParameterValues ?? new Set();
   }
 
   private _getGlobalParameterOffset(tokens: string[]): number {
@@ -214,7 +215,7 @@ export class TabCompleteAction extends CommandLineAction {
   }
 
   private *_completeParameterValues(
-    choiceParameterValues: ReadonlyArray<string>,
+    choiceParameterValues: ReadonlyArray<string> | ReadonlySet<string>,
     lastToken: string
   ): IterableIterator<string> {
     for (const choiceParameterValue of choiceParameterValues) {

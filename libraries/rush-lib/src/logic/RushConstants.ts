@@ -53,6 +53,13 @@ export class RushConstants {
   public static readonly rushTempNpmScope: '@rush-temp' = '@rush-temp';
 
   /**
+   * The folder name ("variants") under which named variant configurations for
+   * alternate dependency sets may be found.
+   * Example: `C:\MyRepo\common\config\rush\variants`
+   */
+  public static readonly rushVariantsFolderName: 'variants' = 'variants';
+
+  /**
    * The folder name ("temp") under the common folder, or under the .rush folder in each project's directory where
    * temporary files will be stored.
    * Example: `C:\MyRepo\common\temp`
@@ -320,4 +327,24 @@ export class RushConstants {
    */
   public static readonly projectImpactGraphFilename: 'project-impact-graph.yaml' =
     'project-impact-graph.yaml';
+
+  /**
+   * The filename for the last link flag
+   */
+  public static readonly lastLinkFlagFilename: 'last-link' = 'last-link';
+
+  /**
+   * The filename for the Rush alerts config file.
+   */
+  public static readonly rushAlertsConfigFilename: 'rush-alerts.json' = 'rush-alerts.json';
+
+  /**
+   * The filename for the machine-generated file that tracks state for Rush alerts.
+   */
+  public static readonly rushAlertsStateFilename: 'rush-alerts-state.json' = 'rush-alerts-state.json';
+
+  /**
+   * The filename for the file that tracks which variant is currently installed.
+   */
+  public static readonly currentVariantsFilename: 'current-variants.json' = 'current-variants.json';
 }

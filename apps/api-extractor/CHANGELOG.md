@@ -1,5 +1,20 @@
 # Change Log - api-extractor custom version
 
+## 7.48.1-rc.0
+- 合并 7.48.1
+
+## 7.43.1-rc.9
+- 优化 constructor 裁剪逻辑，输出 private constructor
+- api report: 保留 private constructor 输出
+
+## 7.43.1-rc.5
+- 支持 type export
+- api report: 修正 AstNamespaceImport 中遗漏外部导入接口的问题
+
+## 7.43.1-rc.3
+- api report: 修正 rootExportTrimmings 设置下可能造成某些引用类型丢失的问题
+- api model: 新增 rootExportTrimmings; 新增引用解析逻辑，仅导出有效类型
+
 ## 7.43.1-rc.2
 - dts rollup: 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法
 
@@ -65,7 +80,170 @@
 
 # Change Log - @microsoft/api-extractor
 
-This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 7.48.1
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 7.48.0
+Sat, 23 Nov 2024 01:18:55 GMT
+
+### Minor changes
+
+- Update TSDoc dependencies.
+
+## 7.47.12
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 7.47.11
+Thu, 17 Oct 2024 08:35:06 GMT
+
+_Version update only_
+
+## 7.47.10
+Tue, 15 Oct 2024 00:12:31 GMT
+
+### Patches
+
+- Fix a compatibility issue with usage of `getModeForUsageLocation` in TypeScript 5.6
+
+## 7.47.9
+Fri, 13 Sep 2024 00:11:42 GMT
+
+_Version update only_
+
+## 7.47.8
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 7.47.7
+Wed, 21 Aug 2024 05:43:04 GMT
+
+_Version update only_
+
+## 7.47.6
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 7.47.5
+Fri, 02 Aug 2024 17:26:42 GMT
+
+_Version update only_
+
+## 7.47.4
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 7.47.3
+Wed, 24 Jul 2024 00:12:14 GMT
+
+### Patches
+
+- Fix an edge case when discarding the file extension from the "reportFileName" setting and improve its documentation
+
+## 7.47.2
+Wed, 17 Jul 2024 06:55:09 GMT
+
+_Version update only_
+
+## 7.47.1
+Tue, 16 Jul 2024 00:36:22 GMT
+
+_Version update only_
+
+## 7.47.0
+Mon, 03 Jun 2024 23:43:15 GMT
+
+### Minor changes
+
+- Add support for re-exporting modules using syntax such as `export * as ns from './file'` (GitHub #2780)
+
+## 7.46.2
+Thu, 30 May 2024 00:13:05 GMT
+
+### Patches
+
+- Include missing `type` modifiers on type-only exports.
+
+## 7.46.1
+Wed, 29 May 2024 02:03:50 GMT
+
+_Version update only_
+
+## 7.46.0
+Wed, 29 May 2024 00:10:52 GMT
+
+### Minor changes
+
+- Bump TSDoc dependencies.
+
+## 7.45.1
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 7.45.0
+Tue, 28 May 2024 00:09:47 GMT
+
+### Minor changes
+
+- Improve support for resolving the `tsdoc-metadata.json` to include the folder referenced by a `types` field in an `"exports"` field and an `"typesVersions"` field in addition to `"types"`, `"typings"`, and `"tsdocMetadata"` fields.
+
+## 7.44.1
+Sat, 25 May 2024 04:54:07 GMT
+
+_Version update only_
+
+## 7.44.0
+Fri, 24 May 2024 00:15:08 GMT
+
+### Minor changes
+
+- Add support for "variants" of API reports which include or exclude items by release tag
+
+## 7.43.8
+Thu, 23 May 2024 02:26:56 GMT
+
+_Version update only_
+
+## 7.43.7
+Thu, 16 May 2024 15:10:22 GMT
+
+_Version update only_
+
+## 7.43.6
+Wed, 15 May 2024 23:42:58 GMT
+
+_Version update only_
+
+## 7.43.5
+Wed, 15 May 2024 06:04:17 GMT
+
+_Version update only_
+
+## 7.43.4
+Fri, 10 May 2024 05:33:33 GMT
+
+_Version update only_
+
+## 7.43.3
+Wed, 08 May 2024 22:23:50 GMT
+
+_Version update only_
+
+## 7.43.2
+Mon, 06 May 2024 15:11:04 GMT
+
+_Version update only_
 
 ## 7.43.1
 Wed, 10 Apr 2024 15:10:09 GMT

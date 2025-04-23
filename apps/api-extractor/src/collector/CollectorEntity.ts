@@ -8,6 +8,7 @@ import { Collector } from './Collector';
 import { Sort } from '@rushstack/node-core-library';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
+import { AstNamespaceExport } from '../analyzer/AstNamespaceExport';
 
 /**
  * This is a data structure used by the Collector to track an AstEntity that may be emitted in the *.d.ts file.
@@ -24,10 +25,11 @@ export class CollectorEntity {
    */
   public readonly astEntity: AstEntity;
 
-  private _exportNames: Set<string> = new Set();
+  private _exportNames: Map<string, { isTypeOnlyExport: boolean }> = new Map();
   private _exportNamesSorted: boolean = false;
   private _singleExportName: string | undefined = undefined;
-  private _localExportNamesByParent: Map<CollectorEntity, Set<string>> = new Map();
+  private _localExportNamesByParent: Map<CollectorEntity, Map<string, { isTypeOnlyExport: boolean }>> =
+    new Map();
 
   private _nameForEmit: string | undefined = undefined;
 
@@ -62,9 +64,9 @@ export class CollectorEntity {
    * export { X as Y }
    * ```
    */
-  public get exportNames(): ReadonlySet<string> {
+  public get exportNames(): ReadonlyMap<string, { isTypeOnlyExport: boolean }> {
     if (!this._exportNamesSorted) {
-      Sort.sortSet(this._exportNames);
+      Sort.sortMapKeys(this._exportNames);
       this._exportNamesSorted = true;
     }
     return this._exportNames;
@@ -83,10 +85,19 @@ export class CollectorEntity {
    * such as "export class X { }" instead of "export { X }".
    */
   public get shouldInlineExport(): boolean {
+    // We export the namespace directly
+    if (this.astEntity instanceof AstNamespaceExport) {
+      return true;
+    }
+
     // We don't inline an AstImport
     if (this.astEntity instanceof AstSymbol || this.astEntity instanceof AstNamespaceImport) {
       // We don't inline a symbol with more than one exported name
       if (this._singleExportName !== undefined && this._singleExportName !== ts.InternalSymbolName.Default) {
+        // We can't inline a type-only export
+        if (this._exportNames.get(this._singleExportName)?.isTypeOnlyExport) {
+          return false;
+        }
         // We can't inline a symbol whose emitted name is different from the export name
         if (this._nameForEmit === undefined || this._nameForEmit === this._singleExportName) {
           return true;
@@ -185,7 +196,7 @@ export class CollectorEntity {
     | undefined {
     for (const [parent, localExportNames] of this._localExportNamesByParent) {
       if (parent.consumable && localExportNames.size > 0) {
-        return { entity: parent, exportNames: localExportNames };
+        return { entity: parent, exportNames: new Set(localExportNames.keys()) };
       }
     }
     return undefined;
@@ -204,10 +215,12 @@ export class CollectorEntity {
   /**
    * Adds a new export name to the entity.
    */
-  public addExportName(exportName: string): void {
+  public addExportName(exportName: string, isTypeOnlyExport: boolean): void {
     if (!this._exportNames.has(exportName)) {
       this._exportNamesSorted = false;
-      this._exportNames.add(exportName);
+      this._exportNames.set(exportName, {
+        isTypeOnlyExport: isTypeOnlyExport && (this._exportNames.get(exportName)?.isTypeOnlyExport ?? true)
+      });
 
       if (this._exportNames.size === 1) {
         this._singleExportName = exportName;
@@ -234,9 +247,16 @@ export class CollectorEntity {
    *
    * `add` is the local export name for the `CollectorEntity` for `add`.
    */
-  public addLocalExportName(localExportName: string, parent: CollectorEntity): void {
-    const localExportNames: Set<string> = this._localExportNamesByParent.get(parent) || new Set();
-    localExportNames.add(localExportName);
+  public addLocalExportName(
+    localExportName: string,
+    isTypeOnlyExport: boolean,
+    parent: CollectorEntity
+  ): void {
+    const localExportNames: Map<string, { isTypeOnlyExport: boolean }> =
+      this._localExportNamesByParent.get(parent) || new Map();
+    localExportNames.set(localExportName, {
+      isTypeOnlyExport: isTypeOnlyExport && (localExportNames.get(localExportName)?.isTypeOnlyExport ?? true)
+    });
 
     this._localExportNamesByParent.set(parent, localExportNames);
   }

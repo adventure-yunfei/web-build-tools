@@ -1,6 +1,198 @@
 # Change Log - @rushstack/webpack4-module-minifier-plugin
 
-This log was last generated on Wed, 10 Apr 2024 15:10:09 GMT and should not be manually modified.
+This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+
+## 0.13.80
+Sat, 14 Dec 2024 01:11:07 GMT
+
+_Version update only_
+
+## 0.13.79
+Mon, 09 Dec 2024 20:31:43 GMT
+
+_Version update only_
+
+## 0.13.78
+Tue, 03 Dec 2024 16:11:08 GMT
+
+_Version update only_
+
+## 0.13.77
+Sat, 23 Nov 2024 01:18:55 GMT
+
+_Version update only_
+
+## 0.13.76
+Fri, 22 Nov 2024 01:10:43 GMT
+
+_Version update only_
+
+## 0.13.75
+Thu, 24 Oct 2024 00:15:48 GMT
+
+_Version update only_
+
+## 0.13.74
+Mon, 21 Oct 2024 18:50:10 GMT
+
+_Version update only_
+
+## 0.13.73
+Thu, 17 Oct 2024 08:35:06 GMT
+
+_Version update only_
+
+## 0.13.72
+Tue, 15 Oct 2024 00:12:31 GMT
+
+_Version update only_
+
+## 0.13.71
+Wed, 02 Oct 2024 00:11:19 GMT
+
+_Version update only_
+
+## 0.13.70
+Tue, 01 Oct 2024 00:11:28 GMT
+
+_Version update only_
+
+## 0.13.69
+Mon, 30 Sep 2024 15:12:19 GMT
+
+_Version update only_
+
+## 0.13.68
+Fri, 13 Sep 2024 00:11:43 GMT
+
+_Version update only_
+
+## 0.13.67
+Tue, 10 Sep 2024 20:08:11 GMT
+
+_Version update only_
+
+## 0.13.66
+Wed, 21 Aug 2024 05:43:04 GMT
+
+_Version update only_
+
+## 0.13.65
+Mon, 12 Aug 2024 22:16:04 GMT
+
+_Version update only_
+
+## 0.13.64
+Fri, 02 Aug 2024 17:26:42 GMT
+
+_Version update only_
+
+## 0.13.63
+Sat, 27 Jul 2024 00:10:27 GMT
+
+### Patches
+
+- Include CHANGELOG.md in published releases again
+
+## 0.13.62
+Wed, 24 Jul 2024 00:12:14 GMT
+
+_Version update only_
+
+## 0.13.61
+Wed, 17 Jul 2024 06:55:10 GMT
+
+_Version update only_
+
+## 0.13.60
+Wed, 17 Jul 2024 00:11:19 GMT
+
+_Version update only_
+
+## 0.13.59
+Tue, 16 Jul 2024 00:36:22 GMT
+
+_Version update only_
+
+## 0.13.58
+Thu, 27 Jun 2024 21:01:36 GMT
+
+_Version update only_
+
+## 0.13.57
+Mon, 03 Jun 2024 23:43:15 GMT
+
+_Version update only_
+
+## 0.13.56
+Thu, 30 May 2024 00:13:05 GMT
+
+_Version update only_
+
+## 0.13.55
+Wed, 29 May 2024 02:03:51 GMT
+
+_Version update only_
+
+## 0.13.54
+Wed, 29 May 2024 00:10:52 GMT
+
+_Version update only_
+
+## 0.13.53
+Tue, 28 May 2024 15:10:09 GMT
+
+_Version update only_
+
+## 0.13.52
+Tue, 28 May 2024 00:09:47 GMT
+
+_Version update only_
+
+## 0.13.51
+Sat, 25 May 2024 04:54:07 GMT
+
+_Version update only_
+
+## 0.13.50
+Fri, 24 May 2024 00:15:08 GMT
+
+_Version update only_
+
+## 0.13.49
+Thu, 23 May 2024 02:26:56 GMT
+
+_Version update only_
+
+## 0.13.48
+Thu, 16 May 2024 15:10:22 GMT
+
+_Version update only_
+
+## 0.13.47
+Wed, 15 May 2024 23:42:58 GMT
+
+_Version update only_
+
+## 0.13.46
+Wed, 15 May 2024 06:04:17 GMT
+
+_Version update only_
+
+## 0.13.45
+Fri, 10 May 2024 05:33:34 GMT
+
+_Version update only_
+
+## 0.13.44
+Wed, 08 May 2024 22:23:51 GMT
+
+_Version update only_
+
+## 0.13.43
+Mon, 06 May 2024 15:11:04 GMT
+
+_Version update only_
 
 ## 0.13.42
 Wed, 10 Apr 2024 15:10:09 GMT

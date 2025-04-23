@@ -113,7 +113,7 @@ export class ApiModelGenerator {
         (entity.exportedFromEntryPoint ||
           (this._collector.extractorConfig.docModelIncludeForgottenExports && !entity.exported))
       ) {
-        const firstExportedName: string | undefined = Array.from(entity.exportNames).find(
+        const firstExportedName: string | undefined = Array.from(entity.exportNames.keys()).find(
           (n) => !this._rootExportTrimmings.has(n)
         );
         this._processAstEntity(entity.astEntity, {
@@ -200,7 +200,7 @@ export class ApiModelGenerator {
     }
 
     astModule.astModuleExportInfo!.exportedLocalEntities.forEach(
-      (exportedEntity: AstEntity, exportedName: string) => {
+      ({ astEntity: exportedEntity }, exportedName: string) => {
         const exportedCollectorEntity: CollectorEntity | undefined =
           this._collector.tryGetCollectorEntity(exportedEntity);
         if (
