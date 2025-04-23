@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.48.1-rc.1
+- api report: 修正 AstNamespaceImport 中的裁剪支持
+
 ## 7.48.1-rc.0
 - 合并 7.48.1
 

@@ -158,7 +158,7 @@
       某些情况下 ts 会自动编译产出一些 string union 类型（比如 `Omit` 类型），这些 string 类型有时候会变更顺序，导致不必要的 api review 变更；排序可以消除这类变更。
 
     </details>
-  - 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a, 09053e057c72ab03093123156c93f678755a049d)
+  - 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a, 09053e057c72ab03093123156c93f678755a049d, 61f2be778a40bfdc7cd2186a7001b38bd45bbc15)
     - 默认开启 `@beta` release 裁剪，移除 `@internal` 变更（可通过 `env.API_REPORT_TRIMMING` 环境变量修改）
     - 新增 entity 有效引用分析，`includeForgottenExports` 下仅导出实际被引用的 entity
     - 新增 rootExportTrimmings 选项，裁剪根节点导出内容 (通过 `env.API_REPORT_EXPORT_TRIMMINGS` 环境变量设置)
