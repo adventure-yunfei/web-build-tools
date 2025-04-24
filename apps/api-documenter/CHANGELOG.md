@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.26.3-rc.1
+- 新增 `_writePreContent`, 支持插入文档开头内容
+
 ## 7.26.3-rc.0
 - 合并 7.26.3
 

@@ -228,3 +228,4 @@
 - markdown 输出结果兼容 mdx@1.x，以支持 Docusaurus 文档工具 (73be47af637970a5a54240a752e8fc579bbbde1f)
 - 支持移除 Home 导航链接 (59afa81a5545a93449e3a22a60a22a78054188b1)
 - `ApiPackage` 页面仅生成导出接口内容 (90c1a4efb1ca60b2347163432710fe957f2ce6db)
+- 支持插入文档开头内容 (02c9f323d5dfbb7223ab581db419758b89b367ae)
