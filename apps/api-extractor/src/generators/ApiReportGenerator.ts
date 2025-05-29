@@ -331,7 +331,7 @@ export class ApiReportGenerator {
     if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, apiReportTimming) < 0) {
       span.modification.skipAll();
       if (this._isTrimmedConstructor(collector, astDeclaration.astSymbol, apiReportTimming)) {
-        if (astDeclaration == last(astDeclaration.astSymbol.astDeclarations)) {
+        if (astDeclaration === last(astDeclaration.astSymbol.astDeclarations)) {
           // If all constructor declarations are trimmed, then emit private constructor.
           span.modification.prefix += 'private constructor();\n';
         }
