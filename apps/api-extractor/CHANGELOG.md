@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.48.1-rc.2
+- api model: 修正 rootExportTrimmings 引用丢失（回滚为初始的根据 Collector Entity 导出结构输出 API Model）
+
 ## 7.48.1-rc.1
 - api report: 修正 AstNamespaceImport 中的裁剪支持
 
