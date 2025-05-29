@@ -113,9 +113,7 @@ export class ApiModelGenerator {
         (entity.exportedFromEntryPoint ||
           (this._collector.extractorConfig.docModelIncludeForgottenExports && !entity.exported))
       ) {
-        const firstExportedName: string | undefined = Array.from(entity.exportNames.keys()).find(
-          (n) => !this._rootExportTrimmings.has(n)
-        );
+        const firstExportedName: string | undefined = Array.from(entity.exportNames.keys())[0];
         this._processAstEntity(entity.astEntity, {
           name: firstExportedName || entity.nameForEmit!,
           isExported: entity.exportedFromEntryPoint && firstExportedName !== undefined,
