@@ -24,6 +24,7 @@ import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { AstModuleExportInfo } from '../analyzer/AstModule';
 import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
 import type { AstEntity } from '../analyzer/AstEntity';
+import { collectAllReferencedEntities } from './utils';
 
 /**
  * Used with DtsRollupGenerator.writeTypingsFile()
@@ -103,8 +104,24 @@ export class DtsRollupGenerator {
     }
     writer.ensureSkippedLine();
 
+    const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
+      collector,
+      dtsKind === DtsRollupKind.PublicRelease
+        ? ReleaseTag.Public
+        : dtsKind === DtsRollupKind.BetaRelease
+          ? ReleaseTag.Beta
+          : dtsKind === DtsRollupKind.AlphaRelease
+            ? ReleaseTag.Alpha
+            : ReleaseTag.Internal,
+      new Set()
+    );
+
     // Emit the imports
     for (const entity of collector.entities) {
+      if (!referencedEntities.has(entity)) {
+        continue;
+      }
+
       if (entity.astEntity instanceof AstImport) {
         // Note: it isn't valid to trim imports based on their release tags.
         // E.g. class Foo (`@public`) extends interface Bar (`@beta`) from some external library.
@@ -129,6 +146,10 @@ export class DtsRollupGenerator {
           writer.ensureSkippedLine();
           writer.writeLine(`/* Excluded from this release type: ${entity.nameForEmit} */`);
         }
+        continue;
+      }
+
+      if (!referencedEntities.has(entity)) {
         continue;
       }
 
