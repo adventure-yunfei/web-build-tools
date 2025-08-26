@@ -432,10 +432,11 @@ export class DtsRollupGenerator {
                 nodeToTrim.parent.parent?.kind === ts.SyntaxKind.ClassDeclaration)
             ) {
               if (
-                nodeToTrim.kind === ts.SyntaxKind.PropertyDeclaration ||
-                nodeToTrim.kind === ts.SyntaxKind.MethodDeclaration ||
-                nodeToTrim.kind === ts.SyntaxKind.GetAccessor ||
-                nodeToTrim.kind === ts.SyntaxKind.SetAccessor
+                (nodeToTrim.kind === ts.SyntaxKind.PropertyDeclaration ||
+                  nodeToTrim.kind === ts.SyntaxKind.MethodDeclaration ||
+                  nodeToTrim.kind === ts.SyntaxKind.GetAccessor ||
+                  nodeToTrim.kind === ts.SyntaxKind.SetAccessor) &&
+                !name.startsWith('[') /* ignore symbol key like "[X.Y.z]" */
               ) {
                 const declarartionsWithSameName: readonly AstDeclaration[] =
                   astDeclaration.findChildrenWithName(name);
