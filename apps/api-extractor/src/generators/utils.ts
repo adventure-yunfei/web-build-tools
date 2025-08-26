@@ -6,6 +6,7 @@ import { AstSymbol } from '../analyzer/AstSymbol';
 import { ApiItemMetadata } from '../collector/ApiItemMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import { AstModuleExportInfo } from '../analyzer/AstModule';
+import { AstImport } from '../analyzer/AstImport';
 
 export function collectAllReferencedEntities(
   collector: Collector,
@@ -45,8 +46,18 @@ export function collectAllReferencedEntities(
       for (const { astEntity: exportedLocalEntity } of astModuleExport.exportedLocalEntities.values()) {
         collectReferencesFromAstEntity(exportedLocalEntity);
       }
-    } else {
+    } else if (astEntity instanceof AstImport) {
       referencedAstEntities.add(astEntity);
+
+      if (astEntity.exportPath.length > 1) {
+        const referencedAstImport: AstImport | undefined =
+          collector.astSymbolTable.tryGetReferencedAstImport(astEntity);
+        if (referencedAstImport) {
+          collectReferencesFromAstEntity(referencedAstImport);
+        }
+      }
+    } else {
+      throw new Error('Unknown AstEntity class: ' + astEntity.constructor.name);
     }
   }
 
