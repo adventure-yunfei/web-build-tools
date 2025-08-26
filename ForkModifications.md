@@ -109,7 +109,7 @@
 
   </details>
 - Dts Rollup:
-  - 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723)
+  - 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723, 184ad9b347f6d0923649006945c8043fbf184cfb)
     <details>
 
       dts 输入：
@@ -131,7 +131,7 @@
       ```
 
     </details>
-  - 增强裁剪逻辑，去除 dts rollup 输出中未被引用的声明 (2d4f597068b401a7660af9358caad8e2e6d6e60e)
+  - 增强裁剪逻辑，去除 dts rollup 输出中未被引用的声明 (2d4f597068b401a7660af9358caad8e2e6d6e60e, 89e71f9c551d743df22a399401f0e051e846622c)
 - API Json:
   - 新增 api model Release Trimming 功能 (33c17c2c814a8b2ecd7058a9dc93b99a1e3243df, 09053e057c72ab03093123156c93f678755a049d)
 - API Review:
