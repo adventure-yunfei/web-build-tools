@@ -74,4 +74,15 @@ export class SyntaxHelpers {
     }
     return parts.join('');
   }
+
+  public static collectIdentifierPath(node: ts.EntityName): readonly ts.Identifier[] {
+    const identifiers: ts.Identifier[] = [];
+    let leftNode: ts.EntityName = node;
+    while (leftNode.kind === ts.SyntaxKind.QualifiedName) {
+      identifiers.unshift(leftNode.right);
+      leftNode = leftNode.left;
+    }
+    identifiers.unshift(leftNode);
+    return identifiers;
+  }
 }

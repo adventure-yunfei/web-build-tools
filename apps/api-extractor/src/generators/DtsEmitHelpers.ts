@@ -79,6 +79,28 @@ export class DtsEmitHelpers {
     }
   }
 
+  public static emitEqualsImport(
+    writer: IndentedWriter,
+    collector: Collector,
+    collectorEntity: CollectorEntity,
+    astSubPathImport: AstSubPathImport
+  ): void {
+    if (astSubPathImport.isImportTypeEverywhere) {
+      return;
+    }
+    const baseEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(
+      astSubPathImport.baseAstEntity
+    );
+    if (!baseEntity) {
+      throw new InternalError(
+        `Base collector entity for AstSubPathImport not found: ${astSubPathImport.baseAstEntity.localName}`
+      );
+    }
+    writer.writeLine(
+      `import ${collectorEntity.nameForEmit} = ${baseEntity.nameForEmit}.${astSubPathImport.exportPath.join('.')};`
+    );
+  }
+
   public static modifyImportTypeSpan(
     collector: Collector,
     span: Span,
