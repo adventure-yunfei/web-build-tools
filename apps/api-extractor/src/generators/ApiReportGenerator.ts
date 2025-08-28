@@ -23,6 +23,7 @@ import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationForma
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 import type { ApiReportVariant } from '../api/IConfigFile';
 import type { SymbolMetadata } from '../collector/SymbolMetadata';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 export class ApiReportGenerator {
   private static _trimSpacesRegExp: RegExp = / +$/gm;
@@ -87,6 +88,10 @@ export class ApiReportGenerator {
     for (const entity of collector.entities) {
       if (entity.astEntity instanceof AstImport) {
         DtsEmitHelpers.emitImport(writer, entity, entity.astEntity);
+      }
+
+      if (entity.astEntity instanceof AstSubPathImport) {
+        DtsEmitHelpers.emitEqualsImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();

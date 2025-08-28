@@ -21,6 +21,7 @@ import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
 import type { AstEntity } from '../analyzer/AstEntity';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 /**
  * Used with DtsRollupGenerator.writeTypingsFile()
@@ -109,6 +110,10 @@ export class DtsRollupGenerator {
         // or the export of `Foo` would include a broken reference to `Bar`.
         const astImport: AstImport = entity.astEntity;
         DtsEmitHelpers.emitImport(writer, entity, astImport);
+      }
+
+      if (entity.astEntity instanceof AstSubPathImport) {
+        DtsEmitHelpers.emitEqualsImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();
