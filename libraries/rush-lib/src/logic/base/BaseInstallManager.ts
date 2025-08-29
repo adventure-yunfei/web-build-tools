@@ -59,6 +59,7 @@ import { ProjectImpactGraphGenerator } from '../ProjectImpactGraphGenerator';
 import { FlagFile } from '../../api/FlagFile';
 import { PnpmShrinkwrapFile } from '../pnpm/PnpmShrinkwrapFile';
 import { PnpmSyncUtilities } from '../../utilities/PnpmSyncUtilities';
+import { HotlinkManager } from '../../utilities/HotlinkManager';
 
 /**
  * Pnpm don't support --ignore-compatibility-db, so use --config.ignoreCompatibilityDb for now.
@@ -193,6 +194,12 @@ export abstract class BaseInstallManager {
       statePropertiesToIgnore: optionsToIgnore
     }));
 
+    const hotlinkManager: HotlinkManager = HotlinkManager.loadFromRushConfiguration(this.rushConfiguration);
+    const wasNodeModulesModifiedOutsideInstallation: boolean = await hotlinkManager.purgeLinksAsync(
+      this._terminal,
+      subspace.subspaceName
+    );
+
     // Allow us to defer the file read until we need it
     const canSkipInstallAsync: () => Promise<boolean> = async () => {
       // Based on timestamps, can we skip this install entirely?
@@ -203,6 +210,7 @@ export abstract class BaseInstallManager {
     if (
       resolutionOnly ||
       cleanInstall ||
+      wasNodeModulesModifiedOutsideInstallation ||
       !variantIsUpToDate ||
       !shrinkwrapIsUpToDate ||
       !(await canSkipInstallAsync()) ||
@@ -285,16 +293,21 @@ export abstract class BaseInstallManager {
     if (this.rushConfiguration.isPnpm && experiments?.usePnpmSyncForInjectedDependencies) {
       const pnpmLockfilePath: string = subspace.getTempShrinkwrapFilename();
       const dotPnpmFolder: string = `${subspace.getSubspaceTempFolderPath()}/node_modules/.pnpm`;
+      const modulesFilePath: string = `${subspace.getSubspaceTempFolderPath()}/node_modules/.modules.yaml`;
 
       // we have an edge case here
       // if a package.json has no dependencies, pnpm will still generate the pnpm-lock.yaml but not .pnpm folder
       // so we need to make sure pnpm-lock.yaml and .pnpm exists before calling the pnpmSync APIs
-      if ((await FileSystem.existsAsync(pnpmLockfilePath)) && (await FileSystem.existsAsync(dotPnpmFolder))) {
+      if (
+        (await FileSystem.existsAsync(pnpmLockfilePath)) &&
+        (await FileSystem.existsAsync(dotPnpmFolder)) &&
+        (await FileSystem.existsAsync(modulesFilePath))
+      ) {
         await pnpmSyncPrepareAsync({
           lockfilePath: pnpmLockfilePath,
           dotPnpmFolder,
           lockfileId: subspace.subspaceName,
-          ensureFolderAsync: FileSystem.ensureFolderAsync,
+          ensureFolderAsync: FileSystem.ensureFolderAsync.bind(FileSystem),
           // eslint-disable-next-line @typescript-eslint/naming-convention
           readPnpmLockfile: async (lockfilePath: string) => {
             const wantedPnpmLockfile: PnpmShrinkwrapFile | undefined = PnpmShrinkwrapFile.loadFromFile(
@@ -333,7 +346,7 @@ export abstract class BaseInstallManager {
 
       // clean up the out of date .pnpm-sync.json
       for (const rushProject of subspace.getProjects()) {
-        const pnpmSyncJsonPath: string = `${rushProject.projectFolder}/node_modules/.pnpm-sync.json`;
+        const pnpmSyncJsonPath: string = `${rushProject.projectFolder}/${RushConstants.nodeModulesFolderName}/${RushConstants.pnpmSyncFilename}`;
         if (!existsSync(pnpmSyncJsonPath)) {
           continue;
         }

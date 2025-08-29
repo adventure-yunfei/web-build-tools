@@ -9,10 +9,10 @@ import type { AstEntity } from './AstEntity';
 /**
  * Represents information collected by {@link AstSymbolTable.fetchAstModuleExportInfo}
  */
-export class AstModuleExportInfo {
-  public readonly exportedLocalEntities: Map<string, { astEntity: AstEntity; isTypeOnlyExport: boolean }> =
-    new Map();
-  public readonly starExportedExternalModules: Map<AstModule, { isTypeOnlyExport: boolean }> = new Map();
+export interface IAstModuleExportInfo {
+  readonly visitedAstModules: Set<AstModule>;
+  readonly exportedLocalEntities: Map<string, { astEntity: AstEntity; isTypeOnlyExport: boolean }>;
+  readonly starExportedExternalModules: Map<AstModule, { isTypeOnlyExport: boolean }>;
 }
 
 /**
@@ -65,7 +65,7 @@ export class AstModule {
   /**
    * Additional state calculated by `AstSymbolTable.fetchWorkingPackageModule()`.
    */
-  public astModuleExportInfo: AstModuleExportInfo | undefined;
+  public astModuleExportInfo: IAstModuleExportInfo | undefined;
 
   public constructor(options: IAstModuleOptions) {
     this.sourceFile = options.sourceFile;

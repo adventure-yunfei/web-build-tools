@@ -1,6 +1,226 @@
 # Change Log - @rushstack/heft-web-rig
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 26 Aug 2025 00:12:57 GMT and should not be manually modified.
+
+## 0.29.6
+Tue, 26 Aug 2025 00:12:57 GMT
+
+_Version update only_
+
+## 0.29.5
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.29.4
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.29.3
+Mon, 28 Jul 2025 15:11:56 GMT
+
+_Version update only_
+
+## 0.29.2
+Sat, 26 Jul 2025 00:12:22 GMT
+
+_Version update only_
+
+## 0.29.1
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.29.0
+Wed, 09 Jul 2025 04:01:17 GMT
+
+### Minor changes
+
+- Clean the temp/sass-ts folder.
+
+## 0.28.17
+Thu, 26 Jun 2025 18:57:04 GMT
+
+_Version update only_
+
+## 0.28.16
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.28.15
+Fri, 06 Jun 2025 00:11:09 GMT
+
+_Version update only_
+
+## 0.28.14
+Thu, 15 May 2025 00:11:49 GMT
+
+_Version update only_
+
+## 0.28.13
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.28.12
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.28.11
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.28.10
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.28.9
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.28.8
+Thu, 17 Apr 2025 00:11:21 GMT
+
+### Patches
+
+- Update documentation for `extends`
+
+## 0.28.7
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 0.28.6
+Wed, 09 Apr 2025 00:11:03 GMT
+
+_Version update only_
+
+## 0.28.5
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.28.4
+Tue, 25 Mar 2025 15:11:15 GMT
+
+_Version update only_
+
+## 0.28.3
+Tue, 25 Mar 2025 00:12:04 GMT
+
+_Version update only_
+
+## 0.28.2
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.28.1
+Wed, 12 Mar 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.28.0
+Tue, 11 Mar 2025 02:12:33 GMT
+
+### Minor changes
+
+- Bump TypeScript to ~5.8.2.
+
+## 0.27.2
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.27.1
+Thu, 06 Mar 2025 01:10:42 GMT
+
+_Version update only_
+
+## 0.27.0
+Tue, 04 Mar 2025 16:10:41 GMT
+
+### Minor changes
+
+- Bump Webpack to ~5.98.0.
+
+## 0.26.0
+Sat, 01 Mar 2025 07:23:16 GMT
+
+### Minor changes
+
+- Bump the `typescript` dependency to `~5.7.3`.
+
+## 0.25.26
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.25.25
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.25.24
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 0.25.23
+Tue, 25 Feb 2025 01:11:55 GMT
+
+_Version update only_
+
+## 0.25.22
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.25.21
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.25.20
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.25.19
+Fri, 07 Feb 2025 01:10:49 GMT
+
+_Version update only_
+
+## 0.25.18
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 0.25.17
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.25.16
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.25.15
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
+
+## 0.25.14
+Tue, 07 Jan 2025 16:11:06 GMT
+
+_Version update only_
 
 ## 0.25.13
 Sat, 14 Dec 2024 01:11:07 GMT

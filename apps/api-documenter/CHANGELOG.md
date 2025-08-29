@@ -25,7 +25,154 @@
 
 # Change Log - @microsoft/api-documenter
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 7.26.32
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 7.26.31
+Fri, 01 Aug 2025 00:12:48 GMT
+
+_Version update only_
+
+## 7.26.30
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 7.26.29
+Tue, 24 Jun 2025 00:11:43 GMT
+
+### Patches
+
+- Ensure a new line is inserted after rendering a table
+
+## 7.26.28
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 7.26.27
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 7.26.26
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 7.26.25
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 7.26.24
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 7.26.23
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 7.26.22
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 7.26.21
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 7.26.20
+Wed, 09 Apr 2025 00:11:02 GMT
+
+_Version update only_
+
+## 7.26.19
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 7.26.18
+Tue, 25 Mar 2025 15:11:15 GMT
+
+_Version update only_
+
+## 7.26.17
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 7.26.16
+Wed, 12 Mar 2025 00:11:31 GMT
+
+_Version update only_
+
+## 7.26.15
+Tue, 11 Mar 2025 02:12:33 GMT
+
+_Version update only_
+
+## 7.26.14
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 7.26.13
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 7.26.12
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 7.26.11
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 7.26.10
+Sat, 22 Feb 2025 01:11:11 GMT
+
+_Version update only_
+
+## 7.26.9
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 7.26.8
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 7.26.7
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 7.26.6
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 7.26.5
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 7.26.4
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 7.26.3
 Sat, 14 Dec 2024 01:11:07 GMT

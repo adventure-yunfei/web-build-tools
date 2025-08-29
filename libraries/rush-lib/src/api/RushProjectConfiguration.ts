@@ -12,6 +12,8 @@ import type { IPhase } from './CommandLineConfiguration';
 import { OverlappingPathAnalyzer } from '../utilities/OverlappingPathAnalyzer';
 import schemaJson from '../schemas/rush-project.schema.json';
 import anythingSchemaJson from '../schemas/rush-project.schema.json';
+import { HotlinkManager } from '../utilities/HotlinkManager';
+import type { RushConfiguration } from './RushConfiguration';
 
 /**
  * Describes the file structure for the `<project root>/config/rush-project.json` config file.
@@ -139,6 +141,11 @@ export interface IOperationSettings {
    * If true, this operation can use cobuilds for orchestration without restoring build cache entries.
    */
   allowCobuildWithoutCache?: boolean;
+
+  /**
+   * If true, this operation will never be skipped by the `--changed-projects-only` flag.
+   */
+  ignoreChangedProjectsOnlyFlag?: boolean;
 }
 
 interface IOldRushProjectJson {
@@ -345,6 +352,14 @@ export class RushProjectConfiguration {
     phaseName: string,
     isNoOp: boolean
   ): string | undefined {
+    const rushConfiguration: RushConfiguration | undefined = this.project.rushConfiguration;
+    if (rushConfiguration) {
+      const hotlinkManager: HotlinkManager = HotlinkManager.loadFromRushConfiguration(rushConfiguration);
+      if (hotlinkManager.hasAnyHotlinksInSubspace(this.project.subspace.subspaceName)) {
+        return 'Caching has been disabled for this project because it is in a subspace with hotlinked dependencies.';
+      }
+    }
+
     // Skip no-op operations as they won't have any output/cacheable things.
     if (isNoOp) {
       return undefined;

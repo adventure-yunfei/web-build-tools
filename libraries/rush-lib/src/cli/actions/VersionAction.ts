@@ -216,8 +216,8 @@ export class VersionAction extends BaseRushAction {
     // Validate result of all subspaces
     for (const subspace of rushConfig.subspaces) {
       // Respect the `ensureConsistentVersions` field in rush.json
-      if (!subspace.shouldEnsureConsistentVersions) {
-        return;
+      if (!subspace.shouldEnsureConsistentVersions(variant)) {
+        continue;
       }
 
       const mismatchFinder: VersionMismatchFinder = VersionMismatchFinder.getMismatches(rushConfig, {
@@ -280,14 +280,14 @@ export class VersionAction extends BaseRushAction {
     }
 
     if (changeLogUpdated || packageJsonUpdated) {
-      await publishGit.pushAsync(tempBranch, !this._ignoreGitHooksParameter.value);
+      await publishGit.pushAsync(tempBranch, !this._ignoreGitHooksParameter.value, false);
 
       // Now merge to target branch.
       await publishGit.fetchAsync();
       await publishGit.checkoutAsync(targetBranch);
       await publishGit.pullAsync(!this._ignoreGitHooksParameter.value);
       await publishGit.mergeAsync(tempBranch, !this._ignoreGitHooksParameter.value);
-      await publishGit.pushAsync(targetBranch, !this._ignoreGitHooksParameter.value);
+      await publishGit.pushAsync(targetBranch, !this._ignoreGitHooksParameter.value, false);
       await publishGit.deleteBranchAsync(tempBranch, true, !this._ignoreGitHooksParameter.value);
     } else {
       // skip commits

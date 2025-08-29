@@ -104,6 +104,11 @@ export class RushConstants {
   public static readonly pnpmModulesFilename: '.modules.yaml' = '.modules.yaml';
 
   /**
+   * The folder name (".pnpm") used by pnpm to store the code of the dependencies for this subspace
+   */
+  public static readonly pnpmVirtualStoreFolderName: '.pnpm' = '.pnpm';
+
+  /**
    * The filename ("global-pnpmfile.cjs") used to add custom configuration to subspaces
    */
   public static readonly pnpmfileGlobalFilename: 'global-pnpmfile.cjs' = 'global-pnpmfile.cjs';
@@ -339,12 +344,18 @@ export class RushConstants {
   public static readonly rushAlertsConfigFilename: 'rush-alerts.json' = 'rush-alerts.json';
 
   /**
-   * The filename for the machine-generated file that tracks state for Rush alerts.
-   */
-  public static readonly rushAlertsStateFilename: 'rush-alerts-state.json' = 'rush-alerts-state.json';
-
-  /**
    * The filename for the file that tracks which variant is currently installed.
    */
   public static readonly currentVariantsFilename: 'current-variants.json' = 'current-variants.json';
+
+  /**
+   * The filename ("rush-hotlink-state.json") used to store information about packages connected via
+   * "rush link-package" and "rush bridge-package" commands.
+   */
+  public static readonly rushHotlinkStateFilename: 'rush-hotlink-state.json' = 'rush-hotlink-state.json';
+
+  /**
+   * The filename ("pnpm-sync.json") used to store the state of the pnpm sync command.
+   */
+  public static readonly pnpmSyncFilename: '.pnpm-sync.json' = '.pnpm-sync.json';
 }

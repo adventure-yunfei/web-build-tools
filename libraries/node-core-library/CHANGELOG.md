@@ -1,6 +1,53 @@
 # Change Log - @rushstack/node-core-library
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Wed, 23 Jul 2025 20:55:57 GMT and should not be manually modified.
+
+## 5.14.0
+Wed, 23 Jul 2025 20:55:57 GMT
+
+### Minor changes
+
+- Add a `Async.runWithTimeoutAsync` function that executes an async function, resolving if the specified timeout elapses first.
+
+## 5.13.1
+Thu, 01 May 2025 00:11:12 GMT
+
+### Patches
+
+- Fix a bug in `FileSystem.isErrnoException` that failed to identify errors if the underlying method was invoked using only a file descriptor, e.g. for `fs.readSync`.
+
+## 5.13.0
+Tue, 25 Mar 2025 15:11:15 GMT
+
+### Minor changes
+
+- Expand `FileSystem.writeBuffersToFile` and `FileSystem.writeBuffersToFileAsync` to take more kinds of buffers.
+
+## 5.12.0
+Tue, 11 Mar 2025 02:12:33 GMT
+
+### Minor changes
+
+- Add `useNodeJSResolver` option to `Import.resolvePackage` to rely on the built-in `require.resolve` and share its cache.
+- In `RealNodeModulePathResolver`, add the option to configure to throw or not throw for non-existent paths.
+
+### Patches
+
+- In `RealNodeModulePathResolver`, add negative caching when a path segment that might be a symbolic link is not.
+
+## 5.11.0
+Thu, 30 Jan 2025 01:11:42 GMT
+
+### Minor changes
+
+- Update fs-extra to 11.3.0.
+
+## 5.10.2
+Thu, 09 Jan 2025 01:10:10 GMT
+
+### Patches
+
+- Provide the `retryCount` parameter to actions executed using `Async.runWithRetriesAsync`
 
 ## 5.10.1
 Sat, 14 Dec 2024 01:11:07 GMT

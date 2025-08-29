@@ -2,6 +2,159 @@
   "name": "@rushstack/heft-config-file",
   "entries": [
     {
+      "version": "0.18.3",
+      "tag": "@rushstack/heft-config-file_v0.18.3",
+      "date": "Wed, 23 Jul 2025 20:55:57 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.14.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.4`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.18.2",
+      "tag": "@rushstack/heft-config-file_v0.18.2",
+      "date": "Thu, 01 May 2025 00:11:12 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.13.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.18.1",
+      "tag": "@rushstack/heft-config-file_v0.18.1",
+      "date": "Fri, 25 Apr 2025 00:11:32 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Fix Node 16 compatibility by using non-built-in structuredClone"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.18.0",
+      "tag": "@rushstack/heft-config-file_v0.18.0",
+      "date": "Thu, 17 Apr 2025 00:11:21 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Allow use of the value `null` to discard any value set for the property from a parent config file.."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.17.0",
+      "tag": "@rushstack/heft-config-file_v0.17.0",
+      "date": "Wed, 09 Apr 2025 00:11:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Fix an issue with `PathResolutionMethod.resolvePathRelativeToProjectRoot` when extending files across packages."
+          },
+          {
+            "comment": "Add a new `customValidationFunction` option for custom validation logic on loaded configuration files."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.8",
+      "tag": "@rushstack/heft-config-file_v0.16.8",
+      "date": "Tue, 25 Mar 2025 15:11:15 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.13.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.7",
+      "tag": "@rushstack/heft-config-file_v0.16.7",
+      "date": "Tue, 11 Mar 2025 02:12:33 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.12.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.6",
+      "tag": "@rushstack/heft-config-file_v0.16.6",
+      "date": "Wed, 19 Feb 2025 18:53:48 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Bump `jsonpath-plus` to `~10.3.0`."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.5",
+      "tag": "@rushstack/heft-config-file_v0.16.5",
+      "date": "Wed, 12 Feb 2025 01:10:52 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.4",
+      "tag": "@rushstack/heft-config-file_v0.16.4",
+      "date": "Thu, 30 Jan 2025 01:11:42 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.11.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.14.6`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.16.3",
+      "tag": "@rushstack/heft-config-file_v0.16.3",
+      "date": "Thu, 09 Jan 2025 01:10:10 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.10.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.14.5`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.16.2",
       "tag": "@rushstack/heft-config-file_v0.16.2",
       "date": "Sat, 14 Dec 2024 01:11:07 GMT",

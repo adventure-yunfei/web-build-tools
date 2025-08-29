@@ -1,6 +1,165 @@
 # Change Log - @rushstack/debug-certificate-manager
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 26 Aug 2025 00:12:57 GMT and should not be manually modified.
+
+## 1.5.4
+Tue, 26 Aug 2025 00:12:57 GMT
+
+### Patches
+
+- Fix handling of home directory paths when reading debug-certificate-manager.json config file.
+
+## 1.5.3
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 1.5.2
+Fri, 01 Aug 2025 00:12:48 GMT
+
+_Version update only_
+
+## 1.5.1
+Sat, 26 Jul 2025 00:12:22 GMT
+
+### Patches
+
+- Read CertificateStore configuration from .vscode/debug-certificate-manager.json
+
+## 1.5.0
+Wed, 23 Jul 2025 20:55:57 GMT
+
+### Minor changes
+
+- CertificateStore - Add params to support custom paths and filenames
+- CertificateManager - Update `untrustCertificateAsync` to clear `caCertificateData`
+- CertificateManager - Use osascript (applescript) to run elevated command on macOS instead of sudo package.
+- CertificateManager - Expose `getCertificateExpirationAsync` method to retrieve certificate expiration date
+
+## 1.4.37
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 1.4.36
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 1.4.35
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 1.4.34
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 1.4.33
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 1.4.32
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 1.4.31
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 1.4.30
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 1.4.29
+Wed, 09 Apr 2025 00:11:03 GMT
+
+_Version update only_
+
+## 1.4.28
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 1.4.27
+Tue, 25 Mar 2025 15:11:15 GMT
+
+_Version update only_
+
+## 1.4.26
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 1.4.25
+Wed, 12 Mar 2025 00:11:31 GMT
+
+_Version update only_
+
+## 1.4.24
+Tue, 11 Mar 2025 02:12:33 GMT
+
+_Version update only_
+
+## 1.4.23
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 1.4.22
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 1.4.21
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 1.4.20
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 1.4.19
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 1.4.18
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 1.4.17
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 1.4.16
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 1.4.15
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 1.4.14
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 1.4.13
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 1.4.12
 Sat, 14 Dec 2024 01:11:07 GMT

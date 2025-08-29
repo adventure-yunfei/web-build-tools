@@ -45,10 +45,6 @@ export interface IOperationExecutionResult {
    */
   readonly nonCachedDurationMs: number | undefined;
   /**
-   * The id of the runner which actually runs the building process in cobuild mode.
-   */
-  readonly cobuildRunnerId: string | undefined;
-  /**
    * The relative path to the folder that contains operation metadata. This folder will be automatically included in cache entries.
    */
   readonly metadataFolderPath: string | undefined;
@@ -56,6 +52,18 @@ export interface IOperationExecutionResult {
    * The paths to the log files, if applicable.
    */
   readonly logFilePaths: ILogFilePaths | undefined;
+
+  /**
+   * Gets the hash of the state of all registered inputs to this operation.
+   * Calling this method will throw if Git is not available.
+   */
+  getStateHash(): string;
+
+  /**
+   * Gets the components of the state hash. This is useful for debugging purposes.
+   * Calling this method will throw if Git is not available.
+   */
+  getStateHashComponents(): ReadonlyArray<string>;
 }
 
 /**

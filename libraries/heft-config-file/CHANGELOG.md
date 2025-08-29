@@ -1,6 +1,70 @@
 # Change Log - @rushstack/heft-config-file
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Wed, 23 Jul 2025 20:55:57 GMT and should not be manually modified.
+
+## 0.18.3
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.18.2
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.18.1
+Fri, 25 Apr 2025 00:11:32 GMT
+
+### Patches
+
+- Fix Node 16 compatibility by using non-built-in structuredClone
+
+## 0.18.0
+Thu, 17 Apr 2025 00:11:21 GMT
+
+### Minor changes
+
+- Allow use of the value `null` to discard any value set for the property from a parent config file..
+
+## 0.17.0
+Wed, 09 Apr 2025 00:11:02 GMT
+
+### Minor changes
+
+- Fix an issue with `PathResolutionMethod.resolvePathRelativeToProjectRoot` when extending files across packages.
+- Add a new `customValidationFunction` option for custom validation logic on loaded configuration files.
+
+## 0.16.8
+Tue, 25 Mar 2025 15:11:15 GMT
+
+_Version update only_
+
+## 0.16.7
+Tue, 11 Mar 2025 02:12:33 GMT
+
+_Version update only_
+
+## 0.16.6
+Wed, 19 Feb 2025 18:53:48 GMT
+
+### Patches
+
+- Bump `jsonpath-plus` to `~10.3.0`.
+
+## 0.16.5
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.16.4
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.16.3
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
 
 ## 0.16.2
 Sat, 14 Dec 2024 01:11:07 GMT

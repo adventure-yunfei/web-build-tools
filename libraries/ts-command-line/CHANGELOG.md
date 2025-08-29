@@ -1,6 +1,51 @@
 # Change Log - @rushstack/ts-command-line
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Wed, 23 Jul 2025 20:55:57 GMT and should not be manually modified.
+
+## 5.0.2
+Wed, 23 Jul 2025 20:55:57 GMT
+
+### Patches
+
+- Escape `%` characters in help text to fix an issue where they were previously interpreted as sprintf-style tokens.
+
+## 5.0.1
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 5.0.0
+Mon, 21 Apr 2025 22:24:25 GMT
+
+### Breaking changes
+
+- Remove the deprecated `onDefineParameters`, `execute`, `executeWithoutErrorHandling`, and `onDefineUnscopedParameters` functions.
+- Rename `onExecute` to `onExecuteAsync`, `CommandLineParameter` to `CommandLineParameterBase`, and `completions` to `getCompletionsAsync`.
+
+## 4.23.7
+Tue, 25 Mar 2025 15:11:15 GMT
+
+_Version update only_
+
+## 4.23.6
+Tue, 11 Mar 2025 02:12:33 GMT
+
+_Version update only_
+
+## 4.23.5
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 4.23.4
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 4.23.3
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
 
 ## 4.23.2
 Sat, 14 Dec 2024 01:11:07 GMT

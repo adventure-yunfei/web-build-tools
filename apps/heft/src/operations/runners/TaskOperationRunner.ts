@@ -2,6 +2,7 @@
 // See LICENSE in the project root for license information.
 
 import { createHash, type Hash } from 'node:crypto';
+import { glob } from 'fast-glob';
 
 import {
   type IOperationRunner,
@@ -28,7 +29,11 @@ import type {
 import type { HeftPhaseSession } from '../../pluginFramework/HeftPhaseSession';
 import type { InternalHeftSession } from '../../pluginFramework/InternalHeftSession';
 import { watchGlobAsync, type IGlobOptions } from '../../plugins/FileGlobSpecifier';
-import { type IWatchedFileState, WatchFileSystemAdapter } from '../../utilities/WatchFileSystemAdapter';
+import {
+  type IWatchedFileState,
+  type IWatchFileSystem,
+  WatchFileSystemAdapter
+} from '../../utilities/WatchFileSystemAdapter';
 
 export interface ITaskOperationRunnerOptions {
   internalHeftSession: InternalHeftSession;
@@ -155,7 +160,8 @@ export class TaskOperationRunner implements IOperationRunner {
           async (): Promise<OperationStatus> => {
             // Create the options and provide a utility method to obtain paths to copy
             const runHookOptions: IHeftTaskRunHookOptions = {
-              abortSignal
+              abortSignal,
+              globAsync: glob
             };
 
             // Run the plugin run hook
@@ -171,6 +177,9 @@ export class TaskOperationRunner implements IOperationRunner {
                       ...options,
                       fs: getWatchFileSystemAdapter()
                     });
+                  },
+                  get watchFs(): IWatchFileSystem {
+                    return getWatchFileSystemAdapter();
                   },
                   requestRun: requestRun!
                 };

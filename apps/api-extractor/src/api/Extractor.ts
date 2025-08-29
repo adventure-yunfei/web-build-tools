@@ -271,7 +271,7 @@ export class Extractor {
     const collector: Collector = new Collector({
       program: compilerState.program as ts.Program,
       messageRouter,
-      extractorConfig: extractorConfig,
+      extractorConfig,
       sourceMapper
     });
 
@@ -282,6 +282,7 @@ export class Extractor {
 
     const modelBuilder: ApiModelGenerator = new ApiModelGenerator(
       collector,
+      extractorConfig,
       parseReleaseTag(process.env.API_MODEL_TRIMMING),
       new Set(process.env.API_MODEL_EXPORT_TRIMMINGS?.split(',') || [])
     );
@@ -291,7 +292,7 @@ export class Extractor {
       messageRouter.logDiagnostic(''); // skip a line after any diagnostic messages
     }
 
-    if (extractorConfig.docModelEnabled) {
+    if (modelBuilder.docModelEnabled) {
       messageRouter.logVerbose(
         ConsoleMessageId.WritingDocModelFile,
         'Writing: ' + extractorConfig.apiJsonFilePath

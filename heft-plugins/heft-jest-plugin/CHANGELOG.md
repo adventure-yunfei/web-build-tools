@@ -1,6 +1,157 @@
 # Change Log - @rushstack/heft-jest-plugin
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 0.16.12
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.16.11
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.16.10
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.16.9
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.16.8
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.16.7
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.16.6
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.16.5
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.16.4
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.16.3
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 0.16.2
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 0.16.1
+Wed, 09 Apr 2025 00:11:02 GMT
+
+_Version update only_
+
+## 0.16.0
+Fri, 04 Apr 2025 18:34:35 GMT
+
+### Minor changes
+
+- (BREAKING CHANGE) Update `jest-string-mock-transform` to emit slash-normalized relative paths to files, rather than absolute paths, to ensure portability of snapshots.
+
+## 0.15.3
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.15.2
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.15.1
+Wed, 12 Mar 2025 00:11:31 GMT
+
+_Version update only_
+
+## 0.15.0
+Tue, 11 Mar 2025 02:12:33 GMT
+
+### Minor changes
+
+- Use `useNodeJSResolver: true` in `Import.resolvePackage` calls.
+
+## 0.14.13
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.14.12
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.14.11
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.14.10
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 0.14.9
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.14.8
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.14.7
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.14.6
+Fri, 07 Feb 2025 01:10:49 GMT
+
+### Patches
+
+- Extend heft-jest-plugin json schema to match HeftJestConfiguration
+
+## 0.14.5
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 0.14.4
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.14.3
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.14.2
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.14.1
 Sat, 14 Dec 2024 01:11:07 GMT
