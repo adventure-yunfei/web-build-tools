@@ -36,6 +36,7 @@ import { ExtractorConfig } from '../api/ExtractorConfig';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import { AstImport } from '../analyzer/AstImport';
 import type { SourceMapper } from './SourceMapper';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 /**
  * Options for Collector constructor.
@@ -598,6 +599,12 @@ export class Collector {
         this._createCollectorEntity(localAstEntity, localExportName, isTypeOnlyExport, parentEntity);
         this._recursivelyCreateEntities(localAstEntity, alreadySeenAstEntities);
       }
+    }
+
+    if (astEntity instanceof AstSubPathImport) {
+      this._createCollectorEntity(astEntity.baseAstEntity);
+      this._createCollectorEntity(astEntity);
+      this._recursivelyCreateEntities(astEntity.baseAstEntity, alreadySeenAstEntities);
     }
   }
 
