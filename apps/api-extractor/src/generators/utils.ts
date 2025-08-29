@@ -7,6 +7,7 @@ import { ApiItemMetadata } from '../collector/ApiItemMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { AstImport } from '../analyzer/AstImport';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 export function collectAllReferencedEntities(
   collector: Collector,
@@ -56,6 +57,10 @@ export function collectAllReferencedEntities(
           collectReferencesFromAstEntity(referencedAstImport);
         }
       }
+    } else if (astEntity instanceof AstSubPathImport) {
+      referencedAstEntities.add(astEntity);
+
+      collectReferencesFromAstEntity(astEntity.baseAstEntity);
     } else {
       throw new Error('Unknown AstEntity class: ' + astEntity.constructor.name);
     }
