@@ -5,7 +5,7 @@ import type { AstEntity } from '../analyzer/AstEntity';
 import { AstSymbol } from '../analyzer/AstSymbol';
 import { ApiItemMetadata } from '../collector/ApiItemMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
-import { AstModuleExportInfo } from '../analyzer/AstModule';
+import { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { AstImport } from '../analyzer/AstImport';
 
 export function collectAllReferencedEntities(
@@ -42,7 +42,7 @@ export function collectAllReferencedEntities(
     } else if (astEntity instanceof AstNamespaceImport) {
       referencedAstEntities.add(astEntity);
 
-      const astModuleExport: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
+      const astModuleExport: IAstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
       for (const { astEntity: exportedLocalEntity } of astModuleExport.exportedLocalEntities.values()) {
         collectReferencesFromAstEntity(exportedLocalEntity);
       }

@@ -417,15 +417,22 @@ export class ExportAnalyzer {
         } else if (ts.isImportSpecifier(declaration)) {
           // import type { Foo } from 'foo';
           isCurrentTypeOnlyReference = declaration.isTypeOnly || declaration.parent.parent.isTypeOnly;
-          currentImportOrExportDeclaration = declaration.parent.parent.parent;
+          currentImportOrExportDeclaration =
+            declaration.parent.parent.parent.kind === ts.SyntaxKind.ImportDeclaration
+              ? declaration.parent.parent.parent
+              : undefined;
         } else if (ts.isImportClause(declaration)) {
           // import type Foo from 'foo';
           isCurrentTypeOnlyReference = declaration.isTypeOnly;
-          currentImportOrExportDeclaration = declaration.parent;
+          currentImportOrExportDeclaration =
+            declaration.parent.kind === ts.SyntaxKind.ImportDeclaration ? declaration.parent : undefined;
         } else if (ts.isNamespaceImport(declaration)) {
           // import type * as Foo from 'foo';
           isCurrentTypeOnlyReference = declaration.parent.isTypeOnly;
-          currentImportOrExportDeclaration = declaration.parent.parent;
+          currentImportOrExportDeclaration =
+            declaration.parent.parent.kind === ts.SyntaxKind.ImportDeclaration
+              ? declaration.parent.parent
+              : undefined;
         }
       }
 
