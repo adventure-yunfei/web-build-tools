@@ -19,33 +19,9 @@ import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 export class DtsEmitHelpers {
   public static emitImport(
     writer: IndentedWriter,
-    collector: Collector,
     collectorEntity: CollectorEntity,
     astImport: AstImport
   ): void {
-    if (astImport.exportPath.length > 1) {
-      const referencedAstImport: AstImport | undefined =
-        collector.astSymbolTable.tryGetReferencedAstImport(astImport);
-      if (referencedAstImport === undefined) {
-        throw new Error(
-          `For an AstImport of "EqualsImport" from namespace, there must have a referenced base AstImport.`
-        );
-      }
-      const referencedCollectorEntity: CollectorEntity | undefined =
-        collector.tryGetCollectorEntity(referencedAstImport);
-      if (referencedCollectorEntity === undefined) {
-        throw new Error(
-          `Cannot find collector entity for referenced AstImport: ${referencedAstImport.modulePath}:${referencedAstImport.exportName}`
-        );
-      }
-      writer.writeLine(
-        `import ${collectorEntity.nameForEmit} = ${
-          referencedCollectorEntity.nameForEmit
-        }.${astImport.exportPath.slice(1).join('.')};`
-      );
-      return;
-    }
-
     const importPrefix: string = 'import';
 
     switch (astImport.importKind) {

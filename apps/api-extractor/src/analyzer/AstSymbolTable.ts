@@ -13,7 +13,6 @@ import type { AstModule, IAstModuleExportInfo } from './AstModule';
 import { PackageMetadataManager } from './PackageMetadataManager';
 import { ExportAnalyzer } from './ExportAnalyzer';
 import type { AstEntity } from './AstEntity';
-import { AstImport } from './AstImport';
 import { AstNamespaceImport } from './AstNamespaceImport';
 import type { MessageRouter } from '../collector/MessageRouter';
 import { TypeScriptInternals, type IGlobalVariableAnalyzer } from './TypeScriptInternals';
@@ -194,10 +193,6 @@ export class AstSymbolTable {
       throw new InternalError('tryGetEntityForIdentifier() called for an identifier that was not analyzed');
     }
     return this._entitiesByNode.get(identifier);
-  }
-
-  public tryGetReferencedAstImport(astImport: AstImport): AstImport | undefined {
-    return this._exportAnalyzer.tryGetReferencedAstImport(astImport);
   }
 
   /**

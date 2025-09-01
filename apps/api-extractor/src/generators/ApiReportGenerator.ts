@@ -108,7 +108,7 @@ export class ApiReportGenerator {
     // Emit the imports
     for (const entity of collector.entities) {
       if (entity.astEntity instanceof AstImport) {
-        DtsEmitHelpers.emitImport(writer, collector, entity, entity.astEntity);
+        DtsEmitHelpers.emitImport(writer, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();

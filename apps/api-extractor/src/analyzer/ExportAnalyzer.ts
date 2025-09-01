@@ -14,7 +14,6 @@ import type { IFetchAstSymbolOptions } from './AstSymbolTable';
 import type { AstEntity } from './AstEntity';
 import { AstNamespaceImport } from './AstNamespaceImport';
 import { SyntaxHelpers } from './SyntaxHelpers';
-import { last } from 'lodash';
 import { AstNamespaceExport } from './AstNamespaceExport';
 import { AstSubPathImport, IAstSubPathImportOptions } from './AstSubPathImport';
 
@@ -865,59 +864,6 @@ export class ExportAnalyzer {
             isTypeOnly: false
           });
         }
-        // EqualsImport by namespace.
-        // EXAMPLE:
-        // import myLib2 = myLib;
-        // import B = myLib.A.B;
-      } else {
-        const reversedIdentifiers: ts.Identifier[] = [];
-        if (ts.isIdentifier(declaration.moduleReference)) {
-          reversedIdentifiers.push(declaration.moduleReference);
-        } else {
-          let current: ts.QualifiedName | undefined = declaration.moduleReference;
-          while (true) {
-            reversedIdentifiers.push(current.right);
-            if (ts.isIdentifier(current.left)) {
-              reversedIdentifiers.push(current.left);
-              break;
-            } else {
-              current = current.left;
-            }
-          }
-        }
-
-        const exportSubPath: string[] = [];
-        let externalImport: AstImport | undefined;
-        for (let i = reversedIdentifiers.length - 1; i >= 0; i--) {
-          const identifier: ts.Identifier = reversedIdentifiers[i];
-          if (!externalImport) {
-            // find the first external import as the base namespace
-            const symbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(identifier);
-            if (!symbol) {
-              throw new Error('Symbol not found for identifier: ' + identifier.getText());
-            }
-            const astEntity: AstEntity | AstImport | undefined = this.fetchReferencedAstEntity(symbol, false);
-            if (astEntity instanceof AstImport) {
-              externalImport = astEntity;
-            }
-          } else {
-            exportSubPath.push(identifier.getText().trim());
-          }
-        }
-
-        if (externalImport) {
-          if (exportSubPath.length === 0) {
-            return externalImport;
-          } else {
-            return this._fetchAstImport(declarationSymbol, {
-              importKind: externalImport.importKind,
-              modulePath: externalImport.modulePath,
-              exportName: last(exportSubPath)!,
-              exportPath: externalImport.exportPath.concat(exportSubPath),
-              isTypeOnly: false
-            });
-          }
-        }
       }
     }
 
@@ -983,25 +929,6 @@ export class ExportAnalyzer {
   public tryGetExportOfAstModule(exportName: string, astModule: AstModule): AstEntity | undefined {
     const visitedAstModules: Set<AstModule> = new Set<AstModule>();
     return this._tryGetExportOfAstModule(exportName, astModule, visitedAstModules);
-  }
-
-  public tryGetReferencedAstImport(astImport: AstImport): AstImport | undefined {
-    if (astImport.exportPath) {
-      const referencedImport: AstImport | undefined = this._astImportsByKey.get(
-        AstImport.getKey({
-          importKind: astImport.importKind,
-          modulePath: astImport.modulePath,
-          exportName: astImport.exportPath[0],
-          isTypeOnly: false
-        })
-      );
-      if (referencedImport === undefined) {
-        throw new Error(
-          `For an AstImport of "EqualsImport" from namespace, there must have a referenced base AstImport.`
-        );
-      }
-      return referencedImport;
-    }
   }
 
   private _tryGetExportOfAstModule(
