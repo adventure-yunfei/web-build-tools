@@ -80,8 +80,8 @@ importers:
         specifier: ~4.17.15
         version: 4.17.21
       minimatch:
-        specifier: 10.0.3
-        version: 10.0.3
+        specifier: 9.0.5
+        version: 9.0.5
       resolve:
         specifier: ~1.22.1
         version: 1.22.8
@@ -3484,8 +3484,8 @@ importers:
         specifier: ~3.8.0
         version: 3.8.0
       minimatch:
-        specifier: 10.0.3
-        version: 10.0.3
+        specifier: 9.0.5
+        version: 9.0.5
       npm-packlist:
         specifier: ~2.1.2
         version: 2.1.5
@@ -5018,8 +5018,8 @@ importers:
         specifier: 1.4.2
         version: 1.4.2
       minimatch:
-        specifier: 10.0.3
-        version: 10.0.3
+        specifier: 9.0.5
+        version: 9.0.5
     devDependencies:
       '@rushstack/heft':
         specifier: workspace:*
@@ -9654,12 +9654,14 @@ packages:
   /@isaacs/balanced-match@4.0.1:
     resolution: {integrity: sha512-yzMTt9lEb8Gv7zRioUilSglI0c0smZ9k5D65677DLWLtWJaXIS3CqcGyUFByYKlnUj6TkjLVs54fBl6+TiGQDQ==}
     engines: {node: 20 || >=22}
+    dev: false
 
   /@isaacs/brace-expansion@5.0.0:
     resolution: {integrity: sha512-ZT55BDLV0yv0RBm2czMiZ+SqCGO7AvmOM3G/w2xhVPH+te0aKgFjmBvGlL1dH+ql2tgGO3MVrbb3jCKyvpgnxA==}
     engines: {node: 20 || >=22}
     dependencies:
       '@isaacs/balanced-match': 4.0.1
+    dev: false
 
   /@isaacs/cliui@8.0.2:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -13926,7 +13928,7 @@ packages:
     resolution: {integrity: sha512-zmPitbQ8+6zNutpwgcQuLcsEpn/Cj54Kbn7L5pX0Os5kdWplB7xPgEh/g+SWOB/qmows2gpuCaPyduq8ZZRnxA==}
     deprecated: This is a stub types definition. minimatch provides its own type definitions, so you do not need this installed.
     dependencies:
-      minimatch: 10.0.3
+      minimatch: 9.0.5
     dev: true
 
   /@types/minimist@1.2.5:
@@ -24321,6 +24323,7 @@ packages:
     engines: {node: 20 || >=22}
     dependencies:
       '@isaacs/brace-expansion': 5.0.0
+    dev: false
 
   /minimatch@3.0.8:
     resolution: {integrity: sha512-6FsRAQsxQ61mw+qP1ZzbL9Bc78x2p5OqNgNpnoAFLTrX8n5Kxph0CsnhmKKNXTWjXqU5L0pGPR7hYk+XWZr60Q==}
