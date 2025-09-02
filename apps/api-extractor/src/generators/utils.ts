@@ -49,14 +49,6 @@ export function collectAllReferencedEntities(
       }
     } else if (astEntity instanceof AstImport) {
       referencedAstEntities.add(astEntity);
-
-      if (astEntity.exportPath.length > 1) {
-        const referencedAstImport: AstImport | undefined =
-          collector.astSymbolTable.tryGetReferencedAstImport(astEntity);
-        if (referencedAstImport) {
-          collectReferencesFromAstEntity(referencedAstImport);
-        }
-      }
     } else if (astEntity instanceof AstSubPathImport) {
       referencedAstEntities.add(astEntity);
 
