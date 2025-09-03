@@ -544,15 +544,9 @@ export class ExportAnalyzer {
     node: ts.ImportTypeNode,
     referringModuleIsExternal: boolean
   ): AstEntity | undefined {
-    const importPath: ts.Identifier[] = [];
-    if (node.qualifier) {
-      let leftNode: ts.EntityName = node.qualifier;
-      while (leftNode.kind === ts.SyntaxKind.QualifiedName) {
-        importPath.unshift(leftNode.right);
-        leftNode = leftNode.left;
-      }
-      importPath.unshift(leftNode);
-    }
+    const importPath: readonly ts.Identifier[] = node.qualifier
+      ? SyntaxHelpers.collectIdentifierPath(node.qualifier)
+      : [];
 
     const externalModulePath: string | undefined = this._tryGetExternalModulePath(node);
 
@@ -589,7 +583,8 @@ export class ExportAnalyzer {
         }
         return this._fetchAstSubPathImport({
           astEntity: exportAstEntity,
-          exportPath: importPath.slice(1).map((id) => id.getText().trim())
+          exportPath: importPath.slice(1).map((id) => id.getText().trim()),
+          isImportType: true
         });
       } else {
         // Example input:
@@ -616,7 +611,8 @@ export class ExportAnalyzer {
       const exportAstEntity: AstEntity = this._getExportOfAstModule(exportName.getText().trim(), astModule);
       return this._fetchAstSubPathImport({
         astEntity: exportAstEntity,
-        exportPath: importPath.slice(1).map((id) => id.getText().trim())
+        exportPath: importPath.slice(1).map((id) => id.getText().trim()),
+        isImportType: true
       });
     } else {
       const localName: string = SyntaxHelpers.makeCamelCaseIdentifier(this._getModuleSpecifier(node));
@@ -864,6 +860,59 @@ export class ExportAnalyzer {
             isTypeOnly: false
           });
         }
+      } else {
+        // EqualsImport by namespace.
+        // EXAMPLE:
+        // import myLib2 = myLib;
+        // import B = myLib.A.B;
+        const importPath: readonly ts.Identifier[] = SyntaxHelpers.collectIdentifierPath(
+          declaration.moduleReference
+        );
+
+        // Find the root (left-most) AstEntity of module reference.
+        //
+        // Ideally should be treated as referenced type node like handling TypeReference in `AstSymbolTable._analyzeChildTree`,
+        //  to handle special cases (e.g. "displaced symbol").
+        // But the symbol of ImportEqualsDeclaration is an alias symbol. It should be parsed during `_tryMatchImportDeclaration`.
+        const leftMostSymbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(importPath[0]);
+        if (!leftMostSymbol) {
+          throw new Error(
+            `Symbol not found for identifier "${importPath[0].getText()}":\n` +
+              SourceFileLocationFormatter.formatDeclaration(importPath[0])
+          );
+        }
+        let baseAstEntity: AstEntity | undefined = this.fetchReferencedAstEntity(leftMostSymbol, false);
+        if (!baseAstEntity) {
+          throw new Error(
+            `AstEntity not found for identifier "${importPath[0].getText()}":\n` +
+              SourceFileLocationFormatter.formatDeclaration(importPath[0])
+          );
+        }
+        if (baseAstEntity instanceof AstSymbol && baseAstEntity.parentAstSymbol) {
+          throw new Error(
+            `"import A = B.C" syntax can only refer to another root declaration:\n` +
+              SourceFileLocationFormatter.formatDeclaration(importPath[0])
+          );
+        }
+
+        for (let i: number = 1; i < importPath.length; i++) {
+          if (baseAstEntity instanceof AstNamespaceImport) {
+            // skip local AstNamespaceImport
+            baseAstEntity = this._getExportOfAstModule(
+              importPath[i].getText().trim(),
+              baseAstEntity.astModule
+            );
+          } else {
+            const variableName: string = TypeScriptInternals.getTextOfIdentifierOrLiteral(declaration.name);
+            return this._fetchAstSubPathImport({
+              astEntity: baseAstEntity,
+              exportPath: importPath.slice(i).map((id) => id.getText().trim()),
+              localName: variableName,
+              isImportType: false
+            });
+          }
+        }
+        return baseAstEntity;
       }
     }
 
@@ -1102,6 +1151,17 @@ export class ExportAnalyzer {
       return options.astEntity;
     }
 
+    if (options.astEntity instanceof AstSubPathImport) {
+      // If the AstEntity is already an AstSubPathImport, just concat the exportPath and return,
+      //  to avoid creating unnecessary intermediate AstSubPathImport entity.
+      return this._fetchAstSubPathImport({
+        astEntity: options.astEntity.baseAstEntity,
+        exportPath: options.astEntity.exportPath.concat(options.exportPath),
+        localName: options.astEntity.localName,
+        isImportType: options.isImportType
+      });
+    }
+
     let astSubPathImportsByExportPath: Map<string, AstSubPathImport> | undefined =
       this._astSubPathImportsByKey.get(options.astEntity);
     if (astSubPathImportsByExportPath === undefined) {
@@ -1115,6 +1175,13 @@ export class ExportAnalyzer {
       astSubPathImport = new AstSubPathImport(options);
       astSubPathImportsByExportPath.set(exportPathKey, astSubPathImport);
     }
+
+    if (!options.isImportType) {
+      // If we encounter at least one non-import-type syntax (i.e. ImportEqualsDeclaration as `import Foo = X.Y.Z`),
+      // then the .d.ts rollup will emit ImportEqualsDeclaration.
+      astSubPathImport.isImportTypeEverywhere = false;
+    }
+
     return astSubPathImport;
   }
 

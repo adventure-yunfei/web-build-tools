@@ -23,6 +23,7 @@ import type { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { collectAllReferencedEntities } from './utils';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 /**
  * Used with DtsRollupGenerator.writeTypingsFile()
@@ -127,6 +128,10 @@ export class DtsRollupGenerator {
         // or the export of `Foo` would include a broken reference to `Bar`.
         const astImport: AstImport = entity.astEntity;
         DtsEmitHelpers.emitImport(writer, entity, astImport);
+      }
+
+      if (entity.astEntity instanceof AstSubPathImport) {
+        DtsEmitHelpers.emitEqualsImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();
@@ -287,6 +292,11 @@ export class DtsRollupGenerator {
 
         // For now, we don't transform JSDoc comment nodes at all
         recurseChildren = false;
+        break;
+
+      case ts.SyntaxKind.ImportEqualsDeclaration:
+        // Delete "import A = B.C;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
+        span.modification.skipAll();
         break;
 
       case ts.SyntaxKind.ExportKeyword:

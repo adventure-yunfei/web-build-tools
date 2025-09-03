@@ -25,6 +25,7 @@ import { collectAllReferencedEntities } from './utils';
 import { last } from 'lodash';
 import type { ApiReportVariant } from '../api/IConfigFile';
 import type { SymbolMetadata } from '../collector/SymbolMetadata';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 function reportVariantToTrimReleaseTag(reportVariant: ApiReportVariant): ReleaseTag {
   switch (reportVariant) {
@@ -109,6 +110,10 @@ export class ApiReportGenerator {
     for (const entity of collector.entities) {
       if (entity.astEntity instanceof AstImport) {
         DtsEmitHelpers.emitImport(writer, entity, entity.astEntity);
+      }
+
+      if (entity.astEntity instanceof AstSubPathImport) {
+        DtsEmitHelpers.emitEqualsImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();
@@ -396,6 +401,11 @@ export class ApiReportGenerator {
         span.modification.skipAll();
         // For now, we don't transform JSDoc comment nodes at all
         recurseChildren = false;
+        break;
+
+      case ts.SyntaxKind.ImportEqualsDeclaration:
+        // Delete "import A = B.C;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
+        span.modification.skipAll();
         break;
 
       case ts.SyntaxKind.ExportKeyword:
