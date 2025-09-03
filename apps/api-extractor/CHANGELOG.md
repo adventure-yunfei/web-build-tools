@@ -1,5 +1,11 @@
 # Change Log - api-extractor custom version
 
+## 7.52.11-rc.0
+- 新增 `import("./foo")` 语法支持
+- 支持 node 14, minimatch 依赖版本由 10.x 降为 9.x
+- 新增/修复 namespace declaration 语法支持的各类边界场景
+- 重构 `import Foo = Bar.Baz;` 语法支持实现
+
 ## 7.48.1-rc.4
 - dts rollup: 增强裁剪逻辑，去除 dts rollup 输出中未被引用的声明
 

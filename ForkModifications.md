@@ -3,7 +3,7 @@
 ## `api-extractor`
 
 #### Features
-- 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）(3d696a3305c050a21c092de5378430e2851d61a0)
+- 新增 `import Foo = Bar.Baz;` 语法支持（根节点声明场景）(~~3d696a3305c050a21c092de5378430e2851d61a0~~, 0f602d53f9f98b4347f2f88700a175ff56978975)
 - ~~新增完整的引用类型链接支持, 包括未导出的类型 (59e634c68baa4cac277bec171f4c6f404c9d384b)~~ api-extractor 本身已支持, 已回滚 (62809e68ec1198506ca8a0604fd9eeace10110da)
 - 支持 type export (42cec4675dc0a8cab84f1436c87e54b2715580b3)
   <details>
@@ -108,6 +108,9 @@
   ```
 
   </details>
+- 新增 `import("./foo")` 语法支持 (e820d432736289058951641ef787937814a26593, 7ecaeafd5eaaa33bf62897f0ea41fae891fd3bdf, 52316739ac7ea6bdaedd263a84398e5b730bde57)
+- 支持 node 14, minimatch 依赖版本由 10.x 降为 9.x (50b423b8f2890117b51041be72571fac48fca492)
+- 新增/修复 namespace declaration 语法支持的各类边界场景 (6c849d98c3c96e89049b869ff2e42265d978bcba)
 - Dts Rollup:
   - 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723, 184ad9b347f6d0923649006945c8043fbf184cfb)
     <details>
