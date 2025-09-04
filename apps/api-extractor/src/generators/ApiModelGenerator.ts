@@ -50,7 +50,7 @@ import type { AstModule } from '../analyzer/AstModule';
 import { TypeScriptInternals } from '../analyzer/TypeScriptInternals';
 import type { ExtractorConfig } from '../api/ExtractorConfig';
 import type { CollectorEntity } from '../collector/CollectorEntity';
-import { collectAllReferencedEntities } from './utils';
+import { collectAllReferencedEntities, getReleaseTagsToTrim } from './utils';
 
 interface IProcessAstEntityContext {
   name: string;
@@ -75,7 +75,6 @@ export class ApiModelGenerator {
   private readonly _apiModel: ApiModel;
   private readonly _referenceGenerator: DeclarationReferenceGenerator;
   private readonly _releaseTagsToTrim: Set<ReleaseTag> | undefined;
-  private readonly _apiModelTrimming: ReleaseTag;
   private readonly _rootExportTrimmings: ReadonlySet<string>;
 
   public readonly docModelEnabled: boolean;
@@ -83,11 +82,10 @@ export class ApiModelGenerator {
   public constructor(
     collector: Collector,
     extractorConfig: ExtractorConfig,
-    apiModelTrimming: ReleaseTag,
+    forceReleaseTag: ReleaseTag | undefined,
     rootExportTrimmings: ReadonlySet<string>
   ) {
     this._collector = collector;
-    this._apiModelTrimming = apiModelTrimming;
     this._rootExportTrimmings = rootExportTrimmings;
 
     this._apiModel = new ApiModel();
@@ -96,7 +94,9 @@ export class ApiModelGenerator {
     const apiModelGenerationOptions: IApiModelGenerationOptions | undefined =
       extractorConfig.docModelGenerationOptions;
     if (apiModelGenerationOptions) {
-      this._releaseTagsToTrim = apiModelGenerationOptions.releaseTagsToTrim;
+      this._releaseTagsToTrim = forceReleaseTag
+        ? getReleaseTagsToTrim(forceReleaseTag)
+        : apiModelGenerationOptions.releaseTagsToTrim;
       this.docModelEnabled = true;
     } else {
       this.docModelEnabled = false;
@@ -123,7 +123,7 @@ export class ApiModelGenerator {
 
     const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
       this._collector,
-      this._apiModelTrimming,
+      this._releaseTagsToTrim ?? new Set(),
       this._rootExportTrimmings
     );
     const ancestorsOfReferencesEntities: ReadonlySet<CollectorEntity> =
@@ -252,9 +252,6 @@ export class ApiModelGenerator {
     const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
     if (this._releaseTagsToTrim?.has(releaseTag)) {
       return;
-    }
-    if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, this._apiModelTrimming) < 0) {
-      return; // trim out items under specified release tag
     }
 
     switch (astDeclaration.declaration.kind) {
@@ -821,7 +818,7 @@ export class ApiModelGenerator {
       const apiItemMetadata: ApiItemMetadata = this._collector.fetchApiItemMetadata(astDeclaration);
       const docComment: tsdoc.DocComment | undefined = apiItemMetadata.tsdocComment;
       const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
-      if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, this._apiModelTrimming) < 0) {
+      if (this._releaseTagsToTrim?.has(releaseTag)) {
         return; // trim out items under specified release tag
       }
       const isOptional: boolean =
