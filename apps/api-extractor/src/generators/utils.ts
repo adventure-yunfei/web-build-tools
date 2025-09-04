@@ -3,21 +3,31 @@ import type { Collector } from '../collector/Collector';
 import type { CollectorEntity } from '../collector/CollectorEntity';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { AstSymbol } from '../analyzer/AstSymbol';
-import { ApiItemMetadata } from '../collector/ApiItemMetadata';
+import type { ApiItemMetadata } from '../collector/ApiItemMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
-import { IAstModuleExportInfo } from '../analyzer/AstModule';
+import type { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { AstImport } from '../analyzer/AstImport';
 import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 export function collectAllReferencedEntities(
   collector: Collector,
-  releaseTimming: ReleaseTag,
+  /** specify a single release tag to emit, or a set of release tags to trim */
+  releaseTimming: ReleaseTag | ReadonlySet<ReleaseTag>,
   rootExportTrimmings: ReadonlySet<string>
 ): ReadonlySet<CollectorEntity> {
+  const trimmedReleaseTags: ReadonlySet<ReleaseTag> =
+    typeof releaseTimming === 'number'
+      ? new Set(
+          [ReleaseTag.Internal, ReleaseTag.Alpha, ReleaseTag.Beta, ReleaseTag.Public].filter(
+            (tag) => ReleaseTag.compare(tag, releaseTimming) < 0
+          )
+        )
+      : releaseTimming;
+
   const referencedAstEntities: Set<AstEntity> = new Set<AstEntity>();
 
   const alreadySeenAstEntities: Set<AstEntity> = new Set();
-  function collectReferencesFromAstEntity(astEntity: AstEntity) {
+  function collectReferencesFromAstEntity(astEntity: AstEntity): void {
     if (alreadySeenAstEntities.has(astEntity)) {
       return;
     }
@@ -27,7 +37,7 @@ export function collectAllReferencedEntities(
       for (const astDeclaration of astEntity.astDeclarations) {
         const apiItemMetadata: ApiItemMetadata = collector.fetchApiItemMetadata(astDeclaration);
         const releaseTag: ReleaseTag = apiItemMetadata.effectiveReleaseTag;
-        if (releaseTag !== ReleaseTag.None && ReleaseTag.compare(releaseTag, releaseTimming) < 0) {
+        if (trimmedReleaseTags.has(releaseTag)) {
           continue; // trim out items under specified release tag
         }
 

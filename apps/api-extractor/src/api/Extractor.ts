@@ -283,7 +283,6 @@ export class Extractor {
     const modelBuilder: ApiModelGenerator = new ApiModelGenerator(
       collector,
       extractorConfig,
-      parseReleaseTag(process.env.API_MODEL_TRIMMING),
       new Set(process.env.API_MODEL_EXPORT_TRIMMINGS?.split(',') || [])
     );
     const apiPackage: ApiPackage = modelBuilder.buildApiPackage();
