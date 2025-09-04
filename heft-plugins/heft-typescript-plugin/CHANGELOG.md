@@ -1,6 +1,168 @@
 # Change Log - @rushstack/heft-typescript-plugin
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 0.9.12
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.9.11
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.9.10
+Mon, 28 Jul 2025 15:11:56 GMT
+
+### Patches
+
+- Update internal typings.
+
+## 0.9.9
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.9.8
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.9.7
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.9.6
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.9.5
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.9.4
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.9.3
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.9.2
+Thu, 17 Apr 2025 00:11:21 GMT
+
+### Patches
+
+- Update documentation for `extends`
+
+## 0.9.1
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 0.9.0
+Wed, 09 Apr 2025 00:11:02 GMT
+
+### Minor changes
+
+- Leverage Heft's new `tryLoadProjectConfigurationFileAsync` method.
+
+## 0.8.2
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.8.1
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.8.0
+Wed, 12 Mar 2025 22:41:36 GMT
+
+### Minor changes
+
+- Expose some internal APIs to be used by `@rushstack/heft-isolated-typescript-transpile-plugin`.
+
+## 0.7.1
+Wed, 12 Mar 2025 00:11:31 GMT
+
+_Version update only_
+
+## 0.7.0
+Tue, 11 Mar 2025 02:12:33 GMT
+
+### Minor changes
+
+- Add support for TypeScript 5.8.
+
+## 0.6.16
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.6.15
+Sat, 01 Mar 2025 07:23:16 GMT
+
+### Patches
+
+- Add support for TypeScript 5.7.
+
+## 0.6.14
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.6.13
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.6.12
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 0.6.11
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.6.10
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.6.9
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.6.8
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 0.6.7
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.6.6
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.6.5
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.6.4
 Sat, 14 Dec 2024 01:11:07 GMT

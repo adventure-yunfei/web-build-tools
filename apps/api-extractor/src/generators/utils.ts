@@ -5,8 +5,9 @@ import type { AstEntity } from '../analyzer/AstEntity';
 import { AstSymbol } from '../analyzer/AstSymbol';
 import { ApiItemMetadata } from '../collector/ApiItemMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
-import { AstModuleExportInfo } from '../analyzer/AstModule';
+import { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { AstImport } from '../analyzer/AstImport';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 export function collectAllReferencedEntities(
   collector: Collector,
@@ -42,20 +43,16 @@ export function collectAllReferencedEntities(
     } else if (astEntity instanceof AstNamespaceImport) {
       referencedAstEntities.add(astEntity);
 
-      const astModuleExport: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
+      const astModuleExport: IAstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
       for (const { astEntity: exportedLocalEntity } of astModuleExport.exportedLocalEntities.values()) {
         collectReferencesFromAstEntity(exportedLocalEntity);
       }
     } else if (astEntity instanceof AstImport) {
       referencedAstEntities.add(astEntity);
+    } else if (astEntity instanceof AstSubPathImport) {
+      referencedAstEntities.add(astEntity);
 
-      if (astEntity.exportPath.length > 1) {
-        const referencedAstImport: AstImport | undefined =
-          collector.astSymbolTable.tryGetReferencedAstImport(astEntity);
-        if (referencedAstImport) {
-          collectReferencesFromAstEntity(referencedAstImport);
-        }
-      }
+      collectReferencesFromAstEntity(astEntity.baseAstEntity);
     } else {
       throw new Error('Unknown AstEntity class: ' + astEntity.constructor.name);
     }

@@ -1,6 +1,167 @@
 # Change Log - @microsoft/rush
 
-This log was last generated on Thu, 12 Dec 2024 01:37:25 GMT and should not be manually modified.
+This log was last generated on Tue, 26 Aug 2025 23:27:47 GMT and should not be manually modified.
+
+## 5.158.0
+Tue, 26 Aug 2025 23:27:47 GMT
+
+### Updates
+
+- Adds an optional safety check flag to the Bridge Cache plugin write action.
+- Fix a bug in "@rushstack/rush-bridge-cache-plugin" where the cache replay did not block the normal execution process and instead was a floating promise.
+- [resolver-cache-plugin] Optimize search for nested package.json files with persistent cache file keyed by integrity hash.
+- [rush-serve-plugin] Allow the Rush process to exit if the server is the only active handle.
+- Fix poor performance scaling during `rush install` when identifying projects in the lockfile that no longer exist.
+- [resolver-cache-plugin] Improve performance of scan for nested package.json files in external packages.
+- Optimize `setPreferredVersions` in install setup.
+- Ensure that `rush version` and `rush publish` preserve all fields in `version-policies-json`.
+
+## 5.157.0
+Fri, 25 Jul 2025 01:24:42 GMT
+
+### Updates
+
+- Improve performance for publishing on filtered clones.
+
+## 5.156.0
+Wed, 23 Jul 2025 20:56:15 GMT
+
+### Updates
+
+- Include "parallelism" in phased operation execution context. Update "rush-bridge-cache-plugin" to support both cache read and cache write, selectable via command line choice parameter. Fixes an issue that the options schema for "rush-bridge-cache-plugin" was invalid.
+- Add support for `RUSH_BUILD_CACHE_OVERRIDE_JSON` environment variable that takes a JSON string with the same format as the `common/config/build-cache.json` file and a `RUSH_BUILD_CACHE_OVERRIDE_JSON_FILE_PATH` environment variable that takes a file path that can be used to override the build cache configuration that is normally provided by that file.
+- Add support for setting environment variables via `<repo-root>/.env` and `~/.rush-user/.env` files.
+- [azure-storage-build-cache] Update build-cache.json schema to allow the full range of `loginFlow` options supported by the underlying authentication provider. Add `loginFlowFailover` option to customize fallback sequencing.
+- Add performance measures around various operations, include performance entries in telemetry payload.
+- Do not run afterExecuteOperation if the operation has not actually completed.
+
+## 5.155.1
+Fri, 27 Jun 2025 19:57:04 GMT
+
+### Updates
+
+- Fix pnpm-sync caused .modules.yaml ENOENT during install
+
+## 5.155.0
+Fri, 13 Jun 2025 16:10:38 GMT
+
+### Updates
+
+- Add support for PNPM v9 to the pnpm-sync feature.
+
+## 5.154.0
+Tue, 10 Jun 2025 18:45:59 GMT
+
+### Updates
+
+- Introduce a `@rushstack/rush-bridge-cache-plugin` package that adds a `--set-cache-only` flag to phased commands, which sets the cache entry without performing the operation.
+- Update the `CredentialCache` options object to add support for custom cache file paths. This is useful if `CredentialCache` is used outside of Rush.
+- PNPMv10 support: SHA256 hashing for dependencies paths lookup
+- Add Linux/MacOS support for new 'virtual-store-dir-max-length'
+
+## 5.153.2
+Tue, 13 May 2025 20:33:12 GMT
+
+### Updates
+
+- Fix path parsing issue when running rush bridge-package
+- Operations that were cobuilt now have the cobuild time correctly reflected across all agents.
+- Add `hasUncommittedChanges` to `IInputSnapshot` for use by plugins.
+
+## 5.153.1
+Fri, 25 Apr 2025 01:12:48 GMT
+
+### Updates
+
+- Fix an issue with implicit phase expansion when `--include-phase-deps` is not specified.
+- Upgrade `rushstack/heft-config-file` to fix an incompatibility with Node 16
+
+## 5.153.0
+Thu, 17 Apr 2025 21:59:15 GMT
+
+### Updates
+
+- Update documentation for `extends`
+- Bind "q" to gracefully exit the watcher.
+- Clarify registry authentication settings in "rush init" template for .npmrc
+- Support the `--changed-projects-only` flag in watch mode and allow it to be toggled between iterations.
+- Fix telemetry for "--changed-projects-only" when toggled in watch mode.
+- (rush-serve-plugin) Support websocket message to enable/disable operations.
+
+## 5.152.0
+Tue, 08 Apr 2025 18:41:27 GMT
+
+### Updates
+
+- Add `ChainedCredential` to `AzureAuthenticationBase` to handle auth failover.
+- Add support for developer tools credentials to the Azure build cache.
+- Add a new CLI flag `--debug-build-cache-ids` to help with root-causing unexpected cache misses.
+- Sort all operations lexicographically by name for reporting purposes.
+- (EXPERIMENTAL) Add new commands `rush link-package` and `rush bridge-package`
+
+## 5.151.0
+Tue, 25 Mar 2025 16:58:46 GMT
+
+### Updates
+
+- Fix an issue where `--include-phase-deps` and watch mode sometimes included operations that were not required
+- Fix an issue where build/rebuild can not be defined in a rush plugin command line configuration
+- Use `useNodeJSResolver: true` in `Import.resolvePackage` calls.
+- Add missing `./package.json` export; revert `useNodeJSResolver: true`.
+- (plugin-api) Guaranteed `operation.associatedPhase` and `operation.associatedProject` are not undefined.
+
+## 5.150.0
+Thu, 27 Feb 2025 17:41:59 GMT
+
+### Updates
+
+- Add an `--include-phase-deps` switch that expands an unsafe project selection to include its phase dependencies
+
+## 5.149.1
+Wed, 19 Feb 2025 18:54:06 GMT
+
+### Updates
+
+- Remove the unused `RushConstants.rushAlertsStateFilename` property.
+- Bump `jsonpath-plus` to `~10.3.0`.
+
+## 5.149.0
+Wed, 12 Feb 2025 04:07:30 GMT
+
+### Updates
+
+- Prefer `os.availableParallelism()` to `os.cpus().length`.
+- Add a new command line parameter `--node-diagnostic-dir=DIR` to phased commands that, when specified, tells all child build processes to write NodeJS diagnostics into `${DIR}/${packageName}/${phaseIdentifier}`. This is useful if `--cpu-prof` or `--heap-prof` are enabled, to avoid polluting workspace folders.
+- Add a new phased command hook `createEnvironmentForOperation` that can be used to customize the environment variables passed to individual operation subprocesses. This may be used to, for example, customize `NODE_OPTIONS` to pass `--diagnostic-dir` or other such parameters.
+- Allow --timeline option for all phased commands
+- Fix support for "ensureConsistentVersions" in common-versions.json when subspaces features is not enabled.
+- Fix an issue where the port parameter in `@rushstack/rush-serve-plugin` was allowed to be a string parameter.
+
+## 5.148.0
+Fri, 10 Jan 2025 02:36:20 GMT
+
+### Updates
+
+- Add a configuration option to avoid manually configuring decoupledLocalDependencies across subspaces.
+- Improve some `rush-sdk` APIs to support future work on GitHub issue #3994
+- Fix an issue where MaxListenersExceeded would get thrown when using the HTTP build cache plugin
+
+## 5.147.2
+Mon, 06 Jan 2025 21:48:43 GMT
+
+### Updates
+
+- Fix an issue with evaluation of `shouldEnsureConsistentVersions` when the value is not constant across subspaces or variants.
+- Fix an issue where the lockfile object has a nullish value causing yaml.dump to report an error.
+
+## 5.147.1
+Thu, 26 Dec 2024 23:35:27 GMT
+
+### Updates
+
+- Fix an issue with the `enableSubpathScan` experiment where the set of returned hashes would result in incorrect build cache identifiers when using `--only`.
+- When a no-op operation is not in scope, reflect its result as no-op instead of skipped, so that downstream operations can still write to the build cache.
+- Allow injected dependencies without enabling subspaces.
 
 ## 5.147.0
 Thu, 12 Dec 2024 01:37:25 GMT

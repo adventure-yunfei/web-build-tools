@@ -1,5 +1,17 @@
 # Change Log - api-extractor custom version
 
+## 7.52.11-rc.1
+- api-review: 新增/修复 namespace declaration 语法支持的各类边界场景
+
+## 7.52.11-rc.0
+- 新增 `import("./foo")` 语法支持
+- 支持 node 14, minimatch 依赖版本由 10.x 降为 9.x
+- 新增/修复 namespace declaration 语法支持的各类边界场景
+- 重构 `import Foo = Bar.Baz;` 语法支持实现
+
+## 7.48.1-rc.4
+- dts rollup: 增强裁剪逻辑，去除 dts rollup 输出中未被引用的声明
+
 ## 7.48.1-rc.2
 - api model: 修正 rootExportTrimmings 引用丢失（回滚为初始的根据 Collector Entity 导出结构输出 API Model）
 
@@ -86,7 +98,126 @@
 
 # Change Log - @microsoft/api-extractor
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 7.52.11
+Tue, 19 Aug 2025 20:45:02 GMT
+
+### Patches
+
+- Fix self-package import resolution by removing outDir/declarationDir from compiler options
+
+## 7.52.10
+Fri, 01 Aug 2025 00:12:48 GMT
+
+### Patches
+
+- Upgrades the minimatch dependency from ~3.0.3 to 10.0.3 across the entire Rush monorepo to address a Regular Expression Denial of Service (ReDoS) vulnerability in the underlying brace-expansion dependency.
+
+## 7.52.9
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 7.52.8
+Tue, 13 May 2025 02:09:20 GMT
+
+### Patches
+
+- Fixes API extractor error handling when changed APIs are encountered and the "--local" flag is not specified
+
+## 7.52.7
+Thu, 01 May 2025 15:11:33 GMT
+
+### Patches
+
+- Fix an issue where default exports were sometimes trimmed incorrectly in .api.md files when using `reportVariants` (GitHub #4775)
+
+## 7.52.6
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 7.52.5
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 7.52.4
+Thu, 17 Apr 2025 00:11:21 GMT
+
+### Patches
+
+- Update documentation for `extends`
+
+## 7.52.3
+Fri, 04 Apr 2025 18:34:35 GMT
+
+### Patches
+
+- Add support for customizing which TSDoc tags appear in API reports
+
+## 7.52.2
+Tue, 25 Mar 2025 15:11:15 GMT
+
+_Version update only_
+
+## 7.52.1
+Tue, 11 Mar 2025 02:12:34 GMT
+
+_Version update only_
+
+## 7.52.0
+Tue, 11 Mar 2025 00:11:25 GMT
+
+### Minor changes
+
+- Upgrade the bundled compiler engine to TypeScript 5.8.2
+
+## 7.51.1
+Sat, 01 Mar 2025 05:00:09 GMT
+
+### Patches
+
+- Include triple-slash references marked with `preserve="true"` from files that only contain re-exports. There was a behavior change in TypeScript 5.5, where only triple-slash references that are explicitly marked with `preserve="true"` are emitted into declaration files. This change adds support for placing these references in files that only contain re-exports, like the API entrypoint file.
+
+## 7.51.0
+Thu, 27 Feb 2025 01:10:39 GMT
+
+### Minor changes
+
+- Add a `docModel.releaseTagsToTrim` property to `api-extractor.json` to specify which release tags should be trimmed when the doc model is produced.
+
+## 7.50.1
+Sat, 22 Feb 2025 01:11:11 GMT
+
+### Patches
+
+- Upgrade the bundled compiler engine to TypeScript 5.7.3
+
+## 7.50.0
+Wed, 12 Feb 2025 01:10:52 GMT
+
+### Minor changes
+
+- Update merge behavior for derived configurations to allow overriding array properties
+
+## 7.49.2
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 7.49.1
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 7.49.0
+Tue, 07 Jan 2025 22:17:32 GMT
+
+### Minor changes
+
+- Upgrade the bundled compiler engine to TypeScript 5.7.2
 
 ## 7.48.1
 Sat, 14 Dec 2024 01:11:07 GMT

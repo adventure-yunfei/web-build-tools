@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
+/// <reference types="node" preserve="true" />
+
 /**
  * A library for writing scripts that interact with the {@link https://rushjs.io/ | Rush} tool.
  * @packageDocumentation
@@ -105,7 +107,12 @@ export {
   VersionPolicy
 } from './api/VersionPolicy';
 
-export { VersionPolicyConfiguration } from './api/VersionPolicyConfiguration';
+export {
+  VersionPolicyConfiguration,
+  type ILockStepVersionJson,
+  type IIndividualVersionJson,
+  type IVersionPolicyJson
+} from './api/VersionPolicyConfiguration';
 
 export { type ILaunchOptions, Rush } from './api/Rush';
 export { RushInternals as _RushInternals } from './api/RushInternals';
@@ -195,3 +202,9 @@ export {
   type IRushCommandLineParameter,
   type IRushCommandLineAction
 } from './api/RushCommandLine';
+
+export { OperationBuildCache as _OperationBuildCache } from './logic/buildCache/OperationBuildCache';
+export type {
+  IOperationBuildCacheOptions as _IOperationBuildCacheOptions,
+  IProjectBuildCacheOptions as _IProjectBuildCacheOptions
+} from './logic/buildCache/OperationBuildCache';

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
+/// <reference types="node" preserve="true" />
+
 /**
  * Core libraries that every NodeJS toolchain project should use.
  *
@@ -13,6 +15,7 @@ export {
   AsyncQueue,
   type IAsyncParallelismOptions,
   type IRunWithRetriesOptions,
+  type IRunWithTimeoutOptions,
   type IWeighted
 } from './Async';
 export type { Brand } from './PrimitiveTypes';

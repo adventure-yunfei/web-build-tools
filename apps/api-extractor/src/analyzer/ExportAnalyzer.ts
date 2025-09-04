@@ -7,15 +7,15 @@ import { InternalError } from '@rushstack/node-core-library';
 import { TypeScriptHelpers } from './TypeScriptHelpers';
 import { AstSymbol } from './AstSymbol';
 import { AstImport, type IAstImportOptions, AstImportKind } from './AstImport';
-import { AstModule, AstModuleExportInfo } from './AstModule';
+import { AstModule, type IAstModuleExportInfo } from './AstModule';
 import { TypeScriptInternals } from './TypeScriptInternals';
 import { SourceFileLocationFormatter } from './SourceFileLocationFormatter';
 import type { IFetchAstSymbolOptions } from './AstSymbolTable';
 import type { AstEntity } from './AstEntity';
 import { AstNamespaceImport } from './AstNamespaceImport';
 import { SyntaxHelpers } from './SyntaxHelpers';
-import { last } from 'lodash';
 import { AstNamespaceExport } from './AstNamespaceExport';
+import { AstSubPathImport, type IAstSubPathImportOptions } from './AstSubPathImport';
 
 /**
  * Exposes the minimal APIs from AstSymbolTable that are needed by ExportAnalyzer.
@@ -69,6 +69,10 @@ export class ExportAnalyzer {
   private readonly _importableAmbientSourceFiles: Set<ts.SourceFile> = new Set<ts.SourceFile>();
 
   private readonly _astImportsByKey: Map<string, AstImport> = new Map<string, AstImport>();
+  private readonly _astSubPathImportsByKey: Map<AstEntity, Map<string, AstSubPathImport>> = new Map<
+    AstEntity,
+    Map<string, AstSubPathImport>
+  >();
   private readonly _astNamespaceImportByModule: Map<AstModule, AstNamespaceImport> = new Map();
 
   public constructor(
@@ -242,15 +246,19 @@ export class ExportAnalyzer {
   /**
    * Implementation of {@link AstSymbolTable.fetchAstModuleExportInfo}.
    */
-  public fetchAstModuleExportInfo(entryPointAstModule: AstModule): AstModuleExportInfo {
+  public fetchAstModuleExportInfo(entryPointAstModule: AstModule): IAstModuleExportInfo {
     if (entryPointAstModule.isExternal) {
       throw new Error('fetchAstModuleExportInfo() is not supported for external modules');
     }
 
     if (entryPointAstModule.astModuleExportInfo === undefined) {
-      const astModuleExportInfo: AstModuleExportInfo = new AstModuleExportInfo();
+      const astModuleExportInfo: IAstModuleExportInfo = {
+        visitedAstModules: new Set<AstModule>(),
+        exportedLocalEntities: new Map<string, { astEntity: AstEntity; isTypeOnlyExport: boolean }>(),
+        starExportedExternalModules: new Map<AstModule, { isTypeOnlyExport: boolean }>()
+      };
 
-      this._collectAllExportsRecursive(astModuleExportInfo, entryPointAstModule, false, new Set<AstModule>());
+      this._collectAllExportsRecursive(astModuleExportInfo, entryPointAstModule, false);
 
       entryPointAstModule.astModuleExportInfo = astModuleExportInfo;
     }
@@ -320,18 +328,18 @@ export class ExportAnalyzer {
   }
 
   private _collectAllExportsRecursive(
-    astModuleExportInfo: AstModuleExportInfo,
+    astModuleExportInfo: IAstModuleExportInfo,
     astModule: AstModule,
-    isTypeOnlyExportedAstModule: boolean,
-    visitedAstModules: Set<AstModule>
+    isTypeOnlyExportedAstModule: boolean
   ): void {
+    const { visitedAstModules, starExportedExternalModules, exportedLocalEntities } = astModuleExportInfo;
     if (visitedAstModules.has(astModule)) {
       return;
     }
     visitedAstModules.add(astModule);
 
     if (astModule.isExternal) {
-      astModuleExportInfo.starExportedExternalModules.set(astModule, {
+      starExportedExternalModules.set(astModule, {
         isTypeOnlyExport:
           isTypeOnlyExportedAstModule &&
           (astModuleExportInfo.starExportedExternalModules.get(astModule)?.isTypeOnlyExport ?? true)
@@ -347,7 +355,7 @@ export class ExportAnalyzer {
             default:
               // Don't collect the "export default" symbol unless this is the entry point module
               if (exportName !== ts.InternalSymbolName.Default || visitedAstModules.size === 1) {
-                if (!astModuleExportInfo.exportedLocalEntities.has(exportSymbol.name)) {
+                if (!exportedLocalEntities.has(exportSymbol.name)) {
                   const astEntity: AstEntity = this._getExportOfAstModule(exportSymbol.name, astModule);
 
                   if (astEntity instanceof AstSymbol && !astEntity.isExternal) {
@@ -358,7 +366,7 @@ export class ExportAnalyzer {
                     this._astSymbolTable.analyze(astEntity);
                   }
 
-                  astModuleExportInfo.exportedLocalEntities.set(exportSymbol.name, {
+                  exportedLocalEntities.set(exportSymbol.name, {
                     astEntity,
                     isTypeOnlyExport:
                       isTypeOnlyExportedAstModule || this._isTypeOnlyReferenceSymbol(exportSymbol)
@@ -371,12 +379,7 @@ export class ExportAnalyzer {
       }
 
       for (const [starExportedModule, { isTypeOnlyExport }] of astModule.starExportedModules) {
-        this._collectAllExportsRecursive(
-          astModuleExportInfo,
-          starExportedModule,
-          isTypeOnlyExport,
-          visitedAstModules
-        );
+        this._collectAllExportsRecursive(astModuleExportInfo, starExportedModule, isTypeOnlyExport);
       }
     }
   }
@@ -418,15 +421,22 @@ export class ExportAnalyzer {
         } else if (ts.isImportSpecifier(declaration)) {
           // import type { Foo } from 'foo';
           isCurrentTypeOnlyReference = declaration.isTypeOnly || declaration.parent.parent.isTypeOnly;
-          currentImportOrExportDeclaration = declaration.parent.parent.parent;
+          currentImportOrExportDeclaration =
+            declaration.parent.parent.parent.kind === ts.SyntaxKind.ImportDeclaration
+              ? declaration.parent.parent.parent
+              : undefined;
         } else if (ts.isImportClause(declaration)) {
           // import type Foo from 'foo';
           isCurrentTypeOnlyReference = declaration.isTypeOnly;
-          currentImportOrExportDeclaration = declaration.parent;
+          currentImportOrExportDeclaration =
+            declaration.parent.kind === ts.SyntaxKind.ImportDeclaration ? declaration.parent : undefined;
         } else if (ts.isNamespaceImport(declaration)) {
           // import type * as Foo from 'foo';
           isCurrentTypeOnlyReference = declaration.parent.isTypeOnly;
-          currentImportOrExportDeclaration = declaration.parent.parent;
+          currentImportOrExportDeclaration =
+            declaration.parent.parent.kind === ts.SyntaxKind.ImportDeclaration
+              ? declaration.parent.parent
+              : undefined;
         }
       }
 
@@ -534,94 +544,80 @@ export class ExportAnalyzer {
     node: ts.ImportTypeNode,
     referringModuleIsExternal: boolean
   ): AstEntity | undefined {
+    const importPath: readonly ts.Identifier[] = node.qualifier
+      ? SyntaxHelpers.collectIdentifierPath(node.qualifier)
+      : [];
+
     const externalModulePath: string | undefined = this._tryGetExternalModulePath(node);
 
     if (externalModulePath) {
-      let exportName: string;
-      if (node.qualifier) {
-        // Example input:
-        //   import('api-extractor-lib1-test').Lib1GenericType<number>
-        //
-        // Extracted qualifier:
-        //   Lib1GenericType
-        exportName = node.qualifier.getText().trim();
+      if (importPath.length > 0) {
+        const exportName: string = importPath[0].getText().trim();
+        // There is no symbol property in a ImportTypeNode, obtain the associated export symbol
+        const exportSymbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(importPath[0]);
+        let exportAstEntity: AstEntity;
+        if (exportName === ts.InternalSymbolName.Default) {
+          // Example input:
+          //   import('api-extractor-lib1-test').default
+          //
+          // Extracted import base:
+          //   import apiExtractorLib1Test from 'api-extractor-lib1-test';
+          exportAstEntity = this._fetchAstImport(exportSymbol, {
+            importKind: AstImportKind.DefaultImport,
+            modulePath: externalModulePath,
+            exportName: SyntaxHelpers.makeCamelCaseIdentifier(externalModulePath),
+            isTypeOnly: true
+          });
+        } else {
+          // Example input:
+          //   import('api-extractor-lib1-test').Lib1GenericType<number>
+          //
+          // Extracted import base:
+          //   import { Lib1GenericType } from 'api-extractor-lib1-test';
+          exportAstEntity = this._fetchAstImport(exportSymbol, {
+            importKind: AstImportKind.NamedImport,
+            exportName: exportName,
+            modulePath: externalModulePath,
+            isTypeOnly: true
+          });
+        }
+        return this._fetchAstSubPathImport({
+          astEntity: exportAstEntity,
+          exportPath: importPath.slice(1).map((id) => id.getText().trim()),
+          isImportType: true
+        });
       } else {
         // Example input:
         //   import('api-extractor-lib1-test')
         //
-        // Extracted qualifier:
-        //   ''
+        // Extracted import base:
+        //   import * as apiExtractorLib1Test from 'api-extractor-lib1-test';
 
-        // exportName = SyntaxHelpers.makeCamelCaseIdentifier(externalModulePath);
-        exportName = '';
+        // Here importSymbol=undefined because {@inheritDoc} and such are not going to work correctly for
+        // a package or source file.
+        return this._fetchAstImport(undefined, {
+          importKind: AstImportKind.StarImport,
+          exportName: SyntaxHelpers.makeCamelCaseIdentifier(externalModulePath),
+          modulePath: externalModulePath,
+          isTypeOnly: false
+        });
       }
+    }
 
-      return this._fetchAstImport(undefined, {
-        importKind: AstImportKind.ImportType,
-        exportName: exportName,
-        modulePath: externalModulePath,
-        isTypeOnly: false
+    // Internal reference
+    const astModule: AstModule = this._fetchSpecifierAstModule(node, undefined);
+    if (importPath.length > 0) {
+      const exportName: ts.Identifier = importPath[0];
+      const exportAstEntity: AstEntity = this._getExportOfAstModule(exportName.getText().trim(), astModule);
+      return this._fetchAstSubPathImport({
+        astEntity: exportAstEntity,
+        exportPath: importPath.slice(1).map((id) => id.getText().trim()),
+        isImportType: true
       });
+    } else {
+      const localName: string = SyntaxHelpers.makeCamelCaseIdentifier(this._getModuleSpecifier(node));
+      return this._getAstNamespaceImport(astModule, localName, astModule.sourceFile);
     }
-
-    // Internal reference: AstSymbol
-    const rightMostToken: ts.Identifier | ts.ImportTypeNode = node.qualifier
-      ? node.qualifier.kind === ts.SyntaxKind.QualifiedName
-        ? node.qualifier.right
-        : node.qualifier
-      : node;
-
-    // There is no symbol property in a ImportTypeNode, obtain the associated export symbol
-    const exportSymbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(rightMostToken);
-    if (!exportSymbol) {
-      throw new InternalError(
-        `Symbol not found for identifier: ${node.getText()}\n` +
-          SourceFileLocationFormatter.formatDeclaration(node)
-      );
-    }
-
-    let followedSymbol: ts.Symbol = exportSymbol;
-    for (;;) {
-      const referencedAstEntity: AstEntity | undefined = this.fetchReferencedAstEntity(
-        followedSymbol,
-        referringModuleIsExternal
-      );
-
-      if (referencedAstEntity) {
-        return referencedAstEntity;
-      }
-
-      const followedSymbolNode: ts.Node | ts.ImportTypeNode | undefined =
-        followedSymbol.declarations && (followedSymbol.declarations[0] as ts.Node | undefined);
-
-      if (followedSymbolNode && followedSymbolNode.kind === ts.SyntaxKind.ImportType) {
-        return this.fetchReferencedAstEntityFromImportTypeNode(
-          followedSymbolNode as ts.ImportTypeNode,
-          referringModuleIsExternal
-        );
-      }
-
-      // eslint-disable-next-line no-bitwise
-      if (!(followedSymbol.flags & ts.SymbolFlags.Alias)) {
-        break;
-      }
-
-      const currentAlias: ts.Symbol = this._typeChecker.getAliasedSymbol(followedSymbol);
-      if (!currentAlias || currentAlias === followedSymbol) {
-        break;
-      }
-
-      followedSymbol = currentAlias;
-    }
-
-    const astSymbol: AstSymbol | undefined = this._astSymbolTable.fetchAstSymbol({
-      followedSymbol: followedSymbol,
-      isExternal: referringModuleIsExternal,
-      includeNominalAnalysis: false,
-      addIfMissing: true
-    });
-
-    return astSymbol;
   }
 
   private _tryMatchExportDeclaration(
@@ -705,15 +701,14 @@ export class ExportAnalyzer {
   ): AstNamespaceExport {
     const imoprtNamespace: AstNamespaceImport = this._getAstNamespaceImport(
       astModule,
-      declarationSymbol,
+      declarationSymbol.name,
       declaration
     );
 
     return new AstNamespaceExport({
       namespaceName: imoprtNamespace.localName,
       astModule: astModule,
-      declaration,
-      symbol: declarationSymbol
+      declaration
     });
   }
 
@@ -744,7 +739,7 @@ export class ExportAnalyzer {
 
         if (externalModulePath === undefined) {
           const astModule: AstModule = this._fetchSpecifierAstModule(importDeclaration, declarationSymbol);
-          return this._getAstNamespaceImport(astModule, declarationSymbol, declaration);
+          return this._getAstNamespaceImport(astModule, declarationSymbol.name, declaration);
         }
 
         // Here importSymbol=undefined because {@inheritDoc} and such are not going to work correctly for
@@ -865,59 +860,59 @@ export class ExportAnalyzer {
             isTypeOnly: false
           });
         }
+      } else {
         // EqualsImport by namespace.
         // EXAMPLE:
         // import myLib2 = myLib;
         // import B = myLib.A.B;
-      } else {
-        const reversedIdentifiers: ts.Identifier[] = [];
-        if (ts.isIdentifier(declaration.moduleReference)) {
-          reversedIdentifiers.push(declaration.moduleReference);
-        } else {
-          let current: ts.QualifiedName | undefined = declaration.moduleReference;
-          while (true) {
-            reversedIdentifiers.push(current.right);
-            if (ts.isIdentifier(current.left)) {
-              reversedIdentifiers.push(current.left);
-              break;
-            } else {
-              current = current.left;
-            }
-          }
+        const importPath: readonly ts.Identifier[] = SyntaxHelpers.collectIdentifierPath(
+          declaration.moduleReference
+        );
+
+        // Find the root (left-most) AstEntity of module reference.
+        //
+        // Ideally should be treated as referenced type node like handling TypeReference in `AstSymbolTable._analyzeChildTree`,
+        //  to handle special cases (e.g. "displaced symbol").
+        // But the symbol of ImportEqualsDeclaration is an alias symbol. It should be parsed during `_tryMatchImportDeclaration`.
+        const leftMostSymbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(importPath[0]);
+        if (!leftMostSymbol) {
+          throw new Error(
+            `Symbol not found for identifier "${importPath[0].getText()}":\n` +
+              SourceFileLocationFormatter.formatDeclaration(importPath[0])
+          );
+        }
+        let baseAstEntity: AstEntity | undefined = this.fetchReferencedAstEntity(leftMostSymbol, false);
+        if (!baseAstEntity) {
+          throw new Error(
+            `AstEntity not found for identifier "${importPath[0].getText()}":\n` +
+              SourceFileLocationFormatter.formatDeclaration(importPath[0])
+          );
+        }
+        if (baseAstEntity instanceof AstSymbol && baseAstEntity.parentAstSymbol) {
+          throw new Error(
+            `"import A = B.C" syntax can only refer to another root declaration:\n` +
+              SourceFileLocationFormatter.formatDeclaration(importPath[0])
+          );
         }
 
-        const exportSubPath: string[] = [];
-        let externalImport: AstImport | undefined;
-        for (let i = reversedIdentifiers.length - 1; i >= 0; i--) {
-          const identifier: ts.Identifier = reversedIdentifiers[i];
-          if (!externalImport) {
-            // find the first external import as the base namespace
-            const symbol: ts.Symbol | undefined = this._typeChecker.getSymbolAtLocation(identifier);
-            if (!symbol) {
-              throw new Error('Symbol not found for identifier: ' + identifier.getText());
-            }
-            const astEntity: AstEntity | AstImport | undefined = this.fetchReferencedAstEntity(symbol, false);
-            if (astEntity instanceof AstImport) {
-              externalImport = astEntity;
-            }
+        for (let i: number = 1; i < importPath.length; i++) {
+          if (baseAstEntity instanceof AstNamespaceImport) {
+            // skip local AstNamespaceImport
+            baseAstEntity = this._getExportOfAstModule(
+              importPath[i].getText().trim(),
+              baseAstEntity.astModule
+            );
           } else {
-            exportSubPath.push(identifier.getText().trim());
-          }
-        }
-
-        if (externalImport) {
-          if (exportSubPath.length === 0) {
-            return externalImport;
-          } else {
-            return this._fetchAstImport(declarationSymbol, {
-              importKind: externalImport.importKind,
-              modulePath: externalImport.modulePath,
-              exportName: last(exportSubPath)!,
-              exportPath: externalImport.exportPath.concat(exportSubPath),
-              isTypeOnly: false
+            const variableName: string = TypeScriptInternals.getTextOfIdentifierOrLiteral(declaration.name);
+            return this._fetchAstSubPathImport({
+              astEntity: baseAstEntity,
+              exportPath: importPath.slice(i).map((id) => id.getText().trim()),
+              localName: variableName,
+              isImportType: false
             });
           }
         }
+        return baseAstEntity;
       }
     }
 
@@ -926,16 +921,15 @@ export class ExportAnalyzer {
 
   private _getAstNamespaceImport(
     astModule: AstModule,
-    declarationSymbol: ts.Symbol,
+    localName: string,
     declaration: ts.Declaration
   ): AstNamespaceImport {
     let namespaceImport: AstNamespaceImport | undefined = this._astNamespaceImportByModule.get(astModule);
     if (namespaceImport === undefined) {
       namespaceImport = new AstNamespaceImport({
-        namespaceName: declarationSymbol.name,
+        namespaceName: localName,
         astModule: astModule,
-        declaration: declaration,
-        symbol: declarationSymbol
+        declaration: declaration
       });
       this._astNamespaceImportByModule.set(astModule, namespaceImport);
     }
@@ -984,25 +978,6 @@ export class ExportAnalyzer {
   public tryGetExportOfAstModule(exportName: string, astModule: AstModule): AstEntity | undefined {
     const visitedAstModules: Set<AstModule> = new Set<AstModule>();
     return this._tryGetExportOfAstModule(exportName, astModule, visitedAstModules);
-  }
-
-  public tryGetReferencedAstImport(astImport: AstImport): AstImport | undefined {
-    if (astImport.exportPath) {
-      const referencedImport: AstImport | undefined = this._astImportsByKey.get(
-        AstImport.getKey({
-          importKind: astImport.importKind,
-          modulePath: astImport.modulePath,
-          exportName: astImport.exportPath[0],
-          isTypeOnly: false
-        })
-      );
-      if (referencedImport === undefined) {
-        throw new Error(
-          `For an AstImport of "EqualsImport" from namespace, there must have a referenced base AstImport.`
-        );
-      }
-      return referencedImport;
-    }
   }
 
   private _tryGetExportOfAstModule(
@@ -1073,16 +1048,20 @@ export class ExportAnalyzer {
    * and fetches the corresponding AstModule object.
    */
   private _fetchSpecifierAstModule(
-    importOrExportDeclaration: ts.ImportDeclaration | ts.ExportDeclaration,
-    exportSymbol: ts.Symbol
+    importOrExportDeclaration: ts.ImportDeclaration | ts.ExportDeclaration | ts.ImportTypeNode,
+    exportSymbol: ts.Symbol | undefined
   ): AstModule {
     const moduleSpecifier: string = this._getModuleSpecifier(importOrExportDeclaration);
+    const moduleSpecifierNode: ts.Expression | undefined = ts.isImportTypeNode(importOrExportDeclaration)
+      ? ts.isLiteralTypeNode(importOrExportDeclaration.argument)
+        ? importOrExportDeclaration.argument.literal
+        : undefined
+      : importOrExportDeclaration.moduleSpecifier;
     const mode: ts.ModuleKind.CommonJS | ts.ModuleKind.ESNext | undefined =
-      importOrExportDeclaration.moduleSpecifier &&
-      ts.isStringLiteralLike(importOrExportDeclaration.moduleSpecifier)
+      moduleSpecifierNode && ts.isStringLiteralLike(moduleSpecifierNode)
         ? TypeScriptInternals.getModeForUsageLocation(
             importOrExportDeclaration.getSourceFile(),
-            importOrExportDeclaration.moduleSpecifier,
+            moduleSpecifierNode,
             this._program.getCompilerOptions()
           )
         : undefined;
@@ -1120,10 +1099,12 @@ export class ExportAnalyzer {
     }
 
     const isExternal: boolean = this._isExternalModulePath(importOrExportDeclaration, moduleSpecifier);
-    const moduleReference: IAstModuleReference = {
-      moduleSpecifier: moduleSpecifier,
-      moduleSpecifierSymbol: exportSymbol
-    };
+    const moduleReference: IAstModuleReference | undefined = exportSymbol
+      ? {
+          moduleSpecifier: moduleSpecifier,
+          moduleSpecifierSymbol: exportSymbol
+        }
+      : undefined;
     const specifierAstModule: AstModule = this.fetchAstModuleFromSourceFile(
       moduleSourceFile,
       moduleReference,
@@ -1161,6 +1142,47 @@ export class ExportAnalyzer {
     }
 
     return astImport;
+  }
+
+  private _fetchAstSubPathImport(options: IAstSubPathImportOptions): AstEntity {
+    if (options.exportPath.length === 0) {
+      // If the exportPath is empty, just use the AstEntity directly instead of creating an unnecessary AstSubPathImport.
+      // e.g. return AstImport for `import("foo").Bar`, return AstEntity of Bar for `import("./foo").Bar`.
+      return options.astEntity;
+    }
+
+    if (options.astEntity instanceof AstSubPathImport) {
+      // If the AstEntity is already an AstSubPathImport, just concat the exportPath and return,
+      //  to avoid creating unnecessary intermediate AstSubPathImport entity.
+      return this._fetchAstSubPathImport({
+        astEntity: options.astEntity.baseAstEntity,
+        exportPath: options.astEntity.exportPath.concat(options.exportPath),
+        localName: options.astEntity.localName,
+        isImportType: options.isImportType
+      });
+    }
+
+    let astSubPathImportsByExportPath: Map<string, AstSubPathImport> | undefined =
+      this._astSubPathImportsByKey.get(options.astEntity);
+    if (astSubPathImportsByExportPath === undefined) {
+      astSubPathImportsByExportPath = new Map<string, AstSubPathImport>();
+      this._astSubPathImportsByKey.set(options.astEntity, astSubPathImportsByExportPath);
+    }
+
+    const exportPathKey: string = options.exportPath.join('.');
+    let astSubPathImport: AstSubPathImport | undefined = astSubPathImportsByExportPath.get(exportPathKey);
+    if (astSubPathImport === undefined) {
+      astSubPathImport = new AstSubPathImport(options);
+      astSubPathImportsByExportPath.set(exportPathKey, astSubPathImport);
+    }
+
+    if (!options.isImportType) {
+      // If we encounter at least one non-import-type syntax (i.e. ImportEqualsDeclaration as `import Foo = X.Y.Z`),
+      // then the .d.ts rollup will emit ImportEqualsDeclaration.
+      astSubPathImport.isImportTypeEverywhere = false;
+    }
+
+    return astSubPathImport;
   }
 
   private _getModuleSpecifier(

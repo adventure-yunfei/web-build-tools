@@ -1,6 +1,153 @@
 # Change Log - @rushstack/localization-utilities
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 0.13.19
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.13.18
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.13.17
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.13.16
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.13.15
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.13.14
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.13.13
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.13.12
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.13.11
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.13.10
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 0.13.9
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 0.13.8
+Wed, 09 Apr 2025 00:11:03 GMT
+
+_Version update only_
+
+## 0.13.7
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.13.6
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.13.5
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.13.4
+Wed, 12 Mar 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.13.3
+Tue, 11 Mar 2025 02:12:34 GMT
+
+_Version update only_
+
+## 0.13.2
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.13.1
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.13.0
+Thu, 27 Feb 2025 16:10:47 GMT
+
+### Minor changes
+
+- Update `loc.json` format to allow keys to be mapped to raw strings. This is useful so that the file name can be preserved for a strings file that can be directly imported at runtime.
+
+## 0.12.24
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.12.23
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 0.12.22
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.12.21
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.12.20
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.12.19
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 0.12.18
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.12.17
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.12.16
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.12.15
 Sat, 14 Dec 2024 01:11:07 GMT

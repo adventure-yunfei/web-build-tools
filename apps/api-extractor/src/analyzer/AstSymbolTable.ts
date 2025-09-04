@@ -9,16 +9,16 @@ import { type PackageJsonLookup, InternalError } from '@rushstack/node-core-libr
 import { AstDeclaration } from './AstDeclaration';
 import { TypeScriptHelpers } from './TypeScriptHelpers';
 import { AstSymbol } from './AstSymbol';
-import type { AstModule, AstModuleExportInfo } from './AstModule';
+import type { AstModule, IAstModuleExportInfo } from './AstModule';
 import { PackageMetadataManager } from './PackageMetadataManager';
 import { ExportAnalyzer } from './ExportAnalyzer';
 import type { AstEntity } from './AstEntity';
-import { AstImport } from './AstImport';
 import { AstNamespaceImport } from './AstNamespaceImport';
 import type { MessageRouter } from '../collector/MessageRouter';
 import { TypeScriptInternals, type IGlobalVariableAnalyzer } from './TypeScriptInternals';
 import { SyntaxHelpers } from './SyntaxHelpers';
 import { SourceFileLocationFormatter } from './SourceFileLocationFormatter';
+import { AstSubPathImport } from './AstSubPathImport';
 
 /**
  * Options for `AstSymbolTable._fetchAstSymbol()`
@@ -125,7 +125,7 @@ export class AstSymbolTable {
   /**
    * This crawls the specified entry point and collects the full set of exported AstSymbols.
    */
-  public fetchAstModuleExportInfo(astModule: AstModule): AstModuleExportInfo {
+  public fetchAstModuleExportInfo(astModule: AstModule): IAstModuleExportInfo {
     return this._exportAnalyzer.fetchAstModuleExportInfo(astModule);
   }
 
@@ -193,10 +193,6 @@ export class AstSymbolTable {
       throw new InternalError('tryGetEntityForIdentifier() called for an identifier that was not analyzed');
     }
     return this._entitiesByNode.get(identifier);
-  }
-
-  public tryGetReferencedAstImport(astImport: AstImport): AstImport | undefined {
-    return this._exportAnalyzer.tryGetReferencedAstImport(astImport);
   }
 
   /**
@@ -322,20 +318,28 @@ export class AstSymbolTable {
       // If this symbol is non-external (i.e. it belongs to the working package), then we also analyze any
       // referencedAstSymbols that are non-external.  For example, this ensures that forgotten exports
       // get analyzed.
+      const analyzeReferencedLocalAstEntity = (referencedAstEntity: AstEntity): void => {
+        if (referencedAstEntity instanceof AstSymbol) {
+          if (!referencedAstEntity.isExternal) {
+            this._analyzeAstSymbol(referencedAstEntity);
+          }
+        }
+
+        if (referencedAstEntity instanceof AstNamespaceImport) {
+          if (!referencedAstEntity.astModule.isExternal) {
+            this._analyzeAstNamespaceImport(referencedAstEntity);
+          }
+        }
+
+        if (referencedAstEntity instanceof AstSubPathImport) {
+          analyzeReferencedLocalAstEntity(referencedAstEntity.baseAstEntity);
+        }
+      };
+
       rootAstSymbol.forEachDeclarationRecursive((astDeclaration: AstDeclaration) => {
         for (const referencedAstEntity of astDeclaration.referencedAstEntities) {
           // Walk up to the root of the tree, looking for any imports along the way
-          if (referencedAstEntity instanceof AstSymbol) {
-            if (!referencedAstEntity.isExternal) {
-              this._analyzeAstSymbol(referencedAstEntity);
-            }
-          }
-
-          if (referencedAstEntity instanceof AstNamespaceImport) {
-            if (!referencedAstEntity.astModule.isExternal) {
-              this._analyzeAstNamespaceImport(referencedAstEntity);
-            }
-          }
+          analyzeReferencedLocalAstEntity(referencedAstEntity);
         }
       });
     }
@@ -354,6 +358,7 @@ export class AstSymbolTable {
       case ts.SyntaxKind.ExpressionWithTypeArguments: // special case for e.g. the "extends" keyword
       case ts.SyntaxKind.ComputedPropertyName: // used for EcmaScript "symbols", e.g. "[toPrimitive]".
       case ts.SyntaxKind.TypeQuery: // represents for "typeof X" as a type
+      case ts.SyntaxKind.ExportSpecifier: // NamedExports inside namespace, e.g. "export { A as B };", "export { A }"
         {
           // Sometimes the type reference will involve multiple identifiers, e.g. "a.b.C".
           // In this case, we only need to worry about importing the first identifier,

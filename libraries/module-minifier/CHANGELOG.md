@@ -1,6 +1,157 @@
 # Change Log - @rushstack/module-minifier
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 0.7.26
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.7.25
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.7.24
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.7.23
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.7.22
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.7.21
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.7.20
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.7.19
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.7.18
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.7.17
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 0.7.16
+Tue, 15 Apr 2025 15:11:58 GMT
+
+_Version update only_
+
+## 0.7.15
+Wed, 09 Apr 2025 00:11:03 GMT
+
+_Version update only_
+
+## 0.7.14
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.7.13
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.7.12
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.7.11
+Wed, 12 Mar 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.7.10
+Tue, 11 Mar 2025 02:12:34 GMT
+
+_Version update only_
+
+## 0.7.9
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.7.8
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.7.7
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.7.6
+Wed, 26 Feb 2025 16:11:12 GMT
+
+_Version update only_
+
+## 0.7.5
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.7.4
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.7.3
+Wed, 12 Feb 2025 01:10:52 GMT
+
+### Patches
+
+- Bump the `serialize-javascript` dependency.
+
+## 0.7.2
+Thu, 30 Jan 2025 16:10:36 GMT
+
+### Patches
+
+- Prefer `os.availableParallelism()` to `os.cpus().length`.
+
+## 0.7.1
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.7.0
+Wed, 22 Jan 2025 03:03:47 GMT
+
+### Minor changes
+
+- Add a `workerResourceLimits` option to the `WorkerPoolMinifier` constructor to control the available resources to the workers.
+
+## 0.6.36
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.6.35
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.6.34
 Sat, 14 Dec 2024 01:11:07 GMT

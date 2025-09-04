@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
+import * as crypto from 'crypto';
 
 import {
   type ITerminal,
@@ -23,16 +24,24 @@ import { OperationMetadataManager } from './OperationMetadataManager';
 import type { IPhase } from '../../api/CommandLineConfiguration';
 import type { RushConfigurationProject } from '../../api/RushConfigurationProject';
 import { CollatedTerminalProvider } from '../../utilities/CollatedTerminalProvider';
+import type { IOperationExecutionResult } from './IOperationExecutionResult';
+import type { IInputsSnapshot } from '../incremental/InputsSnapshot';
+import { RushConstants } from '../RushConstants';
+import type { IEnvironment } from '../../utilities/Utilities';
 import {
   getProjectLogFilePaths,
   type ILogFilePaths,
   initializeProjectLogFilesAsync
 } from './ProjectLogWritable';
-import type { IOperationExecutionResult } from './IOperationExecutionResult';
 
+/**
+ * @internal
+ */
 export interface IOperationExecutionRecordContext {
   streamCollator: StreamCollator;
   onOperationStatusChanged?: (record: OperationExecutionRecord) => void;
+  createEnvironment?: (record: OperationExecutionRecord) => IEnvironment;
+  inputsSnapshot: IInputsSnapshot | undefined;
 
   debugMode: boolean;
   quietMode: boolean;
@@ -104,9 +113,9 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
   });
 
   public readonly runner: IOperationRunner;
-  public readonly associatedPhase: IPhase | undefined;
-  public readonly associatedProject: RushConfigurationProject | undefined;
-  public readonly _operationMetadataManager: OperationMetadataManager | undefined;
+  public readonly associatedPhase: IPhase;
+  public readonly associatedProject: RushConfigurationProject;
+  public readonly _operationMetadataManager: OperationMetadataManager;
 
   public logFilePaths: ILogFilePaths | undefined;
 
@@ -114,13 +123,15 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
 
   private _collatedWriter: CollatedWriter | undefined = undefined;
   private _status: OperationStatus;
+  private _stateHash: string | undefined;
+  private _stateHashComponents: ReadonlyArray<string> | undefined;
 
   public constructor(operation: Operation, context: IOperationExecutionRecordContext) {
     const { runner, associatedPhase, associatedProject } = operation;
 
     if (!runner) {
       throw new InternalError(
-        `Operation for phase '${associatedPhase?.name}' and project '${associatedProject?.packageName}' has no runner.`
+        `Operation for phase '${associatedPhase.name}' and project '${associatedProject.packageName}' has no runner.`
       );
     }
 
@@ -130,17 +141,14 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
     this.associatedProject = associatedProject;
     this.logFilePaths = undefined;
 
-    this._operationMetadataManager =
-      associatedPhase && associatedProject
-        ? new OperationMetadataManager({
-            phase: associatedPhase,
-            rushProject: associatedProject,
-            operation
-          })
-        : undefined;
+    this._operationMetadataManager = new OperationMetadataManager({
+      operation
+    });
 
     this._context = context;
     this._status = operation.dependencies.size > 0 ? OperationStatus.Waiting : OperationStatus.Ready;
+    this._stateHash = undefined;
+    this._stateHashComponents = undefined;
   }
 
   public get name(): string {
@@ -177,6 +185,10 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
     return this._operationMetadataManager?.stateFile.state?.cobuildRunnerId;
   }
 
+  public get environment(): IEnvironment | undefined {
+    return this._context.createEnvironment?.(this);
+  }
+
   public get metadataFolderPath(): string | undefined {
     return this._operationMetadataManager?.metadataFolderPath;
   }
@@ -206,6 +218,62 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
     return !this.operation.enabled || this.runner.silent;
   }
 
+  public getStateHash(): string {
+    if (this._stateHash === undefined) {
+      const components: readonly string[] = this.getStateHashComponents();
+
+      const hasher: crypto.Hash = crypto.createHash('sha1');
+      components.forEach((component) => {
+        hasher.update(`${RushConstants.hashDelimiter}${component}`);
+      });
+
+      const hash: string = hasher.digest('hex');
+      this._stateHash = hash;
+    }
+    return this._stateHash;
+  }
+
+  public getStateHashComponents(): ReadonlyArray<string> {
+    if (!this._stateHashComponents) {
+      const { inputsSnapshot } = this._context;
+
+      if (!inputsSnapshot) {
+        throw new Error(`Cannot calculate state hash without git.`);
+      }
+
+      if (this.dependencies.size !== this.operation.dependencies.size) {
+        throw new InternalError(
+          `State hash calculation failed. Dependencies of record do not match the operation.`
+        );
+      }
+
+      // The final state hashes of operation dependencies are factored into the hash to ensure that any
+      // state changes in dependencies will invalidate the cache.
+      const components: string[] = Array.from(this.dependencies, (record) => {
+        return `${RushConstants.hashDelimiter}${record.name}=${record.getStateHash()}`;
+      }).sort();
+
+      const { associatedProject, associatedPhase } = this;
+      // Examples of data in the local state hash:
+      // - Environment variables specified in `dependsOnEnvVars`
+      // - Git hashes of tracked files in the associated project
+      // - Git hash of the shrinkwrap file for the project
+      // - Git hashes of any files specified in `dependsOnAdditionalFiles` (must not be associated with a project)
+      const localStateHash: string = inputsSnapshot.getOperationOwnStateHash(
+        associatedProject,
+        associatedPhase.name
+      );
+      components.push(`${RushConstants.hashDelimiter}local=${localStateHash}`);
+
+      // Examples of data in the config hash:
+      // - CLI parameters (ShellOperationRunner)
+      const configHash: string = this.runner.getConfigHash();
+      components.push(`${RushConstants.hashDelimiter}config=${configHash}`);
+      this._stateHashComponents = components;
+    }
+    return this._stateHashComponents;
+  }
+
   /**
    * {@inheritdoc IOperationRunnerContext.runWithTerminalAsync}
    */
@@ -216,16 +284,15 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
       logFileSuffix: string;
     }
   ): Promise<T> {
-    const { associatedPhase, associatedProject, stdioSummarizer } = this;
+    const { associatedProject, stdioSummarizer } = this;
     const { createLogFile, logFileSuffix = '' } = options;
 
-    const logFilePaths: ILogFilePaths | undefined =
-      createLogFile && associatedProject && associatedPhase && this._operationMetadataManager
-        ? getProjectLogFilePaths({
-            project: associatedProject,
-            logFilenameIdentifier: `${this._operationMetadataManager.logFilenameIdentifier}${logFileSuffix}`
-          })
-        : undefined;
+    const logFilePaths: ILogFilePaths | undefined = createLogFile
+      ? getProjectLogFilePaths({
+          project: associatedProject,
+          logFilenameIdentifier: `${this._operationMetadataManager.logFilenameIdentifier}${logFileSuffix}`
+        })
+      : undefined;
     this.logFilePaths = logFilePaths;
 
     const projectLogWritable: TerminalWritable | undefined = logFilePaths
@@ -320,18 +387,21 @@ export class OperationExecutionRecord implements IOperationRunnerContext, IOpera
             ? OperationStatus.NoOp
             : OperationStatus.Skipped;
       }
+      // Make sure that the stopwatch is stopped before reporting the result, otherwise endTime is undefined.
+      this.stopwatch.stop();
       // Delegate global state reporting
       await onResult(this);
     } catch (error) {
       this.status = OperationStatus.Failure;
       this.error = error;
+      // Make sure that the stopwatch is stopped before reporting the result, otherwise endTime is undefined.
+      this.stopwatch.stop();
       // Delegate global state reporting
       await onResult(this);
     } finally {
       if (this.isTerminal) {
         this._collatedWriter?.close();
         this.stdioSummarizer.close();
-        this.stopwatch.stop();
       }
     }
   }

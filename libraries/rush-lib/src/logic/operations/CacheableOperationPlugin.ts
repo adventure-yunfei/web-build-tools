@@ -10,7 +10,7 @@ import { SplitterTransform, type TerminalWritable, type ITerminal, Terminal } fr
 import { CollatedTerminalProvider } from '../../utilities/CollatedTerminalProvider';
 import { OperationStatus } from './OperationStatus';
 import { CobuildLock, type ICobuildCompletedState } from '../cobuild/CobuildLock';
-import { ProjectBuildCache } from '../buildCache/ProjectBuildCache';
+import { OperationBuildCache } from '../buildCache/OperationBuildCache';
 import { RushConstants } from '../RushConstants';
 import type { RushProjectConfiguration } from '../../api/RushProjectConfiguration';
 import {
@@ -31,11 +31,9 @@ import type {
   IPhasedCommandPlugin,
   PhasedCommandHooks
 } from '../../pluginFramework/PhasedCommandHooks';
-import type { IPhase } from '../../api/CommandLineConfiguration';
 import type { BuildCacheConfiguration } from '../../api/BuildCacheConfiguration';
 import type { IOperationExecutionResult } from './IOperationExecutionResult';
 import type { OperationExecutionRecord } from './OperationExecutionRecord';
-import type { IInputsSnapshot } from '../incremental/InputsSnapshot';
 
 const PLUGIN_NAME: 'CacheablePhasedOperationPlugin' = 'CacheablePhasedOperationPlugin';
 const PERIODIC_CALLBACK_INTERVAL_IN_SECONDS: number = 10;
@@ -49,9 +47,7 @@ export interface IOperationBuildCacheContext {
   isCacheWriteAllowed: boolean;
   isCacheReadAllowed: boolean;
 
-  stateHash: string;
-
-  operationBuildCache: ProjectBuildCache | undefined;
+  operationBuildCache: OperationBuildCache | undefined;
   cacheDisabledReason: string | undefined;
   outputFolderNames: ReadonlyArray<string>;
 
@@ -88,8 +84,6 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
   public apply(hooks: PhasedCommandHooks): void {
     const { allowWarningsInSuccessfulBuild, buildCacheConfiguration, cobuildConfiguration } = this._options;
 
-    const { cacheHashSalt } = buildCacheConfiguration;
-
     hooks.beforeExecuteOperations.tap(
       PLUGIN_NAME,
       (
@@ -104,78 +98,13 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           );
         }
 
-        // This redefinition is necessary due to limitations in TypeScript's control flow analysis, due to the nested closure.
-        const definitelyDefinedInputsSnapshot: IInputsSnapshot = inputsSnapshot;
-
         const disjointSet: DisjointSet<Operation> | undefined = cobuildConfiguration?.cobuildFeatureEnabled
           ? new DisjointSet()
           : undefined;
 
-        const hashByOperation: Map<Operation, string> = new Map();
-        // Build cache hashes are computed up front to ensure stability and to catch configuration errors early.
-        function getOrCreateOperationHash(operation: Operation): string {
-          const cachedHash: string | undefined = hashByOperation.get(operation);
-          if (cachedHash !== undefined) {
-            return cachedHash;
-          }
-
-          // Examples of data in the config hash:
-          // - CLI parameters (ShellOperationRunner)
-          const configHash: string | undefined = operation.runner?.getConfigHash();
-
-          const { associatedProject, associatedPhase } = operation;
-          // Examples of data in the local state hash:
-          // - Environment variables specified in `dependsOnEnvVars`
-          // - Git hashes of tracked files in the associated project
-          // - Git hash of the shrinkwrap file for the project
-          // - Git hashes of any files specified in `dependsOnAdditionalFiles` (must not be associated with a project)
-          const localStateHash: string | undefined =
-            associatedProject &&
-            definitelyDefinedInputsSnapshot.getOperationOwnStateHash(
-              associatedProject,
-              associatedPhase?.name
-            );
-
-          // The final state hashes of operation dependencies are factored into the hash to ensure that any
-          // state changes in dependencies will invalidate the cache.
-          const dependencyHashes: string[] = Array.from(operation.dependencies, getDependencyHash).sort();
-
-          const hasher: crypto.Hash = crypto.createHash('sha1');
-          // This property is used to force cache bust when version changes, e.g. when fixing bugs in the content
-          // of the build cache.
-          hasher.update(`${RushConstants.buildCacheVersion}`);
-
-          if (cacheHashSalt !== undefined) {
-            // This allows repository owners to force a cache bust by changing the salt.
-            // A common use case is to invalidate the cache when adding/removing/updating rush plugins that alter the build output.
-            hasher.update(cacheHashSalt);
-          }
-
-          for (const dependencyHash of dependencyHashes) {
-            hasher.update(dependencyHash);
-          }
-
-          if (localStateHash) {
-            hasher.update(`${RushConstants.hashDelimiter}${localStateHash}`);
-          }
-
-          if (configHash) {
-            hasher.update(`${RushConstants.hashDelimiter}${configHash}`);
-          }
-
-          const hashString: string = hasher.digest('hex');
-
-          hashByOperation.set(operation, hashString);
-          return hashString;
-        }
-
-        function getDependencyHash(operation: Operation): string {
-          return `${RushConstants.hashDelimiter}${operation.name}=${getOrCreateOperationHash(operation)}`;
-        }
-
         for (const [operation, record] of recordByOperation) {
           const { associatedProject, associatedPhase, runner, settings: operationSettings } = operation;
-          if (!associatedProject || !associatedPhase || !runner) {
+          if (!runner) {
             return;
           }
 
@@ -188,7 +117,6 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           // depending on the selected phase.
           const fileHashes: ReadonlyMap<string, string> | undefined =
             inputsSnapshot.getTrackedFileHashesForOperation(associatedProject, phaseName);
-          const stateHash: string = getOrCreateOperationHash(operation);
 
           const cacheDisabledReason: string | undefined = projectConfiguration
             ? projectConfiguration.getCacheDisabledReason(fileHashes.keys(), phaseName, operation.isNoOp)
@@ -214,7 +142,6 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             isCacheReadAllowed: isIncrementalBuildAllowed,
             operationBuildCache: undefined,
             outputFolderNames,
-            stateHash,
             cacheDisabledReason,
             cobuildLock: undefined,
             cobuildClusterId: undefined,
@@ -244,12 +171,10 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
               const hash: crypto.Hash = crypto.createHash('sha1');
               for (const operation of groupedOperations) {
                 const { associatedPhase: phase, associatedProject: project } = operation;
-                if (project && phase) {
-                  hash.update(project.projectRelativeFolder);
-                  hash.update(RushConstants.hashDelimiter);
-                  hash.update(operation.name ?? phase.name);
-                  hash.update(RushConstants.hashDelimiter);
-                }
+                hash.update(project.projectRelativeFolder);
+                hash.update(RushConstants.hashDelimiter);
+                hash.update(operation.name ?? phase.name);
+                hash.update(RushConstants.hashDelimiter);
               }
               const cobuildClusterId: string = hash.digest('hex');
 
@@ -291,14 +216,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
           operation
         } = record;
 
-        if (
-          !operation.enabled ||
-          !project ||
-          !phase ||
-          !runner?.cacheable ||
-          // this check is just to make the types happy, it will always be defined if project + phase are defined.
-          !operationMetadataManager
-        ) {
+        if (!operation.enabled || !runner?.cacheable) {
           return;
         }
 
@@ -322,13 +240,11 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
 
           const buildCacheTerminal: ITerminal = buildCacheContext.buildCacheTerminal;
 
-          let projectBuildCache: ProjectBuildCache | undefined = this._tryGetProjectBuildCache({
+          let operationBuildCache: OperationBuildCache | undefined = this._tryGetOperationBuildCache({
             buildCacheContext,
             buildCacheConfiguration,
-            rushProject: project,
-            phase,
             terminal: buildCacheTerminal,
-            operation: operation
+            record
           });
 
           // Try to acquire the cobuild lock
@@ -337,19 +253,18 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             if (
               cobuildConfiguration?.cobuildLeafProjectLogOnlyAllowed &&
               operation.consumers.size === 0 &&
-              !projectBuildCache
+              !operationBuildCache
             ) {
               // When the leaf project log only is allowed and the leaf project is build cache "disabled", try to get
               // a log files only project build cache
-              projectBuildCache = await this._tryGetLogOnlyProjectBuildCacheAsync({
+              operationBuildCache = await this._tryGetLogOnlyOperationBuildCacheAsync({
                 buildCacheConfiguration,
                 cobuildConfiguration,
                 buildCacheContext,
-                rushProject: project,
-                phase,
+                record,
                 terminal: buildCacheTerminal
               });
-              if (projectBuildCache) {
+              if (operationBuildCache) {
                 buildCacheTerminal.writeVerboseLine(
                   `Log files only build cache is enabled for the project "${project.packageName}" because the cobuild leaf project log only is allowed`
                 );
@@ -362,7 +277,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
 
             cobuildLock = await this._tryGetCobuildLockAsync({
               buildCacheContext,
-              projectBuildCache,
+              operationBuildCache,
               cobuildConfiguration,
               packageName: project.packageName,
               phaseName: phase.name
@@ -390,14 +305,14 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
             logFilenameIdentifier: operation.logFilenameIdentifier
           });
           const restoreCacheAsync = async (
-            // TODO: Investigate if `projectBuildCacheForRestore` is always the same instance as `projectBuildCache`
+            // TODO: Investigate if `operationBuildCacheForRestore` is always the same instance as `operationBuildCache`
             // above, and if it is, remove this parameter
-            projectBuildCacheForRestore: ProjectBuildCache | undefined,
+            operationBuildCacheForRestore: OperationBuildCache | undefined,
             specifiedCacheId?: string
           ): Promise<boolean> => {
             buildCacheContext.isCacheReadAttempted = true;
             const restoreFromCacheSuccess: boolean | undefined =
-              await projectBuildCacheForRestore?.tryRestoreFromCacheAsync(
+              await operationBuildCacheForRestore?.tryRestoreFromCacheAsync(
                 buildCacheTerminal,
                 specifiedCacheId
               );
@@ -409,7 +324,9 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
                   await operationMetadataManager?.tryRestoreAsync({
                     terminalProvider,
                     terminal: buildCacheTerminal,
-                    errorLogPath
+                    errorLogPath,
+                    cobuildContextId: cobuildConfiguration?.cobuildContextId,
+                    cobuildRunnerId: cobuildConfiguration?.cobuildRunnerId
                   });
                 },
                 { createLogFile: false }
@@ -433,7 +350,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
               }
 
               const restoreFromCacheSuccess: boolean = await restoreCacheAsync(
-                cobuildLock.projectBuildCache,
+                cobuildLock.operationBuildCache,
                 cacheId
               );
 
@@ -441,14 +358,14 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
                 return status;
               }
             } else if (!buildCacheContext.isCacheReadAttempted && buildCacheContext.isCacheReadAllowed) {
-              const restoreFromCacheSuccess: boolean = await restoreCacheAsync(projectBuildCache);
+              const restoreFromCacheSuccess: boolean = await restoreCacheAsync(operationBuildCache);
 
               if (restoreFromCacheSuccess) {
                 return OperationStatus.FromCache;
               }
             }
           } else if (buildCacheContext.isCacheReadAllowed) {
-            const restoreFromCacheSuccess: boolean = await restoreCacheAsync(projectBuildCache);
+            const restoreFromCacheSuccess: boolean = await restoreCacheAsync(operationBuildCache);
 
             if (restoreFromCacheSuccess) {
               return OperationStatus.FromCache;
@@ -482,9 +399,9 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
         const record: OperationExecutionRecord = runnerContext as OperationExecutionRecord;
         const { status, stopwatch, _operationMetadataManager: operationMetadataManager, operation } = record;
 
-        const { associatedProject: project, associatedPhase: phase, runner, enabled } = operation;
+        const { associatedProject: project, runner, enabled } = operation;
 
-        if (!enabled || !project || !phase || !runner?.cacheable || !operationMetadataManager) {
+        if (!enabled || !runner?.cacheable) {
           return;
         }
 
@@ -554,7 +471,7 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
                   });
                 };
                 setCacheEntryPromise = () =>
-                  cobuildLock.projectBuildCache.trySetCacheEntryAsync(buildCacheTerminal, finalCacheId);
+                  cobuildLock.operationBuildCache.trySetCacheEntryAsync(buildCacheTerminal, finalCacheId);
               }
             }
           }
@@ -636,118 +553,105 @@ export class CacheableOperationPlugin implements IPhasedCommandPlugin {
     return buildCacheContext;
   }
 
-  private _tryGetProjectBuildCache({
+  private _tryGetOperationBuildCache({
     buildCacheConfiguration,
     buildCacheContext,
-    rushProject,
-    phase,
     terminal,
-    operation
+    record
   }: {
     buildCacheContext: IOperationBuildCacheContext;
     buildCacheConfiguration: BuildCacheConfiguration | undefined;
-    rushProject: RushConfigurationProject;
-    phase: IPhase;
     terminal: ITerminal;
-    operation: Operation;
-  }): ProjectBuildCache | undefined {
+    record: OperationExecutionRecord;
+  }): OperationBuildCache | undefined {
     if (!buildCacheContext.operationBuildCache) {
       const { cacheDisabledReason } = buildCacheContext;
-      if (cacheDisabledReason && !operation.settings?.allowCobuildWithoutCache) {
+      if (cacheDisabledReason && !record.operation.settings?.allowCobuildWithoutCache) {
         terminal.writeVerboseLine(cacheDisabledReason);
         return;
       }
 
-      const { outputFolderNames, stateHash: operationStateHash } = buildCacheContext;
-      if (!outputFolderNames || !buildCacheConfiguration) {
+      if (!buildCacheConfiguration) {
         // Unreachable, since this will have set `cacheDisabledReason`.
         return;
       }
 
-      // eslint-disable-next-line require-atomic-updates -- This is guaranteed to not be concurrent
-      buildCacheContext.operationBuildCache = ProjectBuildCache.getProjectBuildCache({
-        project: rushProject,
-        projectOutputFolderNames: outputFolderNames,
+      buildCacheContext.operationBuildCache = OperationBuildCache.forOperation(record, {
         buildCacheConfiguration,
-        terminal,
-        operationStateHash,
-        phaseName: phase.name
+        terminal
       });
     }
 
     return buildCacheContext.operationBuildCache;
   }
 
-  // Get a ProjectBuildCache only cache/restore log files
-  private async _tryGetLogOnlyProjectBuildCacheAsync({
-    buildCacheContext,
-    rushProject,
-    terminal,
-    buildCacheConfiguration,
-    cobuildConfiguration,
-    phase
-  }: {
+  // Get an OperationBuildCache only cache/restore log files
+  private async _tryGetLogOnlyOperationBuildCacheAsync(options: {
     buildCacheContext: IOperationBuildCacheContext;
     buildCacheConfiguration: BuildCacheConfiguration | undefined;
     cobuildConfiguration: CobuildConfiguration;
-    rushProject: RushConfigurationProject;
-    phase: IPhase;
+    record: IOperationRunnerContext & IOperationExecutionResult;
     terminal: ITerminal;
-  }): Promise<ProjectBuildCache | undefined> {
+  }): Promise<OperationBuildCache | undefined> {
+    const { buildCacheContext, buildCacheConfiguration, cobuildConfiguration, record, terminal } = options;
+
     if (!buildCacheConfiguration?.buildCacheEnabled) {
       return;
     }
 
-    const { outputFolderNames, stateHash } = buildCacheContext;
+    const { outputFolderNames } = buildCacheContext;
 
     const hasher: crypto.Hash = crypto.createHash('sha1');
-    hasher.update(stateHash);
+    hasher.update(record.getStateHash());
 
     if (cobuildConfiguration.cobuildContextId) {
-      hasher.update(`\ncobuildContextId=${cobuildConfiguration.cobuildContextId}`);
+      hasher.update(
+        `${RushConstants.hashDelimiter}cobuildContextId=${cobuildConfiguration.cobuildContextId}`
+      );
     }
 
-    hasher.update(`\nlogFilesOnly=1`);
+    hasher.update(`${RushConstants.hashDelimiter}logFilesOnly=1`);
 
     const operationStateHash: string = hasher.digest('hex');
 
-    const projectBuildCache: ProjectBuildCache = ProjectBuildCache.getProjectBuildCache({
-      project: rushProject,
+    const { associatedPhase, associatedProject } = record.operation;
+
+    const operationBuildCache: OperationBuildCache = OperationBuildCache.getOperationBuildCache({
+      project: associatedProject,
       projectOutputFolderNames: outputFolderNames,
       buildCacheConfiguration,
       terminal,
       operationStateHash,
-      phaseName: phase.name
+      phaseName: associatedPhase.name
     });
 
-    // eslint-disable-next-line require-atomic-updates -- This is guaranteed to not be concurrent
-    buildCacheContext.operationBuildCache = projectBuildCache;
+    buildCacheContext.operationBuildCache = operationBuildCache;
 
-    return projectBuildCache;
+    return operationBuildCache;
   }
 
   private async _tryGetCobuildLockAsync({
     cobuildConfiguration,
     buildCacheContext,
-    projectBuildCache,
+    operationBuildCache,
     packageName,
     phaseName
   }: {
     cobuildConfiguration: CobuildConfiguration | undefined;
     buildCacheContext: IOperationBuildCacheContext;
-    projectBuildCache: ProjectBuildCache | undefined;
+    operationBuildCache: OperationBuildCache | undefined;
     packageName: string;
     phaseName: string;
   }): Promise<CobuildLock | undefined> {
     if (!buildCacheContext.cobuildLock) {
-      if (projectBuildCache && cobuildConfiguration?.cobuildFeatureEnabled) {
+      if (operationBuildCache && cobuildConfiguration?.cobuildFeatureEnabled) {
         if (!buildCacheContext.cobuildClusterId) {
           // This should not happen
           throw new InternalError('Cobuild cluster id is not defined');
         }
         buildCacheContext.cobuildLock = new CobuildLock({
           cobuildConfiguration,
-          projectBuildCache,
+          operationBuildCache,
           cobuildClusterId: buildCacheContext.cobuildClusterId,
           lockExpireTimeInSeconds: PERIODIC_CALLBACK_INTERVAL_IN_SECONDS * 3,
           packageName,
@@ -860,21 +764,18 @@ export function clusterOperations(
 ): void {
   // If disjoint set exists, connect build cache disabled project with its consumers
   for (const [operation, { cacheDisabledReason }] of operationBuildCacheMap) {
-    const { associatedProject: project, associatedPhase: phase } = operation;
-    if (project && phase) {
-      if (cacheDisabledReason && !operation.settings?.allowCobuildWithoutCache) {
-        /**
-         * Group the project build cache disabled with its consumers. This won't affect too much in
-         * a monorepo with high build cache coverage.
-         *
-         * The mental model is that if X disables the cache, and Y depends on X, then:
-         *   1. Y must be built by the same VM that build X;
-         *   2. OR, Y must be rebuilt on each VM that needs it.
-         * Approach 1 is probably the better choice.
-         */
-        for (const consumer of operation.consumers) {
-          initialClusters?.union(operation, consumer);
-        }
+    if (cacheDisabledReason && !operation.settings?.allowCobuildWithoutCache) {
+      /**
+       * Group the project build cache disabled with its consumers. This won't affect too much in
+       * a monorepo with high build cache coverage.
+       *
+       * The mental model is that if X disables the cache, and Y depends on X, then:
+       *   1. Y must be built by the same VM that build X;
+       *   2. OR, Y must be rebuilt on each VM that needs it.
+       * Approach 1 is probably the better choice.
+       */
+      for (const consumer of operation.consumers) {
+        initialClusters?.union(operation, consumer);
       }
     }
   }

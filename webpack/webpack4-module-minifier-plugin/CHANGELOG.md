@@ -1,6 +1,153 @@
 # Change Log - @rushstack/webpack4-module-minifier-plugin
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 0.13.109
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.13.108
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.13.107
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.13.106
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.13.105
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.13.104
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.13.103
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.13.102
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.13.101
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.13.100
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 0.13.99
+Tue, 15 Apr 2025 15:11:58 GMT
+
+_Version update only_
+
+## 0.13.98
+Wed, 09 Apr 2025 00:11:03 GMT
+
+_Version update only_
+
+## 0.13.97
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.13.96
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.13.95
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.13.94
+Wed, 12 Mar 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.13.93
+Tue, 11 Mar 2025 02:12:34 GMT
+
+_Version update only_
+
+## 0.13.92
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.13.91
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.13.90
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.13.89
+Wed, 26 Feb 2025 16:11:12 GMT
+
+_Version update only_
+
+## 0.13.88
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.13.87
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.13.86
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.13.85
+Thu, 30 Jan 2025 16:10:36 GMT
+
+### Patches
+
+- Prefer `os.availableParallelism()` to `os.cpus().length`.
+
+## 0.13.84
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.13.83
+Wed, 22 Jan 2025 03:03:48 GMT
+
+_Version update only_
+
+## 0.13.82
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.13.81
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.13.80
 Sat, 14 Dec 2024 01:11:07 GMT

@@ -2,6 +2,470 @@
   "name": "@rushstack/heft",
   "entries": [
     {
+      "version": "0.74.3",
+      "tag": "@rushstack/heft_v0.74.3",
+      "date": "Tue, 19 Aug 2025 20:45:02 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.11`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.74.2",
+      "tag": "@rushstack/heft_v0.74.2",
+      "date": "Fri, 01 Aug 2025 00:12:48 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.10`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.74.1",
+      "tag": "@rushstack/heft_v0.74.1",
+      "date": "Wed, 23 Jul 2025 20:55:57 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.18.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.14.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.3.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `5.0.2`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.9`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.74.0",
+      "tag": "@rushstack/heft_v0.74.0",
+      "date": "Sat, 21 Jun 2025 00:13:15 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Added support for task and phase lifecycle events, `taskStart`, `taskFinish`, `phaseStart`, `phaseFinish`."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.3.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.6",
+      "tag": "@rushstack/heft_v0.73.6",
+      "date": "Tue, 13 May 2025 02:09:20 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.8`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.5",
+      "tag": "@rushstack/heft_v0.73.5",
+      "date": "Thu, 01 May 2025 15:11:33 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.7`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.4",
+      "tag": "@rushstack/heft_v0.73.4",
+      "date": "Thu, 01 May 2025 00:11:12 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.18.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.13.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.2.41`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `5.0.1`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.6`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.3",
+      "tag": "@rushstack/heft_v0.73.3",
+      "date": "Fri, 25 Apr 2025 00:11:32 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.18.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.2",
+      "tag": "@rushstack/heft_v0.73.2",
+      "date": "Mon, 21 Apr 2025 22:24:25 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `5.0.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.5`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.1",
+      "tag": "@rushstack/heft_v0.73.1",
+      "date": "Thu, 17 Apr 2025 00:11:21 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Update documentation for `extends`"
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.18.0`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.4`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.73.0",
+      "tag": "@rushstack/heft_v0.73.0",
+      "date": "Tue, 15 Apr 2025 15:11:57 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add `globAsync` to task run options."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.72.0",
+      "tag": "@rushstack/heft_v0.72.0",
+      "date": "Wed, 09 Apr 2025 00:11:02 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add a method `tryLoadProjectConfigurationFileAsync<TConfigFile>(options, terminal)` to `HeftConfiguration`."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.17.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.71.2",
+      "tag": "@rushstack/heft_v0.71.2",
+      "date": "Fri, 04 Apr 2025 18:34:35 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.3`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.71.1",
+      "tag": "@rushstack/heft_v0.71.1",
+      "date": "Tue, 25 Mar 2025 15:11:15 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.16.8`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.13.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.2.40`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.23.7`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.71.0",
+      "tag": "@rushstack/heft_v0.71.0",
+      "date": "Wed, 12 Mar 2025 22:41:36 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Add a `numberOfCores` property to `HeftConfiguration`."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.70.1",
+      "tag": "@rushstack/heft_v0.70.1",
+      "date": "Wed, 12 Mar 2025 00:11:31 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Revert `useNodeJSResolver: true` to deal with plugins that have an `exports` field that doesn't contain `./package.json`."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.70.0",
+      "tag": "@rushstack/heft_v0.70.0",
+      "date": "Tue, 11 Mar 2025 02:12:33 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Use `useNodeJSResolver: true` in `Import.resolvePackage` calls."
+          }
+        ],
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.16.7`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.12.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.2.39`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.1`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.23.6`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.69.3",
+      "tag": "@rushstack/heft_v0.69.3",
+      "date": "Tue, 11 Mar 2025 00:11:25 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.52.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.69.2",
+      "tag": "@rushstack/heft_v0.69.2",
+      "date": "Sat, 01 Mar 2025 05:00:09 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.51.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.69.1",
+      "tag": "@rushstack/heft_v0.69.1",
+      "date": "Thu, 27 Feb 2025 01:10:39 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.51.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.69.0",
+      "tag": "@rushstack/heft_v0.69.0",
+      "date": "Wed, 26 Feb 2025 16:11:11 GMT",
+      "comments": {
+        "minor": [
+          {
+            "comment": "Expose `watchFs` on the incremental run options for tasks to give more flexibility when having Heft perform file watching than only invoking globs directly."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.18",
+      "tag": "@rushstack/heft_v0.68.18",
+      "date": "Sat, 22 Feb 2025 01:11:11 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.50.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.17",
+      "tag": "@rushstack/heft_v0.68.17",
+      "date": "Wed, 19 Feb 2025 18:53:48 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.16.6`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.16",
+      "tag": "@rushstack/heft_v0.68.16",
+      "date": "Wed, 12 Feb 2025 01:10:52 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.16.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.2.38`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.15.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.23.5`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.50.0`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.15",
+      "tag": "@rushstack/heft_v0.68.15",
+      "date": "Thu, 30 Jan 2025 16:10:36 GMT",
+      "comments": {
+        "patch": [
+          {
+            "comment": "Prefer `os.availableParallelism()` to `os.cpus().length`."
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.14",
+      "tag": "@rushstack/heft_v0.68.14",
+      "date": "Thu, 30 Jan 2025 01:11:42 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.16.4`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.11.0`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.2.37`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.14.6`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.23.4`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.49.2`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.13",
+      "tag": "@rushstack/heft_v0.68.13",
+      "date": "Thu, 09 Jan 2025 01:10:10 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@rushstack/heft-config-file\" to `0.16.3`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/node-core-library\" to `5.10.2`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/operation-graph\" to `0.2.36`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/terminal\" to `0.14.5`"
+          },
+          {
+            "comment": "Updating dependency \"@rushstack/ts-command-line\" to `4.23.3`"
+          },
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.49.1`"
+          }
+        ]
+      }
+    },
+    {
+      "version": "0.68.12",
+      "tag": "@rushstack/heft_v0.68.12",
+      "date": "Tue, 07 Jan 2025 22:17:32 GMT",
+      "comments": {
+        "dependency": [
+          {
+            "comment": "Updating dependency \"@microsoft/api-extractor\" to `7.49.0`"
+          }
+        ]
+      }
+    },
+    {
       "version": "0.68.11",
       "tag": "@rushstack/heft_v0.68.11",
       "date": "Sat, 14 Dec 2024 01:11:07 GMT",

@@ -47,16 +47,16 @@
       "allowedCategories": [ "vscode-extensions" ]
     },
     {
+      "name": "@ungap/structured-clone",
+      "allowedCategories": [ "libraries" ]
+    },
+    {
       "name": "axios",
       "allowedCategories": [ "libraries" ]
     },
     {
       "name": "dependency-path",
       "allowedCategories": [ "libraries" ]
-    },
-    {
-      "name": "local-web-rig",
-      "allowedCategories": [ "libraries", "vscode-extensions" ]
     },
     {
       "name": "office-ui-fabric-core",
@@ -93,6 +93,10 @@
     {
       "name": "tslib",
       "allowedCategories": [ "libraries", "tests", "vscode-extensions" ]
+    },
+    {
+      "name": "zod",
+      "allowedCategories": [ "libraries" ]
     }
   ]
 }

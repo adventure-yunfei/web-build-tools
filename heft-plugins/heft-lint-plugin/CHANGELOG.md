@@ -1,6 +1,191 @@
 # Change Log - @rushstack/heft-lint-plugin
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 19 Aug 2025 20:45:02 GMT and should not be manually modified.
+
+## 0.7.4
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.7.3
+Fri, 01 Aug 2025 00:12:49 GMT
+
+_Version update only_
+
+## 0.7.2
+Mon, 28 Jul 2025 15:11:56 GMT
+
+_Version update only_
+
+## 0.7.1
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.7.0
+Thu, 26 Jun 2025 18:57:04 GMT
+
+### Minor changes
+
+- Add support for ESLint 9. When using ESLint 9, the configuration will be loaded from `eslint.config.js`, and flat configs will be required by the Heft plugin
+
+## 0.6.1
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.6.0
+Fri, 06 Jun 2025 00:11:09 GMT
+
+### Minor changes
+
+- Add support for using heft-lint-plugin standalone without a typescript phase
+
+## 0.5.38
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.5.37
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.5.36
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.5.35
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.5.34
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.5.33
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 0.5.32
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 0.5.31
+Wed, 09 Apr 2025 00:11:02 GMT
+
+_Version update only_
+
+## 0.5.30
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.5.29
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.5.28
+Tue, 25 Mar 2025 00:12:04 GMT
+
+### Patches
+
+- Fix the `--fix` argument when the file only contains fixable issues.
+
+## 0.5.27
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.5.26
+Wed, 12 Mar 2025 00:11:31 GMT
+
+_Version update only_
+
+## 0.5.25
+Tue, 11 Mar 2025 02:12:33 GMT
+
+_Version update only_
+
+## 0.5.24
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.5.23
+Thu, 06 Mar 2025 01:10:42 GMT
+
+### Patches
+
+- Fix an issue where the cache is only populated for incremental TypeScript builds.
+
+## 0.5.22
+Sat, 01 Mar 2025 07:23:16 GMT
+
+_Version update only_
+
+## 0.5.21
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.5.20
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.5.19
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 0.5.18
+Tue, 25 Feb 2025 01:11:55 GMT
+
+### Patches
+
+- Add verbose logging around finding the lint config file.
+
+## 0.5.17
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.5.16
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.5.15
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.5.14
+Thu, 30 Jan 2025 16:10:36 GMT
+
+_Version update only_
+
+## 0.5.13
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.5.12
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.5.11
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.5.10
 Sat, 14 Dec 2024 01:11:07 GMT

@@ -40,6 +40,14 @@ function getPlatformInfo(): IPlatformInfo {
   };
 }
 
+const END_TOKEN: string = '/package.json":';
+const SUBPACKAGE_CACHE_FILE_VERSION: 1 = 1;
+
+interface INestedPackageJsonCache {
+  subPackagesByIntegrity: [string, string[] | boolean][];
+  version: number;
+}
+
 /**
  * Plugin entry point for after install.
  * @param rushSession - The Rush Session
@@ -59,10 +67,6 @@ export async function afterInstallAsync(
   const rushRoot: string = `${rushConfiguration.rushJsonFolder}/`;
 
   const lockFilePath: string = subspace.getCommittedShrinkwrapFilePath(variant);
-  const workspaceRoot: string = subspace.getSubspaceTempFolderPath();
-
-  const projectByImporterPath: LookupByPath<RushConfigurationProject> =
-    rushConfiguration.getProjectLookupForRoot(workspaceRoot);
 
   const pnpmStoreDir: string = `${rushConfiguration.pnpmOptions.pnpmStorePath}/v3/files/`;
 
@@ -76,9 +80,32 @@ export async function afterInstallAsync(
     throw new Error(`Failed to load shrinkwrap file: ${lockFilePath}`);
   }
 
+  const workspaceRoot: string = subspace.getSubspaceTempFolderPath();
+
+  const projectByImporterPath: LookupByPath<RushConfigurationProject> =
+    rushConfiguration.getProjectLookupForRoot(workspaceRoot);
+
   const cacheFilePath: string = `${workspaceRoot}/resolver-cache.json`;
+  const subPackageCacheFilePath: string = `${workspaceRoot}/subpackage-entry-cache.json`;
 
   terminal.writeLine(`Resolver cache will be written at ${cacheFilePath}`);
+
+  let oldSubPackagesByIntegrity: Map<string, string[] | boolean> | undefined;
+  const subPackagesByIntegrity: Map<string, string[] | boolean> = new Map();
+  try {
+    const cacheContent: string = await FileSystem.readFileAsync(subPackageCacheFilePath);
+    const cacheJson: INestedPackageJsonCache = JSON.parse(cacheContent);
+    if (cacheJson.version !== SUBPACKAGE_CACHE_FILE_VERSION) {
+      terminal.writeLine(
+        `Expected subpackage cache version ${SUBPACKAGE_CACHE_FILE_VERSION}, got ${cacheJson.version}`
+      );
+    } else {
+      oldSubPackagesByIntegrity = new Map(cacheJson.subPackagesByIntegrity);
+      terminal.writeLine(`Loaded subpackage cache from ${subPackageCacheFilePath}`);
+    }
+  } catch (err) {
+    // Ignore
+  }
 
   async function afterExternalPackagesAsync(
     contexts: Map<string, IResolverContext>,
@@ -88,17 +115,19 @@ export async function afterInstallAsync(
      * Loads the index file from the pnpm store to discover nested package.json files in an external package
      * For internal packages, assumes there are no nested package.json files.
      * @param context - The context to find nested package.json files for
-     * @returns A promise that resolves when the nested package.json files are found, if applicable
+     * @returns A promise that resolves to the nested package.json paths, false if the package fails to load, or true if the package has no nested package.json files.
      */
-    async function findNestedPackageJsonsForContextAsync(context: IResolverContext): Promise<void> {
+    async function tryFindNestedPackageJsonsForContextAsync(
+      context: IResolverContext
+    ): Promise<string[] | boolean> {
       const { descriptionFileRoot, descriptionFileHash } = context;
 
       if (descriptionFileHash === undefined) {
         // Assume this package has no nested package json files for now.
         terminal.writeDebugLine(
-          `Package at ${descriptionFileRoot} does not having a file list. Assuming no nested "package.json" files.`
+          `Package at ${descriptionFileRoot} does not have a file list. Assuming no nested "package.json" files.`
         );
-        return;
+        return true;
       }
 
       // Convert an integrity hash like
@@ -115,29 +144,69 @@ export async function afterInstallAsync(
 
       try {
         const indexContent: string = await FileSystem.readFileAsync(indexPath);
-        const { files } = JSON.parse(indexContent);
-
-        const filteredFiles: string[] = Object.keys(files).filter((file) => file.endsWith('/package.json'));
-        if (filteredFiles.length > 0) {
-          const nestedPackageDirs: string[] = filteredFiles.map((x) =>
-            x.slice(0, /* -'/package.json'.length */ -13)
-          );
-
-          if (nestedPackageDirs.length > 0) {
-            // eslint-disable-next-line require-atomic-updates
-            context.nestedPackageDirs = nestedPackageDirs;
-          }
+        let endIndex: number = indexContent.lastIndexOf(END_TOKEN);
+        if (endIndex > 0) {
+          const nestedPackageDirs: string[] = [];
+          do {
+            const startIndex: number = indexContent.lastIndexOf('"', endIndex);
+            if (startIndex < 0) {
+              throw new Error(
+                `Malformed index file at ${indexPath}: missing starting quote for nested package.json path`
+              );
+            }
+            const nestedPath: string = indexContent.slice(startIndex + 1, endIndex);
+            nestedPackageDirs.push(nestedPath);
+            endIndex = indexContent.lastIndexOf(END_TOKEN, startIndex - 1);
+          } while (endIndex > 0);
+          return nestedPackageDirs;
         }
+        return true;
       } catch (error) {
         if (!context.optional) {
           throw new Error(
-            `Error reading index file for: "${context.descriptionFileRoot}" (${descriptionFileHash})`
+            `Error reading index file for: "${context.descriptionFileRoot}" (${descriptionFileHash}): ${error.toString()}`
           );
-        } else {
-          terminal.writeLine(`Trimming missing optional dependency at: ${descriptionFileRoot}`);
-          contexts.delete(descriptionFileRoot);
-          missingOptionalDependencies.add(descriptionFileRoot);
         }
+        return false;
+      }
+    }
+    /**
+     * Loads the index file from the pnpm store to discover nested package.json files in an external package
+     * For internal packages, assumes there are no nested package.json files.
+     * @param context - The context to find nested package.json files for
+     * @returns A promise that resolves when the nested package.json files are found, if applicable
+     */
+    async function findNestedPackageJsonsForContextAsync(context: IResolverContext): Promise<void> {
+      const { descriptionFileRoot, descriptionFileHash } = context;
+
+      if (descriptionFileHash === undefined) {
+        // Assume this package has no nested package json files for now.
+        terminal.writeDebugLine(
+          `Package at ${descriptionFileRoot} does not have a file list. Assuming no nested "package.json" files.`
+        );
+        return;
+      }
+
+      let result: string[] | boolean | undefined =
+        oldSubPackagesByIntegrity?.get(descriptionFileHash) ??
+        subPackagesByIntegrity.get(descriptionFileHash);
+      if (result === undefined) {
+        result = await tryFindNestedPackageJsonsForContextAsync(context);
+      }
+      subPackagesByIntegrity.set(descriptionFileHash, result);
+      if (result === true) {
+        // Default case. Do nothing.
+      } else if (result === false) {
+        terminal.writeLine(`Trimming missing optional dependency at: ${descriptionFileRoot}`);
+        contexts.delete(descriptionFileRoot);
+        missingOptionalDependencies.add(descriptionFileRoot);
+      } else {
+        terminal.writeDebugLine(
+          `Nested "package.json" files found for package at ${descriptionFileRoot}: ${result.join(', ')}`
+        );
+        // Clone this array to ensure that mutations don't affect the subpackage cache.
+        // eslint-disable-next-line require-atomic-updates
+        context.nestedPackageDirs = [...result];
       }
     }
 
@@ -148,6 +217,21 @@ export async function afterInstallAsync(
       concurrency: 20
     });
   }
+
+  // Serialize this before `computeResolverCacheFromLockfileAsync` because bundledDependencies get removed
+  // from the `nestedPackageDirs` array. We clone above for safety, but this is making doubly sure.
+  const newSubPackageCache: INestedPackageJsonCache = {
+    version: SUBPACKAGE_CACHE_FILE_VERSION,
+    subPackagesByIntegrity: Array.from(subPackagesByIntegrity)
+  };
+  const serializedSubpackageCache: string = JSON.stringify(newSubPackageCache);
+  const writeSubPackageCachePromise: Promise<void> = FileSystem.writeFileAsync(
+    subPackageCacheFilePath,
+    serializedSubpackageCache,
+    {
+      ensureFolderExists: true
+    }
+  );
 
   const cacheFile: IResolverCacheFile = await computeResolverCacheFromLockfileAsync({
     workspaceRoot,
@@ -160,7 +244,12 @@ export async function afterInstallAsync(
 
   const serialized: string = JSON.stringify(cacheFile);
 
-  await FileSystem.writeFileAsync(cacheFilePath, serialized, {
-    ensureFolderExists: true
-  });
+  await Promise.all([
+    FileSystem.writeFileAsync(cacheFilePath, serialized, {
+      ensureFolderExists: true
+    }),
+    writeSubPackageCachePromise
+  ]);
+
+  terminal.writeLine(`Resolver cache written.`);
 }

@@ -1,6 +1,160 @@
 # Change Log - @rushstack/package-extractor
 
-This log was last generated on Sat, 14 Dec 2024 01:11:07 GMT and should not be manually modified.
+This log was last generated on Tue, 26 Aug 2025 00:12:57 GMT and should not be manually modified.
+
+## 0.10.35
+Tue, 26 Aug 2025 00:12:57 GMT
+
+_Version update only_
+
+## 0.10.34
+Tue, 19 Aug 2025 20:45:02 GMT
+
+_Version update only_
+
+## 0.10.33
+Fri, 01 Aug 2025 00:12:48 GMT
+
+### Patches
+
+- Upgrades the minimatch dependency from ~3.0.3 to 10.0.3 across the entire Rush monorepo to address a Regular Expression Denial of Service (ReDoS) vulnerability in the underlying brace-expansion dependency.
+
+## 0.10.32
+Sat, 26 Jul 2025 00:12:22 GMT
+
+_Version update only_
+
+## 0.10.31
+Wed, 23 Jul 2025 20:55:57 GMT
+
+_Version update only_
+
+## 0.10.30
+Sat, 21 Jun 2025 00:13:15 GMT
+
+_Version update only_
+
+## 0.10.29
+Tue, 13 May 2025 02:09:20 GMT
+
+_Version update only_
+
+## 0.10.28
+Thu, 01 May 2025 15:11:33 GMT
+
+_Version update only_
+
+## 0.10.27
+Thu, 01 May 2025 00:11:12 GMT
+
+_Version update only_
+
+## 0.10.26
+Fri, 25 Apr 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.10.25
+Mon, 21 Apr 2025 22:24:25 GMT
+
+_Version update only_
+
+## 0.10.24
+Thu, 17 Apr 2025 00:11:21 GMT
+
+_Version update only_
+
+## 0.10.23
+Tue, 15 Apr 2025 15:11:57 GMT
+
+_Version update only_
+
+## 0.10.22
+Wed, 09 Apr 2025 00:11:03 GMT
+
+_Version update only_
+
+## 0.10.21
+Fri, 04 Apr 2025 18:34:35 GMT
+
+_Version update only_
+
+## 0.10.20
+Tue, 25 Mar 2025 15:11:16 GMT
+
+_Version update only_
+
+## 0.10.19
+Wed, 12 Mar 2025 22:41:36 GMT
+
+_Version update only_
+
+## 0.10.18
+Wed, 12 Mar 2025 00:11:32 GMT
+
+_Version update only_
+
+## 0.10.17
+Tue, 11 Mar 2025 02:12:34 GMT
+
+_Version update only_
+
+## 0.10.16
+Tue, 11 Mar 2025 00:11:25 GMT
+
+_Version update only_
+
+## 0.10.15
+Sat, 01 Mar 2025 05:00:09 GMT
+
+_Version update only_
+
+## 0.10.14
+Thu, 27 Feb 2025 01:10:39 GMT
+
+_Version update only_
+
+## 0.10.13
+Wed, 26 Feb 2025 16:11:11 GMT
+
+_Version update only_
+
+## 0.10.12
+Sat, 22 Feb 2025 01:11:12 GMT
+
+_Version update only_
+
+## 0.10.11
+Wed, 19 Feb 2025 18:53:48 GMT
+
+_Version update only_
+
+## 0.10.10
+Wed, 12 Feb 2025 01:10:52 GMT
+
+_Version update only_
+
+## 0.10.9
+Thu, 30 Jan 2025 16:10:36 GMT
+
+### Patches
+
+- Prefer `os.availableParallelism()` to `os.cpus().length`.
+
+## 0.10.8
+Thu, 30 Jan 2025 01:11:42 GMT
+
+_Version update only_
+
+## 0.10.7
+Thu, 09 Jan 2025 01:10:10 GMT
+
+_Version update only_
+
+## 0.10.6
+Tue, 07 Jan 2025 22:17:32 GMT
+
+_Version update only_
 
 ## 0.10.5
 Sat, 14 Dec 2024 01:11:07 GMT

@@ -26,10 +26,11 @@ import {
   type IOperationExecutionResult,
   OperationStatus,
   type IExecutionResult,
-  type ILogFilePaths
+  type ILogFilePaths,
+  RushConstants
 } from '@rushstack/rush-sdk';
 import { getProjectLogFolders } from '@rushstack/rush-sdk/lib/logic/operations/ProjectLogWritable';
-import type { CommandLineStringParameter } from '@rushstack/ts-command-line';
+import { type CommandLineIntegerParameter, CommandLineParameterKind } from '@rushstack/ts-command-line';
 
 import { PLUGIN_NAME } from './constants';
 import { type IRoutingRule, RushServeConfiguration } from './RushProjectServeConfigFile';
@@ -44,7 +45,8 @@ import type {
   ReadableOperationStatus,
   IWebSocketCommandMessage,
   IRushSessionInfo,
-  ILogFileURLs
+  ILogFileURLs,
+  OperationEnabledState
 } from './api.types';
 
 export interface IPhasedCommandHandlerOptions {
@@ -102,22 +104,19 @@ export async function phasedCommandHandler(options: IPhasedCommandHandlerOptions
       let requestedPort: number = 0;
 
       // If command-line.json has an existing parameter for specifying a port, use it
-      const portParameter: CommandLineStringParameter | undefined = portParameterLongName
-        ? (customParameters.get(portParameterLongName) as CommandLineStringParameter)
+      const portParameter: CommandLineIntegerParameter | undefined = portParameterLongName
+        ? (customParameters.get(portParameterLongName) as CommandLineIntegerParameter)
         : undefined;
       if (portParameter) {
-        const rawValue: string | undefined = portParameter.value;
-        const parsedValue: number = rawValue ? parseInt(rawValue, 10) : 0;
-        if (isNaN(parsedValue)) {
-          logger.terminal.writeErrorLine(
-            `Unexpected value "${rawValue}" for parameter "${portParameterLongName}". Expected an integer.`
-          );
-          throw new AlreadyReportedError();
+        if (portParameter.kind !== CommandLineParameterKind.Integer) {
+          throw new Error(`The "${portParameterLongName}" parameter must be an integer parameter`);
         }
-        requestedPort = parsedValue;
+
+        requestedPort = portParameter.value ?? 0;
       } else if (portParameterLongName) {
         logger.terminal.writeErrorLine(
-          `Custom parameter "${portParameterLongName}" is not defined for command "${command.actionName}" in "command-line.json".`
+          `Custom parameter "${portParameterLongName}" is not defined for command "${command.actionName}" ` +
+            `in "${RushConstants.commandLineFilename}".`
         );
         throw new AlreadyReportedError();
       }
@@ -244,6 +243,9 @@ export async function phasedCommandHandler(options: IPhasedCommandHandlerOptions
       webSocketServerUpgrader?.(server);
 
       server.listen(requestedPort);
+      // Don't let the HTTP/2 server keep the process alive if the user asks to quit.
+      // TODO: use some "user wants to exit" event to close the server.
+      server.unref();
       await once(server, 'listening');
 
       const address: AddressInfo | undefined = server.address() as AddressInfo;
@@ -327,7 +329,7 @@ function tryEnableBuildStatusWebSocketServer(
     const { operation } = record;
     const { name, associatedPhase, associatedProject, runner, enabled } = operation;
 
-    if (!name || !associatedPhase || !associatedProject || !runner) {
+    if (!name || !runner) {
       return;
     }
 
@@ -391,6 +393,51 @@ function tryEnableBuildStatusWebSocketServer(
 
   const { hooks } = command;
 
+  let invalidateOperation: ((operation: Operation, reason: string) => void) | undefined;
+
+  const operationEnabledStates: Map<string, OperationEnabledState> = new Map();
+  hooks.createOperations.tap(
+    {
+      name: PLUGIN_NAME,
+      stage: Infinity
+    },
+    (operations: Set<Operation>, context: ICreateOperationsContext) => {
+      const potentiallyAffectedOperations: Set<Operation> = new Set();
+      for (const operation of operations) {
+        const { associatedProject } = operation;
+        if (context.projectsInUnknownState.has(associatedProject)) {
+          potentiallyAffectedOperations.add(operation);
+        }
+      }
+      for (const operation of potentiallyAffectedOperations) {
+        for (const consumer of operation.consumers) {
+          potentiallyAffectedOperations.add(consumer);
+        }
+
+        const { name } = operation;
+        const expectedState: OperationEnabledState | undefined = operationEnabledStates.get(name);
+        switch (expectedState) {
+          case 'affected':
+            operation.enabled = true;
+            break;
+          case 'never':
+            operation.enabled = false;
+            break;
+          case 'changed':
+            operation.enabled = context.projectsInUnknownState.has(operation.associatedProject);
+            break;
+          case undefined:
+            // Use the original value.
+            break;
+        }
+      }
+
+      invalidateOperation = context.invalidateOperation;
+
+      return operations;
+    }
+  );
+
   hooks.beforeExecuteOperations.tap(
     PLUGIN_NAME,
     (operationsToExecute: Map<Operation, IOperationExecutionResult>): void => {
@@ -451,6 +498,27 @@ function tryEnableBuildStatusWebSocketServer(
         switch (parsedMessage.command) {
           case 'sync': {
             sendSyncMessage(webSocket);
+            break;
+          }
+
+          case 'set-enabled-states': {
+            const { enabledStateByOperationName } = parsedMessage;
+            for (const [name, state] of Object.entries(enabledStateByOperationName)) {
+              operationEnabledStates.set(name, state);
+            }
+            break;
+          }
+
+          case 'invalidate': {
+            const { operationNames } = parsedMessage;
+            const operationNameSet: Set<string> = new Set(operationNames);
+            if (invalidateOperation && operationStates) {
+              for (const operation of operationStates.keys()) {
+                if (operationNameSet.has(operation.name)) {
+                  invalidateOperation(operation, 'WebSocket');
+                }
+              }
+            }
             break;
           }
 

@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
 // See LICENSE in the project root for license information.
 
-/* eslint-disable no-bitwise */
-
 import * as ts from 'typescript';
 import { last } from 'lodash';
 import { FileSystem, type NewlineKind, InternalError } from '@rushstack/node-core-library';
@@ -21,10 +19,11 @@ import { IndentedWriter } from './IndentedWriter';
 import { DtsEmitHelpers } from './DtsEmitHelpers';
 import type { DeclarationMetadata } from '../collector/DeclarationMetadata';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
-import type { AstModuleExportInfo } from '../analyzer/AstModule';
+import type { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
 import type { AstEntity } from '../analyzer/AstEntity';
 import { collectAllReferencedEntities } from './utils';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 /**
  * Used with DtsRollupGenerator.writeTypingsFile()
@@ -128,7 +127,11 @@ export class DtsRollupGenerator {
         // API-Extractor cannot trim `import { Bar } from "external-library"` when generating its public rollup,
         // or the export of `Foo` would include a broken reference to `Bar`.
         const astImport: AstImport = entity.astEntity;
-        DtsEmitHelpers.emitImport(writer, collector, entity, astImport);
+        DtsEmitHelpers.emitImport(writer, entity, astImport);
+      }
+
+      if (entity.astEntity instanceof AstSubPathImport) {
+        DtsEmitHelpers.emitEqualsImport(writer, collector, entity, entity.astEntity);
       }
     }
     writer.ensureSkippedLine();
@@ -175,7 +178,7 @@ export class DtsRollupGenerator {
       }
 
       if (astEntity instanceof AstNamespaceImport) {
-        const astModuleExportInfo: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
+        const astModuleExportInfo: IAstModuleExportInfo = astEntity.fetchAstModuleExportInfo(collector);
 
         if (entity.nameForEmit === undefined) {
           // This should never happen
@@ -291,15 +294,29 @@ export class DtsRollupGenerator {
         recurseChildren = false;
         break;
 
-      case ts.SyntaxKind.ExportKeyword:
-      case ts.SyntaxKind.DefaultKeyword:
-      case ts.SyntaxKind.DeclareKeyword:
-        // Delete any explicit "export" or "declare" keywords -- we will re-add them below
+      case ts.SyntaxKind.ImportEqualsDeclaration:
+        // Delete "import A = B.C;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
         span.modification.skipAll();
         break;
 
-      case ts.SyntaxKind.ImportEqualsDeclaration:
-        // Delete "import Foo = Bar.Baz;" declarations (can be inside "namespace") -- it's useless since we parsed the aliased symbol
+      case ts.SyntaxKind.ExportKeyword:
+      case ts.SyntaxKind.DefaultKeyword:
+      case ts.SyntaxKind.DeclareKeyword:
+        if (astDeclaration.parent) {
+          // Keep it as is for nested declarations.
+          break;
+        }
+        if (
+          ts.isModuleDeclaration(astDeclaration.declaration) &&
+          (TypeScriptHelpers.findFirstParent(span.node, ts.SyntaxKind.ExportDeclaration) ||
+            TypeScriptHelpers.findFirstParent(span.node, ts.SyntaxKind.VariableStatement))
+        ) {
+          // Keep it as is for nested declarations.
+          // (special cases inside namespace. e.g. "export {};", "export const a: number;")
+          break;
+        }
+
+        // Delete any explicit "export" or "declare" keywords -- we will re-add them below
         span.modification.skipAll();
         break;
 
@@ -310,13 +327,16 @@ export class DtsRollupGenerator {
       case ts.SyntaxKind.ModuleKeyword:
       case ts.SyntaxKind.TypeKeyword:
       case ts.SyntaxKind.FunctionKeyword:
+        if (astDeclaration.parent) {
+          // Keep it as is for nested declarations
+          break;
+        }
+
         // Replace the stuff we possibly deleted above
         let replacedModifiers: string = '';
 
         // Add a declare statement for root declarations (but not for nested declarations)
-        if (!astDeclaration.parent) {
-          replacedModifiers += 'declare ';
-        }
+        replacedModifiers += 'declare ';
 
         if (entity.shouldInlineExport) {
           replacedModifiers = 'export ' + replacedModifiers;
@@ -375,6 +395,10 @@ export class DtsRollupGenerator {
             span.modification.prefix = originalComment + span.modification.prefix;
           }
         }
+        break;
+
+      case ts.SyntaxKind.ExportSpecifier:
+        DtsEmitHelpers.modifyExportSpecifierSpan(collector, span);
         break;
 
       case ts.SyntaxKind.Identifier:
@@ -457,10 +481,11 @@ export class DtsRollupGenerator {
                 nodeToTrim.parent.parent?.kind === ts.SyntaxKind.ClassDeclaration)
             ) {
               if (
-                nodeToTrim.kind === ts.SyntaxKind.PropertyDeclaration ||
-                nodeToTrim.kind === ts.SyntaxKind.MethodDeclaration ||
-                nodeToTrim.kind === ts.SyntaxKind.GetAccessor ||
-                nodeToTrim.kind === ts.SyntaxKind.SetAccessor
+                (nodeToTrim.kind === ts.SyntaxKind.PropertyDeclaration ||
+                  nodeToTrim.kind === ts.SyntaxKind.MethodDeclaration ||
+                  nodeToTrim.kind === ts.SyntaxKind.GetAccessor ||
+                  nodeToTrim.kind === ts.SyntaxKind.SetAccessor) &&
+                !name.startsWith('[') /* ignore symbol key like "[X.Y.z]" */
               ) {
                 const declarartionsWithSameName: readonly AstDeclaration[] =
                   astDeclaration.findChildrenWithName(name);

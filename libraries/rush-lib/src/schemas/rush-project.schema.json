@@ -12,7 +12,7 @@
     },
 
     "extends": {
-      "description": "Optionally specifies another JSON config file that this file extends from. This provides a way for standard settings to be shared across multiple projects.",
+      "description": "Optionally specifies another JSON config file that this file extends from. This provides a way for standard settings to be shared across multiple projects. To delete an inherited setting, set it to `null` in this file.",
       "type": "string"
     },
 
@@ -106,6 +106,10 @@
           "allowCobuildWithoutCache": {
             "type": "boolean",
             "description": "If true, this operation will not need to use the build cache to leverage cobuilds"
+          },
+          "ignoreChangedProjectsOnlyFlag": {
+            "type": "boolean",
+            "description": "If true, this operation never be skipped by the `--changed-projects-only` flag. This is useful for projects that bundle code from other packages."
           }
         }
       }

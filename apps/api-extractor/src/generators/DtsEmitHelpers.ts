@@ -5,12 +5,13 @@ import * as ts from 'typescript';
 
 import { InternalError } from '@rushstack/node-core-library';
 import type { CollectorEntity } from '../collector/CollectorEntity';
-import { AstImport, AstImportKind } from '../analyzer/AstImport';
+import { type AstImport, AstImportKind } from '../analyzer/AstImport';
 import { AstDeclaration } from '../analyzer/AstDeclaration';
 import type { Collector } from '../collector/Collector';
 import type { Span } from '../analyzer/Span';
 import type { IndentedWriter } from './IndentedWriter';
 import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 /**
  * Some common code shared between DtsRollupGenerator and ApiReportGenerator.
@@ -18,33 +19,9 @@ import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationForma
 export class DtsEmitHelpers {
   public static emitImport(
     writer: IndentedWriter,
-    collector: Collector,
     collectorEntity: CollectorEntity,
     astImport: AstImport
   ): void {
-    if (astImport.exportPath.length > 1) {
-      const referencedAstImport: AstImport | undefined =
-        collector.astSymbolTable.tryGetReferencedAstImport(astImport);
-      if (referencedAstImport === undefined) {
-        throw new Error(
-          `For an AstImport of "EqualsImport" from namespace, there must have a referenced base AstImport.`
-        );
-      }
-      const referencedCollectorEntity: CollectorEntity | undefined =
-        collector.tryGetCollectorEntity(referencedAstImport);
-      if (referencedCollectorEntity === undefined) {
-        throw new Error(
-          `Cannot find collector entity for referenced AstImport: ${referencedAstImport.modulePath}:${referencedAstImport.exportName}`
-        );
-      }
-      writer.writeLine(
-        `import ${collectorEntity.nameForEmit} = ${
-          referencedCollectorEntity.nameForEmit
-        }.${astImport.exportPath.slice(1).join('.')};`
-      );
-      return;
-    }
-
     const importPrefix: string = 'import';
 
     switch (astImport.importKind) {
@@ -73,21 +50,6 @@ export class DtsEmitHelpers {
         writer.writeLine(
           `${importPrefix} ${collectorEntity.nameForEmit} = require('${astImport.modulePath}');`
         );
-        break;
-      case AstImportKind.ImportType:
-        if (!astImport.exportName) {
-          writer.writeLine(
-            `${importPrefix} * as ${collectorEntity.nameForEmit} from '${astImport.modulePath}';`
-          );
-        } else {
-          const topExportName: string = astImport.exportName.split('.')[0];
-          if (collectorEntity.nameForEmit === topExportName) {
-            writer.write(`${importPrefix} { ${topExportName} }`);
-          } else {
-            writer.write(`${importPrefix} { ${topExportName} as ${collectorEntity.nameForEmit} }`);
-          }
-          writer.writeLine(` from '${astImport.modulePath}';`);
-        }
         break;
       default:
         throw new InternalError('Unimplemented AstImportKind');
@@ -120,6 +82,52 @@ export class DtsEmitHelpers {
     }
   }
 
+  public static emitEqualsImport(
+    writer: IndentedWriter,
+    collector: Collector,
+    collectorEntity: CollectorEntity,
+    astSubPathImport: AstSubPathImport
+  ): void {
+    if (astSubPathImport.isImportTypeEverywhere) {
+      return;
+    }
+    const baseEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(
+      astSubPathImport.baseAstEntity
+    );
+    if (!baseEntity) {
+      throw new InternalError(
+        `Base collector entity for AstSubPathImport not found: ${astSubPathImport.baseAstEntity.localName}`
+      );
+    }
+    writer.writeLine(
+      `import ${collectorEntity.nameForEmit} = ${baseEntity.nameForEmit}.${astSubPathImport.exportPath.join('.')};`
+    );
+  }
+
+  public static modifyExportSpecifierSpan(collector: Collector, span: Span): void {
+    // For "export { A }" (inside namespace), we need to emit as "export { AcutalName as A }"
+    const node: ts.ExportSpecifier = span.node as ts.ExportSpecifier;
+    if (!node.propertyName) {
+      if (!ts.isIdentifier(node.name)) {
+        throw new Error(
+          `Export specifier name should be an identifier, but got ${ts.SyntaxKind[node.name.kind]}.\n` +
+            SourceFileLocationFormatter.formatDeclaration(node)
+        );
+      }
+
+      const referencedEntity: CollectorEntity | undefined = collector.tryGetEntityForNode(node.name);
+      if (!referencedEntity?.nameForEmit) {
+        throw new InternalError('referencedEntry or referencedEntry.nameForEmit is undefined');
+      }
+
+      const exportName: string = node.name.getText().trim();
+      if (referencedEntity.nameForEmit !== exportName) {
+        span.modification.skipAll();
+        span.modification.prefix = `${referencedEntity.nameForEmit} as ${span.getText()}`;
+      }
+    }
+  }
+
   public static modifyImportTypeSpan(
     collector: Collector,
     span: Span,
@@ -135,6 +143,8 @@ export class DtsEmitHelpers {
 
         throw new InternalError('referencedEntry.nameForEmit is undefined');
       }
+
+      const typeofPrefix: string = node.isTypeOf ? 'typeof ' : '';
 
       let typeArgumentsText: string = '';
 
@@ -173,27 +183,25 @@ export class DtsEmitHelpers {
 
       const separatorAfter: string = /(\s*)$/.exec(span.getText())?.[1] ?? '';
 
-      if (
-        referencedEntity.astEntity instanceof AstImport &&
-        referencedEntity.astEntity.importKind === AstImportKind.ImportType &&
-        referencedEntity.astEntity.exportName
-      ) {
-        // For an ImportType with a namespace chain, only the top namespace is imported.
-        // Must add the original nested qualifiers to the rolled up import.
-        const qualifiersText: string = node.qualifier?.getText() ?? '';
-        const nestedQualifiersStart: number = qualifiersText.indexOf('.');
-        // Including the leading "."
-        const nestedQualifiersText: string =
-          nestedQualifiersStart >= 0 ? qualifiersText.substring(nestedQualifiersStart) : '';
-
-        const replacement: string = `${referencedEntity.nameForEmit}${nestedQualifiersText}${typeArgumentsText}${separatorAfter}`;
+      if (referencedEntity.astEntity instanceof AstSubPathImport) {
+        const baseEntity: CollectorEntity | undefined = collector.tryGetCollectorEntity(
+          referencedEntity.astEntity.baseAstEntity
+        );
+        if (!baseEntity) {
+          throw new InternalError(
+            `Collector entity for import() not found: ${node.getText()}\n` +
+              SourceFileLocationFormatter.formatDeclaration(node)
+          );
+        }
+        const exportPathText: string = referencedEntity.astEntity.exportPath.join('.');
+        const replacement: string = `${typeofPrefix}${baseEntity.nameForEmit}.${exportPathText}${typeArgumentsText}${separatorAfter}`;
 
         span.modification.skipAll();
         span.modification.prefix = replacement;
       } else {
         // Replace with internal symbol or AstImport
         span.modification.skipAll();
-        span.modification.prefix = `${referencedEntity.nameForEmit}${typeArgumentsText}${separatorAfter}`;
+        span.modification.prefix = `${typeofPrefix}${referencedEntity.nameForEmit}${typeArgumentsText}${separatorAfter}`;
       }
     }
   }

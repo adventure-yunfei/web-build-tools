@@ -13,14 +13,14 @@ import {
   PackageName
 } from '@rushstack/node-core-library';
 import { ReleaseTag } from '@microsoft/api-extractor-model';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 
 import { CollectorEntity } from './CollectorEntity';
 import { AstSymbolTable } from '../analyzer/AstSymbolTable';
 import type { AstEntity } from '../analyzer/AstEntity';
-import type { AstModule, AstModuleExportInfo } from '../analyzer/AstModule';
+import type { AstModule, IAstModuleExportInfo } from '../analyzer/AstModule';
 import { AstSymbol } from '../analyzer/AstSymbol';
 import type { AstDeclaration } from '../analyzer/AstDeclaration';
 import { TypeScriptHelpers } from '../analyzer/TypeScriptHelpers';
@@ -36,6 +36,7 @@ import { ExtractorConfig } from '../api/ExtractorConfig';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import { AstImport } from '../analyzer/AstImport';
 import type { SourceMapper } from './SourceMapper';
+import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
 /**
  * Options for Collector constructor.
@@ -321,12 +322,12 @@ export class Collector {
       this.workingPackage.tsdocComment = this.workingPackage.tsdocParserContext!.docComment;
     }
 
-    const astModuleExportInfo: AstModuleExportInfo =
+    const { exportedLocalEntities, starExportedExternalModules, visitedAstModules }: IAstModuleExportInfo =
       this.astSymbolTable.fetchAstModuleExportInfo(astEntryPoint);
 
     // Create a CollectorEntity for each top-level export.
     const processedAstEntities: AstEntity[] = [];
-    for (const [exportName, { astEntity, isTypeOnlyExport }] of astModuleExportInfo.exportedLocalEntities) {
+    for (const [exportName, { astEntity, isTypeOnlyExport }] of exportedLocalEntities) {
       this._createCollectorEntity(astEntity, exportName, isTypeOnlyExport);
       processedAstEntities.push(astEntity);
     }
@@ -341,12 +342,33 @@ export class Collector {
       }
     }
 
+    // Ensure references are collected from any intermediate files that
+    // only include exports
+    const nonExternalSourceFiles: Set<ts.SourceFile> = new Set();
+    for (const { sourceFile, isExternal } of visitedAstModules) {
+      if (!nonExternalSourceFiles.has(sourceFile) && !isExternal) {
+        nonExternalSourceFiles.add(sourceFile);
+      }
+    }
+
+    // Here, we're collecting reference directives from all non-external source files
+    // that were encountered while looking for exports, but only those references that
+    // were explicitly written by the developer and marked with the `preserve="true"`
+    // attribute. In TS >= 5.5, only references that are explicitly authored and marked
+    // with `preserve="true"` are included in the output. See https://github.com/microsoft/TypeScript/pull/57681
+    //
+    // The `_collectReferenceDirectives` function pulls in all references in files that
+    // contain definitions, but does not examine files that only reexport from other
+    // files. Here, we're looking through files that were missed by `_collectReferenceDirectives`,
+    // but only collecting references that were explicitly marked with `preserve="true"`.
+    // It is intuitive for developers to include references that they explicitly want part of
+    // their public API in a file like the entrypoint, which is likely to only contain reexports,
+    // and this picks those up.
+    this._collectReferenceDirectivesFromSourceFiles(nonExternalSourceFiles, true);
+
     this._makeUniqueNames();
 
-    for (const [
-      starExportedExternalModule,
-      { isTypeOnlyExport }
-    ] of astModuleExportInfo.starExportedExternalModules) {
+    for (const [starExportedExternalModule, { isTypeOnlyExport }] of starExportedExternalModules) {
       if (starExportedExternalModule.externalModulePath !== undefined) {
         this._starExportedExternalModulePaths.push({
           modulePath: starExportedExternalModule.externalModulePath,
@@ -513,7 +535,7 @@ export class Collector {
       if (astEntity instanceof AstSymbol) {
         this._entitiesBySymbol.set(astEntity.followedSymbol, entity);
       } else if (astEntity instanceof AstNamespaceImport) {
-        this._entitiesBySymbol.set(astEntity.symbol, entity);
+        this._entitiesBySymbol.set(astEntity.astModule.moduleSymbol, entity);
       }
       this._entities.push(entity);
       this._collectReferenceDirectives(astEntity);
@@ -551,16 +573,10 @@ export class Collector {
           this._recursivelyCreateEntities(referencedAstEntity, alreadySeenAstEntities);
         }
       });
-    } else if (astEntity instanceof AstImport) {
-      const referencedImport: AstImport | undefined =
-        this.astSymbolTable.tryGetReferencedAstImport(astEntity);
-      if (referencedImport) {
-        this._createCollectorEntity(referencedImport, undefined);
-      }
     }
 
     if (astEntity instanceof AstNamespaceImport) {
-      const astModuleExportInfo: AstModuleExportInfo = astEntity.fetchAstModuleExportInfo(this);
+      const astModuleExportInfo: IAstModuleExportInfo = astEntity.fetchAstModuleExportInfo(this);
       const parentEntity: CollectorEntity | undefined = this._entitiesByAstEntity.get(astEntity);
       if (!parentEntity) {
         // This should never happen, as we've already created entities for all AstNamespaceImports.
@@ -577,6 +593,12 @@ export class Collector {
         this._createCollectorEntity(localAstEntity, localExportName, isTypeOnlyExport, parentEntity);
         this._recursivelyCreateEntities(localAstEntity, alreadySeenAstEntities);
       }
+    }
+
+    if (astEntity instanceof AstSubPathImport) {
+      this._createCollectorEntity(astEntity.baseAstEntity);
+      this._createCollectorEntity(astEntity);
+      this._recursivelyCreateEntities(astEntity.baseAstEntity, alreadySeenAstEntities);
     }
   }
 
@@ -1077,44 +1099,82 @@ export class Collector {
   }
 
   private _collectReferenceDirectives(astEntity: AstEntity): void {
+    // Here, we're collecting reference directives from source files that contain extracted
+    // definitions (i.e. - files that contain `export class ...`, `export interface ...`, ...).
+    // These references may or may not include the `preserve="true" attribute. In TS < 5.5,
+    // references that end up in .D.TS files may or may not be explicity written by the developer.
+    // In TS >= 5.5, only references that are explicitly authored and are marked with
+    // `preserve="true"` are included in the output. See https://github.com/microsoft/TypeScript/pull/57681
+    //
+    // The calls to `_collectReferenceDirectivesFromSourceFiles` in this function are
+    // preserving existing behavior, which is to include all reference directives
+    // regardless of whether they are explicitly authored or not, but only in files that
+    // contain definitions.
+
     if (astEntity instanceof AstSymbol) {
       const sourceFiles: ts.SourceFile[] = astEntity.astDeclarations.map((astDeclaration) =>
         astDeclaration.declaration.getSourceFile()
       );
-      return this._collectReferenceDirectivesFromSourceFiles(sourceFiles);
+      return this._collectReferenceDirectivesFromSourceFiles(sourceFiles, false);
     }
 
     if (astEntity instanceof AstNamespaceImport) {
       const sourceFiles: ts.SourceFile[] = [astEntity.astModule.sourceFile];
-      return this._collectReferenceDirectivesFromSourceFiles(sourceFiles);
+      return this._collectReferenceDirectivesFromSourceFiles(sourceFiles, false);
     }
   }
 
-  private _collectReferenceDirectivesFromSourceFiles(sourceFiles: ts.SourceFile[]): void {
+  private _collectReferenceDirectivesFromSourceFiles(
+    sourceFiles: Iterable<ts.SourceFile>,
+    onlyIncludeExplicitlyPreserved: boolean
+  ): void {
     const seenFilenames: Set<string> = new Set<string>();
 
     for (const sourceFile of sourceFiles) {
-      if (sourceFile && sourceFile.fileName) {
-        if (!seenFilenames.has(sourceFile.fileName)) {
-          seenFilenames.add(sourceFile.fileName);
+      if (sourceFile?.fileName) {
+        const {
+          fileName,
+          typeReferenceDirectives,
+          libReferenceDirectives,
+          text: sourceFileText
+        } = sourceFile;
+        if (!seenFilenames.has(fileName)) {
+          seenFilenames.add(fileName);
 
-          for (const typeReferenceDirective of sourceFile.typeReferenceDirectives) {
-            const name: string = sourceFile.text.substring(
-              typeReferenceDirective.pos,
-              typeReferenceDirective.end
+          for (const typeReferenceDirective of typeReferenceDirectives) {
+            const name: string | undefined = this._getReferenceDirectiveFromSourceFile(
+              sourceFileText,
+              typeReferenceDirective,
+              onlyIncludeExplicitlyPreserved
             );
-            this._dtsTypeReferenceDirectives.add(name);
+            if (name) {
+              this._dtsTypeReferenceDirectives.add(name);
+            }
           }
 
-          for (const libReferenceDirective of sourceFile.libReferenceDirectives) {
-            const name: string = sourceFile.text.substring(
-              libReferenceDirective.pos,
-              libReferenceDirective.end
+          for (const libReferenceDirective of libReferenceDirectives) {
+            const reference: string | undefined = this._getReferenceDirectiveFromSourceFile(
+              sourceFileText,
+              libReferenceDirective,
+              onlyIncludeExplicitlyPreserved
             );
-            this._dtsLibReferenceDirectives.add(name);
+            if (reference) {
+              this._dtsLibReferenceDirectives.add(reference);
+            }
           }
         }
       }
+    }
+  }
+
+  private _getReferenceDirectiveFromSourceFile(
+    sourceFileText: string,
+    { pos, end, preserve }: ts.FileReference,
+    onlyIncludeExplicitlyPreserved: boolean
+  ): string | undefined {
+    const reference: string = sourceFileText.substring(pos, end);
+    if (preserve || !onlyIncludeExplicitlyPreserved) {
+      return reference;
     }
   }
 }
