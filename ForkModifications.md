@@ -110,7 +110,7 @@
   </details>
 - 新增 `import("./foo")` 语法支持 (e820d432736289058951641ef787937814a26593, 7ecaeafd5eaaa33bf62897f0ea41fae891fd3bdf, 52316739ac7ea6bdaedd263a84398e5b730bde57)
 - 支持 node 14, minimatch 依赖版本由 10.x 降为 9.x (50b423b8f2890117b51041be72571fac48fca492)
-- 新增/修复 namespace declaration 语法支持的各类边界场景 (6c849d98c3c96e89049b869ff2e42265d978bcba)
+- 新增/修复 namespace declaration 语法支持的各类边界场景 (6c849d98c3c96e89049b869ff2e42265d978bcba, bae8a55cb8c12047f2e9579ff36446f47741e024)
 - Dts Rollup:
   - 新增声明占位，避免使用方覆盖被裁剪的 class 属性/方法 (f94cf74d53577491f38403b4d583381e5dec2723, 184ad9b347f6d0923649006945c8043fbf184cfb)
     <details>

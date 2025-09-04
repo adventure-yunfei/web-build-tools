@@ -1,5 +1,8 @@
 # Change Log - api-extractor custom version
 
+## 7.52.11-rc.1
+- api-review: 新增/修复 namespace declaration 语法支持的各类边界场景
+
 ## 7.52.11-rc.0
 - 新增 `import("./foo")` 语法支持
 - 支持 node 14, minimatch 依赖版本由 10.x 降为 9.x
