@@ -158,7 +158,7 @@
       某些情况下 ts 会自动编译产出一些 string union 类型（比如 `Omit` 类型），这些 string 类型有时候会变更顺序，导致不必要的 api review 变更；排序可以消除这类变更。
 
     </details>
-  - 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a, 09053e057c72ab03093123156c93f678755a049d)
+  - 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a, 09053e057c72ab03093123156c93f678755a049d, 61f2be778a40bfdc7cd2186a7001b38bd45bbc15)
     - 默认开启 `@beta` release 裁剪，移除 `@internal` 变更（可通过 `env.API_REPORT_TRIMMING` 环境变量修改）
     - 新增 entity 有效引用分析，`includeForgottenExports` 下仅导出实际被引用的 entity
     - 新增 rootExportTrimmings 选项，裁剪根节点导出内容 (通过 `env.API_REPORT_EXPORT_TRIMMINGS` 环境变量设置)
@@ -228,3 +228,4 @@
 - markdown 输出结果兼容 mdx@1.x，以支持 Docusaurus 文档工具 (73be47af637970a5a54240a752e8fc579bbbde1f)
 - 支持移除 Home 导航链接 (59afa81a5545a93449e3a22a60a22a78054188b1)
 - `ApiPackage` 页面仅生成导出接口内容 (90c1a4efb1ca60b2347163432710fe957f2ce6db)
+- 支持插入文档开头内容 (02c9f323d5dfbb7223ab581db419758b89b367ae)

@@ -177,6 +177,8 @@ export class MarkdownDocumenter {
         throw new Error('Unsupported API item kind: ' + apiItem.kind);
     }
 
+    this._writePreContent(output, apiItem);
+
     if (ApiReleaseTagMixin.isBaseClassOf(apiItem)) {
       if (apiItem.releaseTag === ReleaseTag.Alpha) {
         this._writeAlphaWarning(output);
@@ -1195,6 +1197,11 @@ export class MarkdownDocumenter {
           );
       }
     }
+  }
+
+  /** write before page content */
+  private _writePreContent(output: DocSection, apiItem: ApiItem) {
+    //
   }
 
   private _writeAlphaWarning(output: DocSection): void {
