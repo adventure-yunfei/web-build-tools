@@ -18,8 +18,6 @@ import { IndentedWriter } from './IndentedWriter';
 import { DtsEmitHelpers } from './DtsEmitHelpers';
 import { AstNamespaceImport } from '../analyzer/AstNamespaceImport';
 import type { AstEntity } from '../analyzer/AstEntity';
-import type { IAstModuleExportInfo } from '../analyzer/AstModule';
-import { SourceFileLocationFormatter } from '../analyzer/SourceFileLocationFormatter';
 import { ExtractorMessageId } from '../api/ExtractorMessageId';
 import { collectAllReferencedEntities } from './utils';
 import { last } from 'lodash';
@@ -629,8 +627,8 @@ export class ApiReportGenerator {
     reportVariant: ApiReportVariant
   ): boolean {
     // Private declarations are not included in the API report
-    // eslint-disable-next-line no-bitwise
     if (
+      // eslint-disable-next-line no-bitwise
       (astDeclaration.modifierFlags & ts.ModifierFlags.Private) !== 0 &&
       astDeclaration.declaration.kind !== ts.SyntaxKind.Constructor
     ) {

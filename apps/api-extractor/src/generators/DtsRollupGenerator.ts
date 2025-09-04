@@ -502,6 +502,7 @@ export class DtsRollupGenerator {
                   last(declarartionsWithSameName) === childAstDeclaration
                 ) {
                   modification.prefix += `protected ${
+                    // eslint-disable-next-line no-bitwise
                     childAstDeclaration.modifierFlags & ts.ModifierFlags.Static ? 'static ' : ''
                   }${name}: never;`;
                 }

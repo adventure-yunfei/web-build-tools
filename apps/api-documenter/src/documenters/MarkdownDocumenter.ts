@@ -1200,7 +1200,7 @@ export class MarkdownDocumenter {
   }
 
   /** write before page content */
-  private _writePreContent(output: DocSection, apiItem: ApiItem) {
+  private _writePreContent(output: DocSection, apiItem: ApiItem): void {
     //
   }
 

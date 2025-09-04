@@ -4,7 +4,6 @@
 import type { AstSymbol } from './AstSymbol';
 import { InternalError } from '@rushstack/node-core-library';
 import { AstSyntheticEntity } from './AstEntity';
-import { SyntaxHelpers } from './SyntaxHelpers';
 
 /**
  * Indicates the import kind for an `AstImport`.

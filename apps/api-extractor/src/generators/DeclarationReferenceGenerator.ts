@@ -35,15 +35,15 @@ export class DeclarationReferenceGenerator {
     if (symbol !== undefined) {
       const isExpression: boolean = DeclarationReferenceGenerator._isInExpressionContext(node);
       return (
-        this.getDeclarationReferenceForSymbol(
+        this._getDeclarationReferenceForSymbol(
           symbol,
           isExpression ? ts.SymbolFlags.Value : ts.SymbolFlags.Type
         ) ||
-        this.getDeclarationReferenceForSymbol(
+        this._getDeclarationReferenceForSymbol(
           symbol,
           isExpression ? ts.SymbolFlags.Type : ts.SymbolFlags.Value
         ) ||
-        this.getDeclarationReferenceForSymbol(symbol, ts.SymbolFlags.Namespace)
+        this._getDeclarationReferenceForSymbol(symbol, ts.SymbolFlags.Namespace)
       );
     }
   }
@@ -51,7 +51,7 @@ export class DeclarationReferenceGenerator {
   /**
    * Gets the DeclarationReference for a TypeScript Symbol for a given meaning.
    */
-  private getDeclarationReferenceForSymbol(
+  private _getDeclarationReferenceForSymbol(
     symbol: ts.Symbol,
     meaning: ts.SymbolFlags
   ): DeclarationReference | undefined {
@@ -196,7 +196,7 @@ export class DeclarationReferenceGenerator {
     meaning: ts.SymbolFlags,
     includeModuleSymbols: boolean,
     /** return undefined if meaning not matched */
-    forceMeaning = false
+    forceMeaning: boolean = false
   ): DeclarationReference | undefined {
     const declaration: ts.Node | undefined = TypeScriptHelpers.tryGetADeclaration(symbol);
     const sourceFile: ts.SourceFile | undefined = declaration?.getSourceFile();
@@ -225,8 +225,9 @@ export class DeclarationReferenceGenerator {
       return undefined;
     }
 
-    let parentRefResult: { parentReference: DeclarationReference; exportNameInParent?: string } | undefined =
-      this._getParentReference(followedSymbol);
+    const parentRefResult:
+      | { parentReference: DeclarationReference; exportNameInParent?: string }
+      | undefined = this._getParentReference(followedSymbol);
     if (!parentRefResult) {
       return undefined;
     }
@@ -272,7 +273,10 @@ export class DeclarationReferenceGenerator {
       parentRef = new DeclarationReference(GlobalSource.instance);
     }
 
-    const meaningOfSymbol = DeclarationReferenceGenerator._getMeaningOfSymbol(followedSymbol, meaning);
+    const meaningOfSymbol: Meaning | undefined = DeclarationReferenceGenerator._getMeaningOfSymbol(
+      followedSymbol,
+      meaning
+    );
     if (!meaningOfSymbol && forceMeaning) {
       return undefined;
     }
@@ -308,7 +312,7 @@ export class DeclarationReferenceGenerator {
         const parentSymbol: ts.Symbol | undefined =
           firstExportingConsumableParent.entity.astEntity.astModule.moduleSymbol;
         if (parentSymbol) {
-          const parentReference = this._symbolToDeclarationReference(
+          const parentReference: DeclarationReference | undefined = this._symbolToDeclarationReference(
             parentSymbol,
             parentSymbol.flags,
             /*includeModuleSymbols*/ true
@@ -326,7 +330,7 @@ export class DeclarationReferenceGenerator {
     // Next, try to find a parent symbol via the symbol tree.
     const parentSymbol: ts.Symbol | undefined = TypeScriptInternals.getSymbolParent(symbol);
     if (parentSymbol) {
-      const parentReference = this._symbolToDeclarationReference(
+      const parentReference: DeclarationReference | undefined = this._symbolToDeclarationReference(
         parentSymbol,
         parentSymbol.flags,
         /*includeModuleSymbols*/ true
@@ -353,7 +357,7 @@ export class DeclarationReferenceGenerator {
         this._collector.typeChecker
       );
       if (grandParentSymbol) {
-        const parentReference = this._symbolToDeclarationReference(
+        const parentReference: DeclarationReference | undefined = this._symbolToDeclarationReference(
           grandParentSymbol,
           grandParentSymbol.flags,
           /*includeModuleSymbols*/ true

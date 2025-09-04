@@ -409,7 +409,7 @@ export class ExportAnalyzer {
 
       const declarations: readonly ts.Declaration[] | undefined = current.getDeclarations();
       if (declarations?.length === 1) {
-        const declaration = declarations[0];
+        const declaration: ts.Declaration = declarations[0];
         if (ts.isExportSpecifier(declaration)) {
           // export type { Foo };
           isCurrentTypeOnlyReference = declaration.isTypeOnly || declaration.parent.parent.isTypeOnly;
@@ -456,6 +456,7 @@ export class ExportAnalyzer {
         }
       }
 
+      // eslint-disable-next-line no-bitwise
       if (!(current.flags & ts.SymbolFlags.Alias)) {
         break;
       }
