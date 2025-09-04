@@ -308,11 +308,11 @@ export class DtsRollupGenerator {
         }
         if (
           ts.isModuleDeclaration(astDeclaration.declaration) &&
-          !astDeclaration.declaration.modifiers?.includes(span.node as ts.Modifier)
+          (TypeScriptHelpers.findFirstParent(span.node, ts.SyntaxKind.ExportDeclaration) ||
+            TypeScriptHelpers.findFirstParent(span.node, ts.SyntaxKind.VariableStatement))
         ) {
-          // Keep it as is for nested declarations. Handle special cases inside namespace. e.g.:
-          //  - export declaration: "export {};", "export { A as B };"
-          //  - variable declaration: "export const a: number, b: number;"
+          // Keep it as is for nested declarations.
+          // (special cases inside namespace. e.g. "export {};", "export const a: number;")
           break;
         }
 
@@ -397,6 +397,10 @@ export class DtsRollupGenerator {
         }
         break;
 
+      case ts.SyntaxKind.ExportSpecifier:
+        DtsEmitHelpers.modifyExportSpecifierSpan(collector, span);
+        break;
+
       case ts.SyntaxKind.Identifier:
         {
           const referencedEntity: CollectorEntity | undefined = collector.tryGetEntityForNode(
@@ -410,17 +414,6 @@ export class DtsRollupGenerator {
             }
 
             span.modification.prefix = referencedEntity.nameForEmit;
-
-            if (
-              ts.isExportSpecifier(span.node.parent) &&
-              !span.node.parent.propertyName &&
-              span.node.getText().trim() !== referencedEntity.nameForEmit
-            ) {
-              // For "export { A }" (inside namespace), if "A" is renamed (e.g. renamed to "B"),
-              //  we need to emit as "export { B as A }" instead
-              span.modification.prefix += ' as ' + span.node.getText().trim();
-            }
-
             // For debugging:
             // span.modification.prefix += '/*R=FIX*/';
           } else {
