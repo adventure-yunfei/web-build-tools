@@ -280,23 +280,30 @@ export class Extractor {
     DocCommentEnhancer.analyze(collector);
     ValidationEnhancer.analyze(collector);
 
-    const modelBuilder: ApiModelGenerator = new ApiModelGenerator(
-      collector,
-      extractorConfig,
-      new Set(process.env.API_MODEL_EXPORT_TRIMMINGS?.split(',') || [])
-    );
-    const apiPackage: ApiPackage = modelBuilder.buildApiPackage();
-
     if (messageRouter.showDiagnostics) {
       messageRouter.logDiagnostic(''); // skip a line after any diagnostic messages
     }
 
-    if (modelBuilder.docModelEnabled) {
+    function writeDocModel(forceReleaseTag?: string): void {
+      const modelBuilder: ApiModelGenerator = new ApiModelGenerator(
+        collector,
+        extractorConfig,
+        forceReleaseTag ? parseReleaseTag(forceReleaseTag) : undefined,
+        new Set(process.env.API_MODEL_EXPORT_TRIMMINGS?.split(',') || [])
+      );
+
+      const apiPackage: ApiPackage = modelBuilder.buildApiPackage();
       messageRouter.logVerbose(
         ConsoleMessageId.WritingDocModelFile,
         'Writing: ' + extractorConfig.apiJsonFilePath
       );
-      apiPackage.saveToJsonFile(extractorConfig.apiJsonFilePath, {
+      const apiJsonFilePath: string = forceReleaseTag
+        ? path.resolve(
+            extractorConfig.apiJsonFilePath,
+            `../${forceReleaseTag}.${path.basename(extractorConfig.apiJsonFilePath)}`
+          )
+        : extractorConfig.apiJsonFilePath;
+      apiPackage.saveToJsonFile(apiJsonFilePath, {
         toolPackage: Extractor.packageName,
         toolVersion: Extractor.version,
 
@@ -304,6 +311,17 @@ export class Extractor {
         ensureFolderExists: true,
         testMode: extractorConfig.testMode
       });
+    }
+
+    if (extractorConfig.docModelGenerationOptions) {
+      if (process.env.API_MODEL_TRIMMINGS) {
+        const apiModelTrimmings: string[] = process.env.API_MODEL_TRIMMINGS.split(',').map((t) => t.trim());
+        for (const apiModelTrimming of apiModelTrimmings) {
+          writeDocModel(apiModelTrimming);
+        }
+      } else {
+        writeDocModel();
+      }
     }
 
     function writeApiReport(reportConfig: IExtractorConfigApiReport): boolean {

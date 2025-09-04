@@ -50,7 +50,7 @@ import type { AstModule } from '../analyzer/AstModule';
 import { TypeScriptInternals } from '../analyzer/TypeScriptInternals';
 import type { ExtractorConfig } from '../api/ExtractorConfig';
 import type { CollectorEntity } from '../collector/CollectorEntity';
-import { collectAllReferencedEntities } from './utils';
+import { collectAllReferencedEntities, getReleaseTagsToTrim } from './utils';
 
 interface IProcessAstEntityContext {
   name: string;
@@ -82,6 +82,7 @@ export class ApiModelGenerator {
   public constructor(
     collector: Collector,
     extractorConfig: ExtractorConfig,
+    forceReleaseTag: ReleaseTag | undefined,
     rootExportTrimmings: ReadonlySet<string>
   ) {
     this._collector = collector;
@@ -93,7 +94,9 @@ export class ApiModelGenerator {
     const apiModelGenerationOptions: IApiModelGenerationOptions | undefined =
       extractorConfig.docModelGenerationOptions;
     if (apiModelGenerationOptions) {
-      this._releaseTagsToTrim = apiModelGenerationOptions.releaseTagsToTrim;
+      this._releaseTagsToTrim = forceReleaseTag
+        ? getReleaseTagsToTrim(forceReleaseTag)
+        : apiModelGenerationOptions.releaseTagsToTrim;
       this.docModelEnabled = true;
     } else {
       this.docModelEnabled = false;

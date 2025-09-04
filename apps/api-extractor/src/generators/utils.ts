@@ -9,20 +9,24 @@ import type { IAstModuleExportInfo } from '../analyzer/AstModule';
 import { AstImport } from '../analyzer/AstImport';
 import { AstSubPathImport } from '../analyzer/AstSubPathImport';
 
+export function getReleaseTagsToTrim(targetReleaseTag: ReleaseTag): Set<ReleaseTag> {
+  return new Set(
+    [ReleaseTag.Internal, ReleaseTag.Alpha, ReleaseTag.Beta, ReleaseTag.Public].filter(
+      (tag) => ReleaseTag.compare(tag, targetReleaseTag) < 0
+    )
+  );
+}
+
 export function collectAllReferencedEntities(
   collector: Collector,
   /** specify a single release tag to emit, or a set of release tags to trim */
-  releaseTimming: ReleaseTag | ReadonlySet<ReleaseTag>,
+  releaseTagOrTrimming: ReleaseTag | ReadonlySet<ReleaseTag>,
   rootExportTrimmings: ReadonlySet<string>
 ): ReadonlySet<CollectorEntity> {
   const trimmedReleaseTags: ReadonlySet<ReleaseTag> =
-    typeof releaseTimming === 'number'
-      ? new Set(
-          [ReleaseTag.Internal, ReleaseTag.Alpha, ReleaseTag.Beta, ReleaseTag.Public].filter(
-            (tag) => ReleaseTag.compare(tag, releaseTimming) < 0
-          )
-        )
-      : releaseTimming;
+    typeof releaseTagOrTrimming === 'number'
+      ? getReleaseTagsToTrim(releaseTagOrTrimming)
+      : releaseTagOrTrimming;
 
   const referencedAstEntities: Set<AstEntity> = new Set<AstEntity>();
 
