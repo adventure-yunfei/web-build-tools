@@ -7,10 +7,14 @@ import { type AstEntity, AstSyntheticEntity } from './AstEntity';
 export interface IAstSubPathImportOptions {
   readonly astEntity: AstEntity;
   readonly exportPath: string[];
+  readonly localName?: string;
+  readonly isImportType: boolean;
 }
 
 /**
- * `AstSubPathImport` represents a sub-path import, such as `import("foo").X.Y.Z` will import Y.Z from X of "foo".
+ * `AstSubPathImport` represents a sub-path import, such as:
+ *  - `import("foo").X.Y.Z` will import Y.Z from X export of "foo"
+ *  - `import Foo = X.Y.Z` will usually import Y.Z from AstEntity of X
  *
  * @remarks
  *
@@ -25,6 +29,9 @@ export interface IAstSubPathImportOptions {
  *
  * // import from AstEntity of X, with exportPath ["Y", "Z"]
  * const bar: import("./foo").X.Y.Z;
+ *
+ * // (usually) import from AstEntity of X, with exportPath ["Y", "Z"]
+ * import Foo = X.Y.Z;
  * ```
  */
 export class AstSubPathImport extends AstSyntheticEntity {
@@ -42,6 +49,13 @@ export class AstSubPathImport extends AstSyntheticEntity {
    */
   public readonly exportPath: string[];
 
+  /**
+   * Whether it is referenced only by import type syntax, e.g. `import("foo").Bar`.
+   */
+  public isImportTypeEverywhere: boolean;
+
+  private readonly _localName: string;
+
   public constructor(options: IAstSubPathImportOptions) {
     super();
 
@@ -51,11 +65,15 @@ export class AstSubPathImport extends AstSyntheticEntity {
 
     this.baseAstEntity = options.astEntity;
     this.exportPath = options.exportPath;
+    this._localName = options.localName ?? this.exportPath[this.exportPath.length - 1];
+
+    // We start with this assumption, but it may get changed later if non-import-type syntax is encountered.
+    this.isImportTypeEverywhere = options.isImportType;
   }
 
   /** {@inheritdoc} */
   public get localName(): string {
     // abstract
-    return this.exportPath[this.exportPath.length - 1];
+    return this._localName;
   }
 }
