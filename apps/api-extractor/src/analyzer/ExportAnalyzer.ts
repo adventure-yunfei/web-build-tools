@@ -1053,7 +1053,7 @@ export class ExportAnalyzer {
       return this._fetchAstSubPathImport({
         astEntity: options.astEntity.baseAstEntity,
         exportPath: options.astEntity.exportPath.concat(options.exportPath),
-        localName: options.astEntity.localName,
+        localName: options.localName,
         isImportType: options.isImportType
       });
     }
