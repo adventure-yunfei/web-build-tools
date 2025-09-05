@@ -104,8 +104,18 @@ export class ApiReportGenerator {
     }
     writer.ensureSkippedLine();
 
+    const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
+      collector,
+      reportVariantToTrimReleaseTag(reportVariant),
+      rootExportTrimmings
+    );
+
     // Emit the imports
     for (const entity of collector.entities) {
+      if (!referencedEntities.has(entity)) {
+        continue;
+      }
+
       if (entity.astEntity instanceof AstImport) {
         DtsEmitHelpers.emitImport(writer, entity, entity.astEntity);
       }
@@ -219,11 +229,6 @@ export class ApiReportGenerator {
     };
 
     // Emit the regular declarations
-    const referencedEntities: ReadonlySet<CollectorEntity> = collectAllReferencedEntities(
-      collector,
-      reportVariantToTrimReleaseTag(reportVariant),
-      rootExportTrimmings
-    );
     for (const entity of collector.entities) {
       const astEntity: AstEntity = entity.astEntity;
       const symbolMetadata: SymbolMetadata | undefined = collector.tryFetchMetadataForAstEntity(astEntity);
