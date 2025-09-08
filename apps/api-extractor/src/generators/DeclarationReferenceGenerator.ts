@@ -98,7 +98,9 @@ export class DeclarationReferenceGenerator {
     // global symbols or external library symbols to be Locals.
     const isGlobal: boolean = !!sourceFile && !ts.isExternalModule(sourceFile);
     const isFromExternalLibrary: boolean =
-      !!sourceFile && this._collector.program.isSourceFileFromExternalLibrary(sourceFile);
+      !!sourceFile &&
+      this._collector.program.isSourceFileFromExternalLibrary(sourceFile) &&
+      !this._collector.bundledPackageNames.has(this._getPackageName(sourceFile));
     if (isGlobal || isFromExternalLibrary) {
       if (
         parent &&
