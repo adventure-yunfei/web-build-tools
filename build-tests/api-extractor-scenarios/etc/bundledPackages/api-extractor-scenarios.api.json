@@ -281,7 +281,7 @@
             {
               "kind": "Reference",
               "text": "Lib1ForgottenExport",
-              "canonicalReference": "api-extractor-scenarios!Lib1ForgottenExport:class"
+              "canonicalReference": "api-extractor-scenarios!~Lib1ForgottenExport:class"
             },
             {
               "kind": "Content",
