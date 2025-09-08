@@ -137,6 +137,7 @@
   - 增强裁剪逻辑，去除 dts rollup 输出中未被引用的声明 (2d4f597068b401a7660af9358caad8e2e6d6e60e, 89e71f9c551d743df22a399401f0e051e846622c)
 - API Json:
   - 新增 api model Release Trimming 功能 (33c17c2c814a8b2ecd7058a9dc93b99a1e3243df, 09053e057c72ab03093123156c93f678755a049d)
+  - 支持多个 api model Release 输出 (806f9e50b89874eca21a4da1e1201245a093cb32)
 - API Review:
   - 优化 `AstNamespaceImport` 输出结果 (5ffd9dde49218c26b146de7ffa6701a4bf761309, 8c2d1295f1e6cbe09d0f8282cd09556f43551321, 77cf4dc37c3b394aec0e6402d222cee6ff44393e)
   - 新增 api-review string union type 结果排序 (4869e262d5de89051cd689230d52207daa8f15f4)
@@ -162,7 +163,7 @@
       某些情况下 ts 会自动编译产出一些 string union 类型（比如 `Omit` 类型），这些 string 类型有时候会变更顺序，导致不必要的 api review 变更；排序可以消除这类变更。
 
     </details>
-  - 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a, 09053e057c72ab03093123156c93f678755a049d, 61f2be778a40bfdc7cd2186a7001b38bd45bbc15)
+  - 优化&裁剪 api-review 导出 (b2c51d7b0ce7a7afa6d7b01beeabbd129d3c05ff, 9bfb6df94472298117f5e1234144f04b53d1a88a, 09053e057c72ab03093123156c93f678755a049d, 61f2be778a40bfdc7cd2186a7001b38bd45bbc15, be0168bbbcaa59497e5eb43415602c64db10a73a)
     - 默认开启 `@beta` release 裁剪，移除 `@internal` 变更（可通过 `env.API_REPORT_TRIMMING` 环境变量修改）
     - 新增 entity 有效引用分析，`includeForgottenExports` 下仅导出实际被引用的 entity
     - 新增 rootExportTrimmings 选项，裁剪根节点导出内容 (通过 `env.API_REPORT_EXPORT_TRIMMINGS` 环境变量设置)

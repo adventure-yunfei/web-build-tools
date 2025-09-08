@@ -1,7 +1,11 @@
 # Change Log - api-extractor custom version
 
+## 7.52.11-rc.2
+- 支持多个 api model Release 输出
+
 ## 7.52.11-rc.1
 - api-review: 新增/修复 namespace declaration 语法支持的各类边界场景
+- api-review: 裁剪未被引用的 import
 
 ## 7.52.11-rc.0
 - 新增 `import("./foo")` 语法支持
