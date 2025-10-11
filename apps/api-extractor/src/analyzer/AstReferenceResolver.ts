@@ -12,6 +12,7 @@ import type { AstModule } from './AstModule';
 import type { Collector } from '../collector/Collector';
 import type { DeclarationMetadata } from '../collector/DeclarationMetadata';
 import { AstSymbol } from './AstSymbol';
+import { AstNamespaceImport } from './AstNamespaceImport';
 
 /**
  * Used by `AstReferenceResolver` to report a failed resolution.
@@ -91,13 +92,44 @@ export class AstReferenceResolver {
       );
     }
 
+    if (rootAstEntity instanceof AstNamespaceImport) {
+      let currentNamespaceImport: AstNamespaceImport = rootAstEntity;
+      for (let index: number = 1; index < declarationReference.memberReferences.length; ++index) {
+        const memberReference: tsdoc.DocMemberReference = declarationReference.memberReferences[index];
+        const memberName: string | ResolverFailure = this._getMemberReferenceIdentifier(memberReference);
+        if (memberName instanceof ResolverFailure) {
+          return memberName;
+        }
+        const member: AstEntity | undefined = currentNamespaceImport
+          .fetchAstModuleExportInfo(this._collector)
+          .exportedLocalEntities.get(memberName);
+        if (member === undefined) {
+          return new ResolverFailure(`No member was found with name "${memberName}"`);
+        } else if (member instanceof AstNamespaceImport) {
+          currentNamespaceImport = member;
+        } else if (member instanceof AstSymbol) {
+          return this._resolveFromAstSymbol(member, declarationReference.memberReferences.slice(index));
+        } else {
+          return new ResolverFailure('This type of declaration is not supported yet by the resolver');
+        }
+      }
+      return new ResolverFailure('Reference to namespace import is not supported yet by the resolver');
+    }
+
     if (!(rootAstEntity instanceof AstSymbol)) {
       return new ResolverFailure('This type of declaration is not supported yet by the resolver');
     }
 
+    return this._resolveFromAstSymbol(rootAstEntity, declarationReference.memberReferences);
+  }
+
+  private _resolveFromAstSymbol(
+    rootAstEntity: AstSymbol,
+    memberReferences: readonly tsdoc.DocMemberReference[]
+  ): AstDeclaration | ResolverFailure {
     let currentDeclaration: AstDeclaration | ResolverFailure = this._selectDeclaration(
       rootAstEntity.astDeclarations,
-      rootMemberReference,
+      memberReferences[0],
       rootAstEntity.localName
     );
 
@@ -105,8 +137,8 @@ export class AstReferenceResolver {
       return currentDeclaration;
     }
 
-    for (let index: number = 1; index < declarationReference.memberReferences.length; ++index) {
-      const memberReference: tsdoc.DocMemberReference = declarationReference.memberReferences[index];
+    for (let index: number = 1; index < memberReferences.length; ++index) {
+      const memberReference: tsdoc.DocMemberReference = memberReferences[index];
 
       const memberName: string | ResolverFailure = this._getMemberReferenceIdentifier(memberReference);
       if (memberName instanceof ResolverFailure) {
